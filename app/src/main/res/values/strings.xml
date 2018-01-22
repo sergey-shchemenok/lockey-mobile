@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Lockey Mobile</string>
+    <string name="no_connection">Нет интернет-соединения.</string>
+    <string name="no_assets">Нет объектов</string>
+
+</resources>

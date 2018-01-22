@@ -45,7 +45,7 @@ public final class AssetsQueryUtils {
                 String name = asset.getString("Name");
                 String model = asset.getString("Model");
                 String regNumber = asset.getString("RegNumber");
-                int lastSignalTime = 30;//todo this should be updated later
+                int lastSignalTime = (int)(100*Math.random());//todo this should be updated later
                 assets.add(new AssetsData(id,name,model,regNumber,lastSignalTime));
             }
 
@@ -85,7 +85,7 @@ public final class AssetsQueryUtils {
 
         // Extract relevant fields from the JSON response and create an {@link Event} object
 
-        jsonResponse = "[{\"ID\":2670,\"Name\":\"х808рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х808рт77\"},{\"ID\":5800,\"Name\":\"х108мо77\",\"Model\":\"fh; Volvo\",\"RegNumber\":\"х108мо77\"},{\"ID\":5801,\"Name\":\"с580км777\",\"Model\":\"FH; Вольво\",\"RegNumber\":\"с580км777\"},{\"ID\":6317,\"Name\":\"с416км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с416км777\"},{\"ID\":5807,\"Name\":\"с415км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с415км777\"},{\"ID\":116208,\"Name\":\"о901хк77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"о901хк77\"},{\"ID\":116237,\"Name\":\"х807рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х807рт77\"},{\"ID\":120387,\"Name\":\"х109мо77\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"х109мо77\"}]";
+        //jsonResponse = "[{\"ID\":2670,\"Name\":\"х808рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х808рт77\"},{\"ID\":5800,\"Name\":\"х108мо77\",\"Model\":\"fh; Volvo\",\"RegNumber\":\"х108мо77\"},{\"ID\":5801,\"Name\":\"с580км777\",\"Model\":\"FH; Вольво\",\"RegNumber\":\"с580км777\"},{\"ID\":6317,\"Name\":\"с416км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с416км777\"},{\"ID\":5807,\"Name\":\"с415км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с415км777\"},{\"ID\":116208,\"Name\":\"о901хк77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"о901хк77\"},{\"ID\":116237,\"Name\":\"х807рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х807рт77\"},{\"ID\":120387,\"Name\":\"х109мо77\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"х109мо77\"}]";
 
         ArrayList<AssetsData> assetsList = extractAssets(jsonResponse);
 

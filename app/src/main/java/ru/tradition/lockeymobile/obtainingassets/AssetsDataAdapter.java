@@ -50,16 +50,15 @@ public class AssetsDataAdapter extends ArrayAdapter<AssetsData> {
         TextView carModelView = (TextView) listItemView.findViewById(R.id.car_model);
         carModelView.setText(currentAssetsData.getModel());
 
-        // Set the proper background color on the magnitude circle.
         // Fetch the background from the TextView, which is a GradientDrawable.
         GradientDrawable lastSignalTimeCircle = (GradientDrawable) lastSignalTimeView.getBackground();
         GradientDrawable lastSignalTimeInnerCircle = (GradientDrawable) lastSignalTimeInnerView.getBackground();
 
 
-        // Get the appropriate background color based on the current earthquake magnitude
+        // Get the appropriate background color based on the last time signal
         int lastSignalTimeColor = getlastSignalTimeColor(currentAssetsData.getLastSignalTime());
 
-        // Set the color on the magnitude circle
+        // Set the color on the last time signal circle
         lastSignalTimeCircle.setColor(lastSignalTimeColor);
         lastSignalTimeInnerCircle.setColor(lastSignalTimeColor);
 

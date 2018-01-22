@@ -30,7 +30,7 @@ public final class AssetsQueryUtils {
 
     public static ArrayList<AssetsData> extractAssets(String jsonResponse) {
 
-        // Create an empty ArrayList that we can start adding earthquakes to
+        // Create an empty ArrayList that we can start adding assets to
         ArrayList<AssetsData> assets = new ArrayList<>();
 
         // Try to parse the SAMPLE_JSON_RESPONSE. If there's a problem with the way the JSON
@@ -50,10 +50,10 @@ public final class AssetsQueryUtils {
             }
 
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Problem parsing the earthquake JSON results", e);
+            Log.e(LOG_TAG, "Problem parsing the JSON results", e);
         }
 
-        // Return the list of earthquakes
+        // Return the list of assets
         return assets;
     }
 
@@ -125,7 +125,7 @@ public final class AssetsQueryUtils {
                 Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
             }
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem retrieving the earthquake JSON results.", e);
+            Log.e(LOG_TAG, "Problem retrieving the assets JSON results.", e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();

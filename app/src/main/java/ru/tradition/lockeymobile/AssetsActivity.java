@@ -97,7 +97,7 @@ public class AssetsActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<List<AssetsData>> loader, List<AssetsData> assetData) {
-        // Set empty state text to display "No earthquakes found."
+        // Set empty state text to display "No assets found."
         mEmptyStateTextView.setText(R.string.no_assets);
         progressCircle.setVisibility(View.GONE);
 

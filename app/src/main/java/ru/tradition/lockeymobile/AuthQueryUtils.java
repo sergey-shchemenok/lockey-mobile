@@ -12,11 +12,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import ru.tradition.lockeymobile.obtainingassets.AssetsData;
 
@@ -27,6 +30,7 @@ import ru.tradition.lockeymobile.obtainingassets.AssetsData;
 public final class AuthQueryUtils {
     public static final String LOG_TAG = AuthQueryUtils.class.getName();
 
+    public static java.net.CookieManager authCookieManager = new java.net.CookieManager();
 
     private AuthQueryUtils() {}
 
@@ -85,32 +89,41 @@ public final class AuthQueryUtils {
      */
     public static String makeHttpRequest(URL url, String pwd, String usr) throws IOException {
         StringBuilder sb = new StringBuilder();
-        HttpURLConnection urlConn = null;
+        HttpURLConnection urlConnection = null;
 
         try {
             JSONObject jsonParam = new JSONObject();
             jsonParam.put("Usr", usr);
             jsonParam.put("Pwd", pwd);
 
-            urlConn = (HttpURLConnection) url.openConnection();
-            urlConn.setRequestMethod("POST");
-            urlConn.setConnectTimeout(10000);
-            urlConn.setReadTimeout(15000);
-            urlConn.setDoOutput(true);
-            urlConn.setDoInput(true);
-            urlConn.setFixedLengthStreamingMode(jsonParam.toString().getBytes().length);
-            urlConn.setRequestProperty("Content-Type", "application/json;charset=utf-8"); //;charset=utf-8
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setConnectTimeout(10000);
+            urlConnection.setReadTimeout(15000);
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.setFixedLengthStreamingMode(jsonParam.toString().getBytes().length);
+            urlConnection.setRequestProperty("Content-Type", "application/json;charset=utf-8"); //;charset=utf-8
             //urlConnection.setRequestProperty("Host", "my.lockey.ru");
-            urlConn.connect();
+            urlConnection.connect();
 
-            OutputStream os = new BufferedOutputStream(urlConn.getOutputStream());
+            OutputStream os = new BufferedOutputStream(urlConnection.getOutputStream());
             os.write(jsonParam.toString().getBytes());
             os.flush();
 
-            int httpResult = urlConn.getResponseCode();
+            Map<String, List<String>> headerFields = urlConnection.getHeaderFields();
+            List<String> cookiesHeader = headerFields.get("Set-Cookie");
+
+            if (cookiesHeader != null) {
+                for (String cookie : cookiesHeader) {
+                    authCookieManager.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
+                }
+            }
+
+            int httpResult = urlConnection.getResponseCode();
             if (httpResult == HttpURLConnection.HTTP_OK) {
                 BufferedReader br = new BufferedReader(new InputStreamReader(
-                        urlConn.getInputStream(), "utf-8"));
+                        urlConnection.getInputStream(), "utf-8"));
                 String line = null;
                 while ((line = br.readLine()) != null) {
                     sb.append(line + "\n");
@@ -136,8 +149,8 @@ public final class AuthQueryUtils {
             return "error3";
 
         } finally {
-            if (urlConn != null)
-                urlConn.disconnect();
+            if (urlConnection != null)
+                urlConnection.disconnect();
         }
     }
 

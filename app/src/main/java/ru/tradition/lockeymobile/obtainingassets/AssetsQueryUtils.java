@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static ru.tradition.lockeymobile.AuthQueryUtils.authCookieManager;
+
 
 /**
  * Created by Caelestis on 22.01.2018.
@@ -120,61 +122,14 @@ public final class AssetsQueryUtils {
         InputStream inputStream = null;
 
         try {
-
-            URL searchUrl = new URL("http://my.lockey.ru/LockeyREST/api/Auth");
-
-
-            JSONObject jsonParam = new JSONObject();
-            try {
-                jsonParam.put("Usr", "az");
-                jsonParam.put("Pwd", "123456");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-
-            urlConnection = (HttpURLConnection) searchUrl.openConnection();
-            urlConnection.setRequestMethod("POST");
-            urlConnection.setConnectTimeout(10000);
-            urlConnection.setReadTimeout(15000);
-            urlConnection.setDoOutput(true);
-            urlConnection.setDoInput(true);
-            urlConnection.setFixedLengthStreamingMode(jsonParam.toString().getBytes().length);
-            urlConnection.setRequestProperty("Content-Type", "application/json;charset=utf-8"); //;charset=utf-8
-            //urlConnection.setRequestProperty("Host", "my.lockey.ru");
-            urlConnection.connect();
-
-
-
-            OutputStream os = new BufferedOutputStream(urlConnection.getOutputStream());
-            os.write(jsonParam.toString().getBytes());
-            os.flush();
-            Log.e(LOG_TAG, "url..........." + urlConnection.getResponseCode()+"......" + urlConnection.getResponseMessage());
-
-
-            java.net.CookieManager msCookieManager = new java.net.CookieManager();
-
-            Map<String, List<String>> headerFields = urlConnection.getHeaderFields();
-            List<String> cookiesHeader = headerFields.get("Set-Cookie");
-
-            if (cookiesHeader != null) {
-                for (String cookie : cookiesHeader) {
-                    msCookieManager.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
-                }
-            }
-
-
-
-
-
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setReadTimeout(10000 /* milliseconds */);
             urlConnection.setConnectTimeout(15000 /* milliseconds */);
             urlConnection.setRequestMethod("GET");
 
-            if (msCookieManager.getCookieStore().getCookies().size() > 0) {
+            if (authCookieManager.getCookieStore().getCookies().size() > 0) {
                 urlConnection.setRequestProperty("Cookie",
-                        TextUtils.join(";",  msCookieManager.getCookieStore().getCookies()));
+                        TextUtils.join(";",  authCookieManager.getCookieStore().getCookies()));
             }
 
             urlConnection.connect();

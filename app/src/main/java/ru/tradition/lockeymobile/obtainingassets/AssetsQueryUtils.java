@@ -1,6 +1,5 @@
 package ru.tradition.lockeymobile.obtainingassets;
 
-import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -8,25 +7,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-import ru.tradition.lockeymobile.AssetsActivity;
-import ru.tradition.lockeymobile.AuthActivity;
-
-import static ru.tradition.lockeymobile.AuthQueryUtils.authCookieManager;
+import static ru.tradition.lockeymobile.auth.AuthQueryUtils.authCookieManager;
 
 
 /**

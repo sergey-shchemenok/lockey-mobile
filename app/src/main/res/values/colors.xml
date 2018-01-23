@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#C03823</color>
+    <color name="colorPrimary">#C03823</color>
+    <color name="colorPrimaryDark">#97200d</color>
 
+    <color name="colorAccent">#C03823</color>
 
     <!-- Text color for the header in assets table list -->
     <color name="assetTableHeaderColor">#B4BAC0</color>

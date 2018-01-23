@@ -108,7 +108,6 @@ public class AssetsActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<List<AssetsData>> loader, List<AssetsData> assetData) {
         // Set empty state text to display "No assets found."
-        mEmptyStateTextView.setText(R.string.no_assets);
         progressCircle.setVisibility(View.GONE);
 
         assetsDataAdapter.clear();
@@ -119,6 +118,14 @@ public class AssetsActivity extends AppCompatActivity
         }
 
         if (assetData == null || assetData.isEmpty()) {
+            connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+            if (activeNetwork != null && activeNetwork.isConnected()) {}else
+            {
+                mEmptyStateTextView.setText(R.string.no_connection);
+                return;
+            }
+            mEmptyStateTextView.setText(R.string.no_assets);
             return;
         }
         Log.v(LOG_TAG, "onLoadFinished");

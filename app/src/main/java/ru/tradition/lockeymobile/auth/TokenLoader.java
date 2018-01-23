@@ -1,4 +1,4 @@
-package ru.tradition.lockeymobile;
+package ru.tradition.lockeymobile.auth;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;

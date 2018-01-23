@@ -1,20 +1,28 @@
 package ru.tradition.lockeymobile.obtainingassets;
 
+import android.content.Intent;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * Created by Caelestis on 22.01.2018.
@@ -82,6 +90,8 @@ public final class AssetsQueryUtils {
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error closing input stream", e);
         }
+        Log.e(LOG_TAG, "here jsonResponse     " + jsonResponse + " ");
+
 
         // Extract relevant fields from the JSON response and create an {@link Event} object
 
@@ -104,17 +114,71 @@ public final class AssetsQueryUtils {
             return jsonResponse;
         }
 
-        Log.e(LOG_TAG, "\n\n\nurl..........." + url+"\n\n");
+        Log.e(LOG_TAG, "url..........." + url+"...");
 
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
+
         try {
+
+            URL searchUrl = new URL("http://my.lockey.ru/LockeyREST/api/Auth");
+
+
+            JSONObject jsonParam = new JSONObject();
+            try {
+                jsonParam.put("Usr", "az");
+                jsonParam.put("Pwd", "123456");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+            urlConnection = (HttpURLConnection) searchUrl.openConnection();
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setConnectTimeout(10000);
+            urlConnection.setReadTimeout(15000);
+            urlConnection.setDoOutput(true);
+            urlConnection.setDoInput(true);
+            urlConnection.setFixedLengthStreamingMode(jsonParam.toString().getBytes().length);
+            urlConnection.setRequestProperty("Content-Type", "application/json;charset=utf-8"); //;charset=utf-8
+            //urlConnection.setRequestProperty("Host", "my.lockey.ru");
+            urlConnection.connect();
+
+
+
+            OutputStream os = new BufferedOutputStream(urlConnection.getOutputStream());
+            os.write(jsonParam.toString().getBytes());
+            os.flush();
+            Log.e(LOG_TAG, "url..........." + urlConnection.getResponseCode()+"......" + urlConnection.getResponseMessage());
+
+
+            java.net.CookieManager msCookieManager = new java.net.CookieManager();
+
+            Map<String, List<String>> headerFields = urlConnection.getHeaderFields();
+            List<String> cookiesHeader = headerFields.get("Set-Cookie");
+
+            if (cookiesHeader != null) {
+                for (String cookie : cookiesHeader) {
+                    msCookieManager.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
+                }
+            }
+
+
+
+
+
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setReadTimeout(10000 /* milliseconds */);
             urlConnection.setConnectTimeout(15000 /* milliseconds */);
             urlConnection.setRequestMethod("GET");
+
+            if (msCookieManager.getCookieStore().getCookies().size() > 0) {
+                urlConnection.setRequestProperty("Cookie",
+                        TextUtils.join(";",  msCookieManager.getCookieStore().getCookies()));
+            }
+
             urlConnection.connect();
-            Log.e(LOG_TAG, "\n\n\nurl..........." + urlConnection.getResponseCode()+"\n\n");
+            Log.e(LOG_TAG, "url..........." + urlConnection.getResponseCode()+"......" + urlConnection.getResponseMessage());
 
             // If the request was successful (response code 200),
             // then read the input stream and parse the response.
@@ -123,6 +187,7 @@ public final class AssetsQueryUtils {
                 jsonResponse = readFromStream(inputStream);
             } else {
                 Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
+                //jsonResponse = "[{\"ID\":2670,\"Name\":\"х808рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х808рт77\"},{\"ID\":5800,\"Name\":\"х108мо77\",\"Model\":\"fh; Volvo\",\"RegNumber\":\"х108мо77\"},{\"ID\":5801,\"Name\":\"с580км777\",\"Model\":\"FH; Вольво\",\"RegNumber\":\"с580км777\"},{\"ID\":6317,\"Name\":\"с416км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с416км777\"},{\"ID\":5807,\"Name\":\"с415км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с415км777\"},{\"ID\":116208,\"Name\":\"о901хк77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"о901хк77\"},{\"ID\":116237,\"Name\":\"х807рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х807рт77\"},{\"ID\":120387,\"Name\":\"х109мо77\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"х109мо77\"}]";
             }
         } catch (IOException e) {
             Log.e(LOG_TAG, "Problem retrieving the assets JSON results.", e);

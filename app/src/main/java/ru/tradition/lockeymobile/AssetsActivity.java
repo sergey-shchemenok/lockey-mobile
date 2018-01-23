@@ -15,12 +15,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.AdapterView;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 import ru.tradition.lockeymobile.obtainingassets.AssetsData;
 import ru.tradition.lockeymobile.obtainingassets.AssetsDataAdapter;
 import ru.tradition.lockeymobile.obtainingassets.AssetsLoader;
+
+import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsUrlResponseCode;
 
 
 public class AssetsActivity extends AppCompatActivity
@@ -56,6 +59,12 @@ public class AssetsActivity extends AppCompatActivity
 
         progressCircle = (ProgressBar) findViewById(R.id.loading_spinner);
         mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
+
+
+        if (assetsUrlResponseCode == 0){
+            Intent intent = new Intent(this, AuthActivity.class);
+            startActivity(intent);
+        }
 
         //Checking the connection using connectivityManager
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -103,6 +112,12 @@ public class AssetsActivity extends AppCompatActivity
         progressCircle.setVisibility(View.GONE);
 
         assetsDataAdapter.clear();
+        if (assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED){
+            Intent intent = new Intent(this, AuthActivity.class);
+            startActivity(intent);
+            return;
+        }
+
         if (assetData == null || assetData.isEmpty()) {
             return;
         }

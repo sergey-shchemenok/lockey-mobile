@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import ru.tradition.lockeymobile.AssetsActivity;
+import ru.tradition.lockeymobile.AuthActivity;
+
 import static ru.tradition.lockeymobile.AuthQueryUtils.authCookieManager;
 
 
@@ -33,13 +36,14 @@ import static ru.tradition.lockeymobile.AuthQueryUtils.authCookieManager;
 public final class AssetsQueryUtils {
     public static final String LOG_TAG = AssetsQueryUtils.class.getName();
 
+    public static int assetsUrlResponseCode;
+
     /**
      * Create a private constructor because no one should ever create a {@link AssetsQueryUtils} object.
      */
     private AssetsQueryUtils() {}
 
     public static ArrayList<AssetsData> extractAssets(String jsonResponse) {
-
         // Create an empty ArrayList that we can start adding assets to
         ArrayList<AssetsData> assets = new ArrayList<>();
 
@@ -54,6 +58,7 @@ public final class AssetsQueryUtils {
                 int id = asset.getInt("ID");
                 String name = asset.getString("Name");
                 String model = asset.getString("Model");
+                model = model.substring(model.indexOf(";")+1).trim();
                 String regNumber = asset.getString("RegNumber");
                 int lastSignalTime = (int)(100*Math.random());//todo this should be updated later
                 assets.add(new AssetsData(id,name,model,regNumber,lastSignalTime));
@@ -94,9 +99,7 @@ public final class AssetsQueryUtils {
         }
         Log.e(LOG_TAG, "here jsonResponse     " + jsonResponse + " ");
 
-
         // Extract relevant fields from the JSON response and create an {@link Event} object
-
         //jsonResponse = "[{\"ID\":2670,\"Name\":\"х808рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х808рт77\"},{\"ID\":5800,\"Name\":\"х108мо77\",\"Model\":\"fh; Volvo\",\"RegNumber\":\"х108мо77\"},{\"ID\":5801,\"Name\":\"с580км777\",\"Model\":\"FH; Вольво\",\"RegNumber\":\"с580км777\"},{\"ID\":6317,\"Name\":\"с416км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с416км777\"},{\"ID\":5807,\"Name\":\"с415км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с415км777\"},{\"ID\":116208,\"Name\":\"о901хк77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"о901хк77\"},{\"ID\":116237,\"Name\":\"х807рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х807рт77\"},{\"ID\":120387,\"Name\":\"х109мо77\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"х109мо77\"}]";
 
         ArrayList<AssetsData> assetsList = extractAssets(jsonResponse);
@@ -137,10 +140,12 @@ public final class AssetsQueryUtils {
 
             // If the request was successful (response code 200),
             // then read the input stream and parse the response.
-            if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+
+            assetsUrlResponseCode = urlConnection.getResponseCode();
+            if (assetsUrlResponseCode == HttpURLConnection.HTTP_OK) {
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);
-            } else {
+            } else  {
                 Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
                 //jsonResponse = "[{\"ID\":2670,\"Name\":\"х808рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х808рт77\"},{\"ID\":5800,\"Name\":\"х108мо77\",\"Model\":\"fh; Volvo\",\"RegNumber\":\"х108мо77\"},{\"ID\":5801,\"Name\":\"с580км777\",\"Model\":\"FH; Вольво\",\"RegNumber\":\"с580км777\"},{\"ID\":6317,\"Name\":\"с416км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с416км777\"},{\"ID\":5807,\"Name\":\"с415км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с415км777\"},{\"ID\":116208,\"Name\":\"о901хк77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"о901хк77\"},{\"ID\":116237,\"Name\":\"х807рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х807рт77\"},{\"ID\":120387,\"Name\":\"х109мо77\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"х109мо77\"}]";
             }

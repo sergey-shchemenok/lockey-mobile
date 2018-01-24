@@ -12,14 +12,14 @@
     <color name="assetTableContentColor">#2B3D4D</color>
 
     <!-- Last signal time (lst) between 0 and 5 min -->
-    <color name="lst1">#24ab19</color>
+    <color name="lst1">#21a30d</color>
 
     <!-- Last signal time between 5 and 15 min -->
-    <color name="lst2">#04B4B3</color>
+    <color name="lst2">#ff2f34</color>
 
 
     <!-- Last signal time between 15 and 60 min -->
-    <color name="lst3">#F5A623</color>
+    <color name="lst3">#ffdd00</color>
 
 
     <!-- Last signal time more than 60 min -->

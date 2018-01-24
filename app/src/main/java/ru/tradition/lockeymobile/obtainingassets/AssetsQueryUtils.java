@@ -1,5 +1,7 @@
 package ru.tradition.lockeymobile.obtainingassets;
 
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -15,7 +17,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.TimeZone;
 
 import static ru.tradition.lockeymobile.auth.AuthQueryUtils.authCookieManager;
 
@@ -32,7 +38,8 @@ public final class AssetsQueryUtils {
     /**
      * Create a private constructor because no one should ever create a {@link AssetsQueryUtils} object.
      */
-    private AssetsQueryUtils() {}
+    private AssetsQueryUtils() {
+    }
 
     public static ArrayList<AssetsData> extractAssets(String jsonResponse) {
         // Create an empty ArrayList that we can start adding assets to
@@ -49,10 +56,14 @@ public final class AssetsQueryUtils {
                 int id = asset.getInt("ID");
                 String name = asset.getString("Name");
                 String model = asset.getString("Model");
-                model = model.substring(model.indexOf(";")+1).trim();
+                if (model.contains(";")) {
+                    model = model.substring(model.indexOf(";") + 1).trim();
+                }
                 String regNumber = asset.getString("RegNumber");
-                int lastSignalTime = (int)(100*Math.random());//todo this should be updated later
-                assets.add(new AssetsData(id,name,model,regNumber,lastSignalTime));
+                int lastSignalTime = getLastTimeInMilli(asset.getString("PositionTime"));
+                double latitude = asset.getDouble("Latitude");
+                double longitude = asset.getDouble("Longitude");
+                assets.add(new AssetsData(id, name, model, regNumber, lastSignalTime, latitude, longitude));
             }
 
         } catch (JSONException e) {
@@ -61,6 +72,34 @@ public final class AssetsQueryUtils {
 
         // Return the list of assets
         return assets;
+    }
+
+    private static int getLastTimeInMilli(String posTime){
+        int lastSignalTime = 1440;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            Instant now = Instant.now();
+            Instant then = Instant.parse(posTime);
+            return (int) ((now.toEpochMilli()-then.toEpochMilli())/60000);
+        } else {
+            long now = new Date().getTime();
+            Log.e(LOG_TAG, "try to get the last position time...");
+
+            java.text.SimpleDateFormat simpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+            try {
+                Date then =  simpleDateFormat.parse(posTime);
+                long thenL = then.getTime();
+                return (int) ((now-thenL)/60000);
+
+            } catch (java.text.ParseException e) {
+                e.printStackTrace();
+                Log.e(LOG_TAG, "Problem with getting the last position time...", e);
+
+            }
+
+        }
+        return lastSignalTime;
     }
 
     /**
@@ -110,7 +149,7 @@ public final class AssetsQueryUtils {
             return jsonResponse;
         }
 
-        Log.e(LOG_TAG, "url..........." + url+"...");
+        Log.e(LOG_TAG, "url..........." + url + "...");
 
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
@@ -123,11 +162,11 @@ public final class AssetsQueryUtils {
 
             if (authCookieManager.getCookieStore().getCookies().size() > 0) {
                 urlConnection.setRequestProperty("Cookie",
-                        TextUtils.join(";",  authCookieManager.getCookieStore().getCookies()));
+                        TextUtils.join(";", authCookieManager.getCookieStore().getCookies()));
             }
 
             urlConnection.connect();
-            Log.e(LOG_TAG, "url..........." + urlConnection.getResponseCode()+"......" + urlConnection.getResponseMessage());
+            Log.e(LOG_TAG, "url..........." + urlConnection.getResponseCode() + "......" + urlConnection.getResponseMessage());
 
             // If the request was successful (response code 200),
             // then read the input stream and parse the response.
@@ -136,7 +175,7 @@ public final class AssetsQueryUtils {
             if (assetsUrlResponseCode == HttpURLConnection.HTTP_OK) {
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);
-            } else  {
+            } else {
                 Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
                 //jsonResponse = "[{\"ID\":2670,\"Name\":\"х808рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х808рт77\"},{\"ID\":5800,\"Name\":\"х108мо77\",\"Model\":\"fh; Volvo\",\"RegNumber\":\"х108мо77\"},{\"ID\":5801,\"Name\":\"с580км777\",\"Model\":\"FH; Вольво\",\"RegNumber\":\"с580км777\"},{\"ID\":6317,\"Name\":\"с416км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с416км777\"},{\"ID\":5807,\"Name\":\"с415км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с415км777\"},{\"ID\":116208,\"Name\":\"о901хк77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"о901хк77\"},{\"ID\":116237,\"Name\":\"х807рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х807рт77\"},{\"ID\":120387,\"Name\":\"х109мо77\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"х109мо77\"}]";
             }

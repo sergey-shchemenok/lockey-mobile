@@ -5,6 +5,9 @@
 
     <color name="colorAccent">#C03823</color>
 
+    <!-- Primary color of the app (shown in the app bar) -->
+    <color name="primary_color">#4e342e</color>
+
     <!-- Text color for the header in assets table list -->
     <color name="assetTableHeaderColor">#B4BAC0</color>
 

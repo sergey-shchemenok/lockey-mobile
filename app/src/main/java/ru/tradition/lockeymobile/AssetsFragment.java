@@ -6,14 +6,17 @@ import android.content.Intent;
 import android.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.AppCompatActivity;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.AdapterView;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -25,9 +28,17 @@ import ru.tradition.lockeymobile.obtainingassets.AssetsLoader;
 
 import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsUrlResponseCode;
 
+/**
+ * Created by Caelestis on 25.01.2018.
+ */
 
-public class AssetsActivity extends AppCompatActivity
+public class AssetsFragment  extends Fragment
         implements LoaderManager.LoaderCallbacks<List<AssetsData>>{
+
+    public AssetsFragment() {
+        // Required empty public constructor
+    }
+
 
 
     /**
@@ -51,28 +62,27 @@ public class AssetsActivity extends AppCompatActivity
 
     private AssetsDataAdapter assetsDataAdapter;
 
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.asset_list, container, false);
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.asset_list);
 
-        progressCircle = (ProgressBar) findViewById(R.id.loading_spinner);
-        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
+        progressCircle = (ProgressBar) rootView.findViewById(R.id.loading_spinner);
+        mEmptyStateTextView = (TextView) rootView.findViewById(R.id.empty_view);
 
 
         if (assetsUrlResponseCode == 0){
-            Intent intent = new Intent(this, AuthActivity.class);
+            Intent intent = new Intent(getActivity(), AuthActivity.class);
             startActivity(intent);
         }
 
         //Checking the connection using connectivityManager
-        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
             // Get a reference to the LoaderManager, in order to interact with loaders.
-            LoaderManager loaderManager = getLoaderManager();
+            LoaderManager loaderManager = getActivity().getLoaderManager();
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
             // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
             // because this activity implements the LoaderCallbacks interface).
@@ -83,8 +93,8 @@ public class AssetsActivity extends AppCompatActivity
             mEmptyStateTextView.setText(R.string.no_connection);
         }
 
-        ListView assetsListView = (ListView) findViewById(R.id.assets_list);
-        assetsDataAdapter = new AssetsDataAdapter(this, new ArrayList<AssetsData>());
+        ListView assetsListView = (ListView) rootView.findViewById(R.id.assets_list);
+        assetsDataAdapter = new AssetsDataAdapter(getActivity(), new ArrayList<AssetsData>());
         assetsListView.setAdapter(assetsDataAdapter);
 
         assetsListView.setEmptyView(mEmptyStateTextView);
@@ -93,9 +103,12 @@ public class AssetsActivity extends AppCompatActivity
         assetsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            //AssetsData assetsData = assetsDataAdapter.getItem(position);
+                //AssetsData assetsData = assetsDataAdapter.getItem(position);
             }
         });
+
+
+        return rootView;
 
     }
 
@@ -103,7 +116,7 @@ public class AssetsActivity extends AppCompatActivity
     public Loader<List<AssetsData>> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
         Log.v(LOG_TAG, "onCreateLoader");
-        return new AssetsLoader(this, ASSETS_REQUEST_URL);
+        return new AssetsLoader(getActivity(), ASSETS_REQUEST_URL);
     }
 
     @Override
@@ -113,13 +126,13 @@ public class AssetsActivity extends AppCompatActivity
 
         assetsDataAdapter.clear();
         if (assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED){
-            Intent intent = new Intent(this, AuthActivity.class);
+            Intent intent = new Intent(getActivity(), AuthActivity.class);
             startActivity(intent);
             return;
         }
 
         if (assetData == null || assetData.isEmpty()) {
-            connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
             if (activeNetwork != null && activeNetwork.isConnected()) {}else
             {
@@ -140,5 +153,41 @@ public class AssetsActivity extends AppCompatActivity
         Log.v(LOG_TAG, "onLoadReset");
 
     }
+
+
+    private MapFragment.OnFragmentInteractionListener mListener;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof MapFragment.OnFragmentInteractionListener) {
+            mListener = (MapFragment.OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
 
 }

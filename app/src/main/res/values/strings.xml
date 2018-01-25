@@ -5,4 +5,12 @@
     <string name="login">Логин</string>
     <string name="hint_login">Имя пользователя</string>
 
+
+    <string name="tab_assets">Объекты</string>
+    <string name="tab_map">Карта</string>
+    <string name="tab_other">Разное</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

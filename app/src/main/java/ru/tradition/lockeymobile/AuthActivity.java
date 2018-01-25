@@ -94,7 +94,7 @@ public class AuthActivity extends AppCompatActivity
         Log.v(LOG_TAG, "onLoadFinished");
 //        result = (TextView)findViewById(R.id.result);
 //        result.setText(message);
-        Intent intent = new Intent(AuthActivity.this, AssetsActivity.class);
+        Intent intent = new Intent(AuthActivity.this, MainActivity.class);
         startActivity(intent);
 
     }

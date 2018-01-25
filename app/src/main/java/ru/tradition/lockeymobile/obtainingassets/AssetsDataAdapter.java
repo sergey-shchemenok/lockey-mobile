@@ -66,19 +66,14 @@ public class AssetsDataAdapter extends ArrayAdapter<AssetsData> {
     }
 
     private int getlastSignalTimeColor(int lastSignalTime) {
-        int lastSignalTimeColorResourceId = R.color.lst5;
+        int lastSignalTimeColorResourceId = R.color.lst5;//серый
         if (lastSignalTime < 15 && lastSignalTime >= 0) {
-            lastSignalTimeColorResourceId = R.color.lst1;
+            lastSignalTimeColorResourceId = R.color.lst1;//зеленый
         } else if (lastSignalTime < 60 && lastSignalTime >= 15) {
-            lastSignalTimeColorResourceId = R.color.lst3;
+            lastSignalTimeColorResourceId = R.color.lst3;//желтый
         }
-//        else if (lastSignalTime < 15 && lastSignalTime >= 5) {
-//            lastSignalTimeColorResourceId = R.color.lst2;
-//        } else if (lastSignalTime < 60 && lastSignalTime >= 15) {
-//            lastSignalTimeColorResourceId = R.color.lst3;
-//        }
         else if (lastSignalTime < 1440) {
-            lastSignalTimeColorResourceId = R.color.lst2;
+            lastSignalTimeColorResourceId = R.color.lst2;//красный
         }
         return ContextCompat.getColor(getContext(), lastSignalTimeColorResourceId);
     }

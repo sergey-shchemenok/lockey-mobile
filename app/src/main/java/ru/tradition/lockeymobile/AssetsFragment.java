@@ -32,13 +32,16 @@ import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsU
  * Created by Caelestis on 25.01.2018.
  */
 
-public class AssetsFragment  extends Fragment
-        implements LoaderManager.LoaderCallbacks<List<AssetsData>>{
+public class AssetsFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<List<AssetsData>> {
+
+    private MapFragment.OnFragmentInteractionListener mListener;
+
+    private List<AssetsData> ad;//todo remake later
 
     public AssetsFragment() {
         // Required empty public constructor
     }
-
 
 
     /**
@@ -72,7 +75,7 @@ public class AssetsFragment  extends Fragment
         mEmptyStateTextView = (TextView) rootView.findViewById(R.id.empty_view);
 
 
-        if (assetsUrlResponseCode == 0){
+        if (assetsUrlResponseCode == 0) {
             Intent intent = new Intent(getActivity(), AuthActivity.class);
             startActivity(intent);
         }
@@ -125,7 +128,7 @@ public class AssetsFragment  extends Fragment
         progressCircle.setVisibility(View.GONE);
 
         assetsDataAdapter.clear();
-        if (assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED){
+        if (assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             Intent intent = new Intent(getActivity(), AuthActivity.class);
             startActivity(intent);
             return;
@@ -134,8 +137,8 @@ public class AssetsFragment  extends Fragment
         if (assetData == null || assetData.isEmpty()) {
             connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-            if (activeNetwork != null && activeNetwork.isConnected()) {}else
-            {
+            if (activeNetwork != null && activeNetwork.isConnected()) {
+            } else {
                 mEmptyStateTextView.setText(R.string.no_connection);
                 return;
             }
@@ -143,6 +146,8 @@ public class AssetsFragment  extends Fragment
             return;
         }
         Log.v(LOG_TAG, "onLoadFinished");
+
+        ad = assetData;
 
         assetsDataAdapter.addAll(assetData);
     }
@@ -154,8 +159,13 @@ public class AssetsFragment  extends Fragment
 
     }
 
-
-    private MapFragment.OnFragmentInteractionListener mListener;
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (ad == null || ad.isEmpty()) {
+        } else
+            assetsDataAdapter.addAll(ad);
+    }
 
     @Override
     public void onAttach(Context context) {

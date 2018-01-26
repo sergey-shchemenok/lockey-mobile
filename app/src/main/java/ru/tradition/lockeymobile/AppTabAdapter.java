@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import ru.tradition.lockeymobile.obtainingassets.AssetsFragment;
+
 /**
  * Created by Caelestis on 25.01.2018.
  */

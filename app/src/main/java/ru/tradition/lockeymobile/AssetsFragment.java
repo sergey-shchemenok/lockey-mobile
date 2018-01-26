@@ -4,6 +4,7 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -35,9 +36,13 @@ import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsU
 public class AssetsFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<List<AssetsData>> {
 
-    private MapFragment.OnFragmentInteractionListener mListener;
+    private OnFragmentInteractionListener mListener;
 
-    private List<AssetsData> ad;//todo remake later
+    //Here is the data from Loader about cars and other assets
+    private List<AssetsData> mAssetData;
+
+    //Here is the data from Loader about cars and other assets for API lesser 26
+    private static List<AssetsData> mAssetDataAPIBefore26;
 
     public AssetsFragment() {
         // Required empty public constructor
@@ -50,6 +55,7 @@ public class AssetsFragment extends Fragment
     private TextView mEmptyStateTextView;
     private ProgressBar progressCircle;
     private ConnectivityManager connectivityManager;
+    private LoaderManager loaderManager;
 
     /**
      * Constant value for the assets loader ID. We can choose any integer.
@@ -80,12 +86,18 @@ public class AssetsFragment extends Fragment
             startActivity(intent);
         }
 
+        ListView assetsListView = (ListView) rootView.findViewById(R.id.assets_list);
+        assetsDataAdapter = new AssetsDataAdapter(getActivity(), new ArrayList<AssetsData>());
+        assetsListView.setAdapter(assetsDataAdapter);
+
+        assetsListView.setEmptyView(mEmptyStateTextView);
+
         //Checking the connection using connectivityManager
         connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
             // Get a reference to the LoaderManager, in order to interact with loaders.
-            LoaderManager loaderManager = getActivity().getLoaderManager();
+            loaderManager = getActivity().getLoaderManager();
             // Initialize the loader. Pass in the int ID constant defined above and pass in null for
             // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
             // because this activity implements the LoaderCallbacks interface).
@@ -95,12 +107,6 @@ public class AssetsFragment extends Fragment
             progressCircle.setVisibility(View.GONE);
             mEmptyStateTextView.setText(R.string.no_connection);
         }
-
-        ListView assetsListView = (ListView) rootView.findViewById(R.id.assets_list);
-        assetsDataAdapter = new AssetsDataAdapter(getActivity(), new ArrayList<AssetsData>());
-        assetsListView.setAdapter(assetsDataAdapter);
-
-        assetsListView.setEmptyView(mEmptyStateTextView);
 
         //this will be made in the near future, i hope
         assetsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -142,14 +148,60 @@ public class AssetsFragment extends Fragment
                 mEmptyStateTextView.setText(R.string.no_connection);
                 return;
             }
-            mEmptyStateTextView.setText(R.string.no_assets);
-            return;
+            if (progressCircle.getVisibility() == View.GONE) {
+                mEmptyStateTextView.setText(R.string.no_assets);
+                return;
+            }
         }
         Log.v(LOG_TAG, "onLoadFinished");
 
-        ad = assetData;
+        mAssetData = assetData;
+        //mAssetDataAPIBefore26 = assetData;
 
-        assetsDataAdapter.addAll(assetData);
+        assetsDataAdapter.addAll(mAssetData);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (mAssetData == null || mAssetData.isEmpty()) {
+            connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+            if (activeNetwork != null && activeNetwork.isConnected()) {
+                mEmptyStateTextView.setText(R.string.no_assets);
+            } else {
+                mEmptyStateTextView.setText(R.string.no_connection);
+            }
+
+        } else
+            assetsDataAdapter.addAll(mAssetData);
+    }
+
+//    @Override
+//    public void onConfigurationChanged(Configuration newConfig) {
+//        super.onConfigurationChanged(newConfig);
+//        // Checks the orientation of the screen
+//        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
+//            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//                mAssetData = mAssetDataAPIBefore26;
+//                progressCircle.setVisibility(View.GONE);
+//            } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+//                mAssetData = mAssetDataAPIBefore26;
+//                progressCircle.setVisibility(View.GONE);
+//            }
+//        }
+//    }
+
+    //    if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O) {
+//
+//    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        progressCircle.setVisibility(View.VISIBLE);
+
+
     }
 
     @Override
@@ -159,19 +211,12 @@ public class AssetsFragment extends Fragment
 
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (ad == null || ad.isEmpty()) {
-        } else
-            assetsDataAdapter.addAll(ad);
-    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof MapFragment.OnFragmentInteractionListener) {
-            mListener = (MapFragment.OnFragmentInteractionListener) context;
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");

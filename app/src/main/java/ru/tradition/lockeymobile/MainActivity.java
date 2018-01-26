@@ -17,11 +17,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.List;
 
 import ru.tradition.lockeymobile.obtainingassets.AssetsData;
-import ru.tradition.lockeymobile.obtainingassets.AssetsDataAdapter;
 import ru.tradition.lockeymobile.obtainingassets.AssetsFragment;
 import ru.tradition.lockeymobile.obtainingassets.AssetsLoader;
 
@@ -29,7 +27,7 @@ import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsU
 
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<List<AssetsData>>,
-        MapFragment.OnFragmentInteractionListener,
+        MapFragmentActivity.OnFragmentInteractionListener,
         OtherFragment.OnFragmentInteractionListener,
         AssetsFragment.OnFragmentInteractionListener {
 

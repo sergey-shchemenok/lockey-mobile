@@ -35,7 +35,7 @@ public class AppTabAdapter extends FragmentPagerAdapter {
         if (position == 0) {
             return new AssetsFragment();
         } else if (position == 1) {
-            return new MapFragmentActivity();
+            return new MapFragmentTab();
         } else {
             return new OtherFragment();
         }

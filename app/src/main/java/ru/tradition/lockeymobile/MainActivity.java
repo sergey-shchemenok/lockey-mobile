@@ -27,11 +27,12 @@ import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsU
 
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<List<AssetsData>>,
-        MapFragmentActivity.OnFragmentInteractionListener,
+        MapFragmentTab.OnFragmentInteractionListener,
         OtherFragment.OnFragmentInteractionListener,
         AssetsFragment.OnFragmentInteractionListener {
 
     //Here is the data from Loader about cars and other assets
+    //todo move it into User class
     public static List<AssetsData> mAssetData;
 
     //todo Here is the data from Loader about cars and other assets for API lesser 26

@@ -3,9 +3,12 @@ package ru.tradition.lockeymobile;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +34,8 @@ import ru.tradition.lockeymobile.obtainingassets.AssetsData;
  * create an instance of this fragment.
  */
 public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
+
+    private final String LOG_TAG = MapFragmentTab.class.getSimpleName();
 
     private static View rootView;
 
@@ -128,19 +133,17 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         return rootView;
     }
 
-
-
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mHandler = new Handler();
+        startRepeatingTask();
+    }
 
     @Override
     public void onMapReady(GoogleMap map) {
         mapReady = true;
         m_map = map;
-//        LatLng moscow = new LatLng(55.7522200, 37.6155600);
-//        CameraPosition target = CameraPosition.builder()
-//                .target(moscow)
-//                .zoom(10)
-//                .build();
-
         m_map.moveCamera(CameraUpdateFactory.newCameraPosition(UserData.target));
 
         for (AssetsData asset : UserData.mAssetData) {
@@ -149,6 +152,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
             m_map.addMarker(marker);
         }
     }
+
 
     @Override
     public void onStop() {
@@ -195,4 +199,47 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    //The code for map updating
+    private int mInterval = 5000; // 5 seconds by default, can be changed later
+    private Handler mHandler;
+
+    @Override
+    public void onDestroy() {
+        stopRepeatingTask();
+        super.onDestroy();
+    }
+
+    Runnable mStatusChecker = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                if (m_map != null) {
+                    UserData.target = m_map.getCameraPosition();
+                    m_map.clear();
+                    m_map.moveCamera(CameraUpdateFactory.newCameraPosition(UserData.target));
+
+                    for (AssetsData asset : UserData.mAssetData) {
+                        MarkerOptions marker = new MarkerOptions()
+                                .position(new LatLng(asset.getLatitude(), asset.getLongitude()));
+                        m_map.addMarker(marker);
+                    }
+                    Log.i(LOG_TAG, "The position of markers was updated");
+                }
+            } finally {
+                // 100% guarantee that this always happens, even if
+                // your update method throws an exception
+                mHandler.postDelayed(mStatusChecker, mInterval);
+            }
+        }
+    };
+
+    void startRepeatingTask() {
+        mStatusChecker.run();
+    }
+
+    void stopRepeatingTask() {
+        mHandler.removeCallbacks(mStatusChecker);
+    }
+
 }

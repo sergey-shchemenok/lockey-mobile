@@ -52,6 +52,8 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         // Required empty public constructor
     }
 
+    MapFragmentTab fragment;
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -70,6 +72,8 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         return fragment;
     }
 
+    SupportMapFragment mapFragment;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,7 +83,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         This is perhaps the best solution to the problem
          */
         FragmentManager fm = getChildFragmentManager();
-        SupportMapFragment mapFragment = (SupportMapFragment) fm.findFragmentByTag("mapFragment");
+        mapFragment = (SupportMapFragment) fm.findFragmentByTag("mapFragment");
         if (mapFragment == null) {
             mapFragment = new SupportMapFragment();
             FragmentTransaction ft = fm.beginTransaction();
@@ -97,7 +101,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
 
 
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -126,29 +129,33 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
     }
 
 
+
+
     @Override
     public void onMapReady(GoogleMap map) {
         mapReady = true;
         m_map = map;
-        MarkerOptions renton = new MarkerOptions()
-                .position(new LatLng(47.489805, -122.120502))
-                .title("Renton");
-        m_map.addMarker(renton);
+//        LatLng moscow = new LatLng(55.7522200, 37.6155600);
+//        CameraPosition target = CameraPosition.builder()
+//                .target(moscow)
+//                .zoom(10)
+//                .build();
 
-        for (AssetsData asset: MainActivity.mAssetData){
+        m_map.moveCamera(CameraUpdateFactory.newCameraPosition(UserData.target));
+
+        for (AssetsData asset : UserData.mAssetData) {
             MarkerOptions marker = new MarkerOptions()
                     .position(new LatLng(asset.getLatitude(), asset.getLongitude()));
             m_map.addMarker(marker);
         }
-        LatLng moscow = new LatLng(55.7522200, 37.6155600);
-        CameraPosition target = CameraPosition.builder()
-                .target(moscow)
-                .zoom(10)
-                .build();
-        m_map.moveCamera(CameraUpdateFactory.newCameraPosition(target));
-
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        UserData.target = m_map.getCameraPosition();
+
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

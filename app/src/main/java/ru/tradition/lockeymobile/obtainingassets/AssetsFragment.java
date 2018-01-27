@@ -25,7 +25,7 @@ import java.util.List;
 import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.R;
 
-import static ru.tradition.lockeymobile.MainActivity.mAssetData;
+import static ru.tradition.lockeymobile.UserData.mAssetData;
 import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsUrlResponseCode;
 
 /**

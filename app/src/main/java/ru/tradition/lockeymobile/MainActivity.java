@@ -16,6 +16,9 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+
 import java.net.HttpURLConnection;
 import java.util.List;
 
@@ -31,12 +34,14 @@ public class MainActivity extends AppCompatActivity implements
         OtherFragment.OnFragmentInteractionListener,
         AssetsFragment.OnFragmentInteractionListener {
 
-    //Here is the data from Loader about cars and other assets
-    //todo move it into User class
-    public static List<AssetsData> mAssetData;
 
-    //todo Here is the data from Loader about cars and other assets for API lesser 26
-    public static List<AssetsData> mAssetDataAPIBefore26;
+
+    public static boolean isRepeated = false;
+    public static boolean isInterrupted = false;
+    public static boolean isFinished = false;
+
+
+
 
     private TextView mEmptyStateTextView;
     private ProgressBar progressCircle;
@@ -68,21 +73,50 @@ public class MainActivity extends AppCompatActivity implements
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
         }
-
         //Checking the connection using connectivityManager
+        startLoader();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!isInterrupted) {
+
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (isFinished) {
+                        repeatLoader();
+                        isRepeated = true;
+                        Log.i(LOG_TAG, "Repeating loading assets");
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private void startLoader() {
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
-            // Get a reference to the LoaderManager, in order to interact with loaders.
             loaderManager = getLoaderManager();
-            // Initialize the loader. Pass in the int ID constant defined above and pass in null for
-            // the bundle. Pass in this activity for the LoaderCallbacks parameter (which is valid
-            // because this activity implements the LoaderCallbacks interface).
             loaderManager.initLoader(ASSETS_LOADER_ID, null, this);
             Log.v(LOG_TAG, "initLoader");
         } else {
             progressCircle.setVisibility(View.GONE);
             mEmptyStateTextView.setText(R.string.no_connection);
+        }
+    }
+
+    private void repeatLoader() {
+        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        if (activeNetwork != null && activeNetwork.isConnected()) {
+            loaderManager.restartLoader(ASSETS_LOADER_ID, null, this);
+            Log.v(LOG_TAG, "initLoader");
+        } else {
+
         }
     }
 
@@ -99,57 +133,70 @@ public class MainActivity extends AppCompatActivity implements
         // Set empty state text to display "No assets found."
         progressCircle.setVisibility(View.GONE);
 
+
+        //whether it can be authorized. The token has not expired
         if (assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             Intent intent = new Intent(this, AuthActivity.class);
+            isFinished = false;
+            isRepeated = false;
             startActivity(intent);
             return;
         }
 
-        //assetsDataAdapter.clear();
-
-
-        if (assetData == null || assetData.isEmpty()) {
-            connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-            if (activeNetwork != null && activeNetwork.isConnected()) {
-            } else {
-                mEmptyStateTextView.setText(R.string.no_connection);
+        if (!isRepeated) {
+            if (assetData == null || assetData.isEmpty()) {
+                connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+                if (activeNetwork != null && activeNetwork.isConnected()) {
+                } else {
+                    mEmptyStateTextView.setText(R.string.no_connection);
+                    return;
+                }
+                mEmptyStateTextView.setText(R.string.no_assets);
                 return;
             }
-            mEmptyStateTextView.setText(R.string.no_assets);
-            return;
+            Log.v(LOG_TAG, "onLoadFinished");
+
+            UserData.mAssetData = assetData;
+
+            // Find the view pager that will allow the user to swipe between fragments
+            ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+
+            // Create an adapter that knows which fragment should be shown on each page
+            AppTabAdapter adapter = new AppTabAdapter(this, getSupportFragmentManager());
+
+            // Set the adapter onto the view pager
+            viewPager.setAdapter(adapter);
+
+            //assetsListView.setEmptyView(mEmptyStateTextView);
+
+            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+
+            // Connect the tab layout with the view pager. This will
+            //   1. Update the tab layout when the view pager is swiped
+            //   2. Update the view pager when a tab is selected
+            //   3. Set the tab layout's tab names with the view pager's adapter's titles
+            //      by calling onPageTitle()
+            tabLayout.setupWithViewPager(viewPager);
+
+            isFinished = true;
+        } else {
+            UserData.mAssetData = assetData;
         }
-        Log.v(LOG_TAG, "onLoadFinished");
-
-        mAssetData = assetData;
-
-        //mAssetDataAPIBefore26 = assetData;
-
-        // Find the view pager that will allow the user to swipe between fragments
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-
-        // Create an adapter that knows which fragment should be shown on each page
-        AppTabAdapter adapter = new AppTabAdapter(this, getSupportFragmentManager());
-
-        // Set the adapter onto the view pager
-        viewPager.setAdapter(adapter);
-
-        //assetsListView.setEmptyView(mEmptyStateTextView);
-
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-
-        // Connect the tab layout with the view pager. This will
-        //   1. Update the tab layout when the view pager is swiped
-        //   2. Update the view pager when a tab is selected
-        //   3. Set the tab layout's tab names with the view pager's adapter's titles
-        //      by calling onPageTitle()
-        tabLayout.setupWithViewPager(viewPager);
 
     }
 
     @Override
+    protected void onDestroy() {
+        //we need to interrupt this thread
+        isFinished = false;
+        isRepeated = false;
+        super.onDestroy();
+    }
+
+    @Override
     public void onLoaderReset(Loader<List<AssetsData>> loader) {
-        mAssetData.clear();
+        UserData.mAssetData.clear();
 
         Log.v(LOG_TAG, "onLoadReset");
 

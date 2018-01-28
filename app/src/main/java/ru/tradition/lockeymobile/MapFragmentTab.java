@@ -18,7 +18,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -84,7 +83,8 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
 
         /*
-        Note: You cannot inflate a layout into a fragment when that layout includes a <fragment>. Nested fragments are only supported when added to a fragment dynamically.
+        Note: You cannot inflate a layout into a fragment when that layout includes a <fragment>.
+        Nested fragments are only supported when added to a fragment dynamically.
         This is perhaps the best solution to the problem
          */
         FragmentManager fm = getChildFragmentManager();
@@ -122,24 +122,31 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
 //                parent.removeView(rootView);
 //        }
 //        try {
-//            rootView = inflater.inflate(R.layout.mapus, container, false);
+//            rootView = inflater.inflate(R.layout.tab_fragment_map, container, false);
 //        } catch (InflateException e) {
 //        /* map is already there, just return view as it is */
 //        }
 
-        rootView = inflater.inflate(R.layout.mapus, container, false);
+        rootView = inflater.inflate(R.layout.tab_fragment_map, container, false);
 
         // Inflate the layout for this fragment
         return rootView;
     }
 
+    //Handler for map updating here
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mHandler = new Handler();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         startRepeatingTask();
     }
 
+    //Get data from mAssetData list and make marker from it
     @Override
     public void onMapReady(GoogleMap map) {
         mapReady = true;
@@ -154,12 +161,53 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
     }
 
 
+    //Save camera position
     @Override
     public void onStop() {
-        super.onStop();
         UserData.target = m_map.getCameraPosition();
+        stopRepeatingTask();
+        super.onStop();
 
     }
+
+    //The code for map updating
+    private int mInterval = 5000; // 5 seconds by default, can be changed later
+    private Handler mHandler;
+
+    Runnable mStatusChecker = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                if (m_map != null) {
+                    UserData.target = m_map.getCameraPosition();
+                    m_map.clear();
+                    m_map.moveCamera(CameraUpdateFactory.newCameraPosition(UserData.target));
+
+                    for (AssetsData asset : UserData.mAssetData) {
+                        MarkerOptions marker = new MarkerOptions()
+                                .position(new LatLng(asset.getLatitude(), asset.getLongitude()));
+                        m_map.addMarker(marker);
+                    }
+                    Log.i(LOG_TAG, "The position of markers was updated");
+                }
+            } finally {
+                // 100% guarantee that this always happens, even if
+                // your update method throws an exception
+                mHandler.postDelayed(mStatusChecker, mInterval);
+            }
+        }
+    };
+
+    void startRepeatingTask() {
+        mStatusChecker.run();
+    }
+
+    void stopRepeatingTask() {
+        mHandler.removeCallbacks(mStatusChecker);
+    }
+
+
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -200,46 +248,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         void onFragmentInteraction(Uri uri);
     }
 
-    //The code for map updating
-    private int mInterval = 5000; // 5 seconds by default, can be changed later
-    private Handler mHandler;
 
-    @Override
-    public void onDestroy() {
-        stopRepeatingTask();
-        super.onDestroy();
-    }
-
-    Runnable mStatusChecker = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                if (m_map != null) {
-                    UserData.target = m_map.getCameraPosition();
-                    m_map.clear();
-                    m_map.moveCamera(CameraUpdateFactory.newCameraPosition(UserData.target));
-
-                    for (AssetsData asset : UserData.mAssetData) {
-                        MarkerOptions marker = new MarkerOptions()
-                                .position(new LatLng(asset.getLatitude(), asset.getLongitude()));
-                        m_map.addMarker(marker);
-                    }
-                    Log.i(LOG_TAG, "The position of markers was updated");
-                }
-            } finally {
-                // 100% guarantee that this always happens, even if
-                // your update method throws an exception
-                mHandler.postDelayed(mStatusChecker, mInterval);
-            }
-        }
-    };
-
-    void startRepeatingTask() {
-        mStatusChecker.run();
-    }
-
-    void stopRepeatingTask() {
-        mHandler.removeCallbacks(mStatusChecker);
-    }
 
 }

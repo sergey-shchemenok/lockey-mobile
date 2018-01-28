@@ -25,20 +25,16 @@ public class AuthActivity extends AppCompatActivity
     private EditText passwordView;
     private Button loginButton;
 
-    private String pwd;
-    private String usr;
-
-    private static final int AUTH_LOADER_ID = 2;
-
     public static final String LOG_TAG = AuthActivity.class.getName();
     /**
      * URL for assets data from the Lockey Server
      */
-    private static final String AUTH_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/Auth";
 
     private ConnectivityManager connectivityManager;
 
     private LoaderManager loaderManager;
+
+    private  NetworkInfo activeNetwork;
 
 
     @Override
@@ -55,20 +51,23 @@ public class AuthActivity extends AppCompatActivity
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pwd = passwordView.getText().toString();
-                usr = loginView.getText().toString();
-                startLoader();
+                UserData.pwd = passwordView.getText().toString();
+                UserData.usr = loginView.getText().toString();
+                getToken();
             }
         });
 
+        getToken();
+
+
     }
 
-    public void startLoader(){
+    public void getToken(){
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
             loaderManager = getLoaderManager();
-            loaderManager.initLoader(AUTH_LOADER_ID, null, this);
+            loaderManager.initLoader(UserData.AUTH_LOADER_ID, null, this);
             Log.v(LOG_TAG, "initLoader");
         } else {
 //            progressCircle.setVisibility(View.GONE);
@@ -80,14 +79,12 @@ public class AuthActivity extends AppCompatActivity
     public Loader<String> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
         Log.v(LOG_TAG, "onCreateLoader");
-        return new TokenLoader(this, AUTH_REQUEST_URL, pwd, usr);
+        return new TokenLoader(this, UserData.AUTH_REQUEST_URL, UserData.pwd, UserData.usr);
     }
 
     @Override
     public void onLoadFinished(Loader<String> loader, String message) {
         loaderManager.destroyLoader(2);
-        pwd = "";
-        usr = "";
         if (!message.equals("OK")) {
             return;
         }

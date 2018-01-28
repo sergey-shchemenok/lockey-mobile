@@ -23,6 +23,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
+import ru.tradition.lockeymobile.AuthActivity;
+import ru.tradition.lockeymobile.UserData;
+import ru.tradition.lockeymobile.auth.AuthQueryUtils;
+
 import static ru.tradition.lockeymobile.auth.AuthQueryUtils.authCookieManager;
 
 
@@ -33,7 +37,10 @@ import static ru.tradition.lockeymobile.auth.AuthQueryUtils.authCookieManager;
 public final class AssetsQueryUtils {
     public static final String LOG_TAG = AssetsQueryUtils.class.getName();
 
+    //Stores the response code for the request
     public static int assetsUrlResponseCode;
+
+    public static boolean needToken = false;
 
     /**
      * Create a private constructor because no one should ever create a {@link AssetsQueryUtils} object.
@@ -74,12 +81,12 @@ public final class AssetsQueryUtils {
         return assets;
     }
 
-    private static int getLastTimeInMilli(String posTime){
+    private static int getLastTimeInMilli(String posTime) {
         int lastSignalTime = 1440;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             Instant now = Instant.now();
             Instant then = Instant.parse(posTime);
-            return (int) ((now.toEpochMilli()-then.toEpochMilli())/60000);
+            return (int) ((now.toEpochMilli() - then.toEpochMilli()) / 60000);
         } else {
             long now = new Date().getTime();
             Log.e(LOG_TAG, "try to get the last position time...");
@@ -88,9 +95,9 @@ public final class AssetsQueryUtils {
             simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
             try {
-                Date then =  simpleDateFormat.parse(posTime);
+                Date then = simpleDateFormat.parse(posTime);
                 long thenL = then.getTime();
-                return (int) ((now-thenL)/60000);
+                return (int) ((now - thenL) / 60000);
 
             } catch (java.text.ParseException e) {
                 e.printStackTrace();
@@ -147,6 +154,12 @@ public final class AssetsQueryUtils {
         // If the URL is null, then return early.
         if (url == null) {
             return jsonResponse;
+        }
+
+        //todo process here
+        if (needToken) {
+            AuthQueryUtils.makeHttpRequest(new URL(UserData.AUTH_REQUEST_URL), UserData.pwd, UserData.usr);
+            needToken = false;
         }
 
         Log.e(LOG_TAG, "url..........." + url + "...");

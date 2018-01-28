@@ -24,6 +24,7 @@ import java.util.Map;
 public final class AuthQueryUtils {
     public static final String LOG_TAG = AuthQueryUtils.class.getName();
 
+    //For getting cookies
     public static java.net.CookieManager authCookieManager = new java.net.CookieManager();
 
     private AuthQueryUtils() {}

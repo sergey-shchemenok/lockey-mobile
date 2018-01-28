@@ -25,6 +25,7 @@ import java.util.List;
 import ru.tradition.lockeymobile.obtainingassets.AssetsData;
 import ru.tradition.lockeymobile.obtainingassets.AssetsFragment;
 import ru.tradition.lockeymobile.obtainingassets.AssetsLoader;
+import ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils;
 
 import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsUrlResponseCode;
 
@@ -35,30 +36,22 @@ public class MainActivity extends AppCompatActivity implements
         AssetsFragment.OnFragmentInteractionListener {
 
 
+    //Flags for managing the updating thread
+    private static boolean isRepeated = false;
+    private static boolean isInterrupted = false;
+    private static boolean isFinished = false;
 
-    public static boolean isRepeated = false;
-    public static boolean isInterrupted = false;
-    public static boolean isFinished = false;
-
-
+    private static boolean hasToken = true;
 
 
     private TextView mEmptyStateTextView;
     private ProgressBar progressCircle;
     private ConnectivityManager connectivityManager;
+    private NetworkInfo activeNetwork;
     private LoaderManager loaderManager;
 
-    /**
-     * Constant value for the assets loader ID. We can choose any integer.
-     * This comes into play if you're using multiple loaders.
-     */
-    private static final int ASSETS_LOADER_ID = 1;
-
     public static final String LOG_TAG = MainActivity.class.getName();
-    /**
-     * URL for assets data from the Lockey Server
-     */
-    private static final String ASSETS_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/Cars";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,9 +66,13 @@ public class MainActivity extends AppCompatActivity implements
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
         }
-        //Checking the connection using connectivityManager
+
+        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        //launch loading data from server
         startLoader();
 
+        //updating thread
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -96,36 +93,39 @@ public class MainActivity extends AppCompatActivity implements
         }).start();
     }
 
+        //For initial data loading
     private void startLoader() {
-        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
             loaderManager = getLoaderManager();
-            loaderManager.initLoader(ASSETS_LOADER_ID, null, this);
-            Log.v(LOG_TAG, "initLoader");
+            loaderManager.initLoader(UserData.ASSETS_LOADER_ID, null, this);
+            Log.i(LOG_TAG, "initLoader");
         } else {
             progressCircle.setVisibility(View.GONE);
             mEmptyStateTextView.setText(R.string.no_connection);
         }
     }
 
+    //For periodic data loading
     private void repeatLoader() {
-        connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
-            loaderManager.restartLoader(ASSETS_LOADER_ID, null, this);
-            Log.v(LOG_TAG, "initLoader");
+            loaderManager.restartLoader(UserData.ASSETS_LOADER_ID, null, this);
+            Log.i(LOG_TAG, "repeatLoader");
         } else {
-
+            //todo set red bar status
+//            isFinished = false;
+//            isRepeated = false;
+//            Intent intent = new Intent(this, MainActivity.class);
+//            startActivity(intent);
         }
     }
-
 
     @Override
     public Loader<List<AssetsData>> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
-        Log.v(LOG_TAG, "onCreateLoader");
-        return new AssetsLoader(this, ASSETS_REQUEST_URL);
+        Log.i(LOG_TAG, "onCreateLoader");
+        return new AssetsLoader(this, UserData.ASSETS_REQUEST_URL);
     }
 
     @Override
@@ -136,26 +136,20 @@ public class MainActivity extends AppCompatActivity implements
 
         //whether it can be authorized. The token has not expired
         if (assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
-            Intent intent = new Intent(this, AuthActivity.class);
-            isFinished = false;
-            isRepeated = false;
-            startActivity(intent);
-            return;
+            AssetsQueryUtils.needToken = true;
+//            Intent intent = new Intent(this, AuthActivity.class);
+//            isFinished = false;
+//            isRepeated = false;
+//            startActivity(intent);
+//            return;
         }
 
         if (!isRepeated) {
             if (assetData == null || assetData.isEmpty()) {
-                connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-                if (activeNetwork != null && activeNetwork.isConnected()) {
-                } else {
-                    mEmptyStateTextView.setText(R.string.no_connection);
-                    return;
-                }
                 mEmptyStateTextView.setText(R.string.no_assets);
                 return;
             }
-            Log.v(LOG_TAG, "onLoadFinished");
+            Log.i(LOG_TAG, "onLoadFinished");
 
             UserData.mAssetData = assetData;
 
@@ -198,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onLoaderReset(Loader<List<AssetsData>> loader) {
         UserData.mAssetData.clear();
 
-        Log.v(LOG_TAG, "onLoadReset");
+        Log.i(LOG_TAG, "onLoadReset");
 
     }
 

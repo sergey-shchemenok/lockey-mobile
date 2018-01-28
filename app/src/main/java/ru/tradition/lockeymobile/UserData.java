@@ -11,7 +11,11 @@ import ru.tradition.lockeymobile.obtainingassets.AssetsData;
  * Created by Caelestis on 28.01.2018.
  */
 
-public class UserData {
+public final class UserData {
+
+    //for getting token without starting MainActivity
+    public static boolean hasToken = false;
+
     //Here is the data from Loader about cars and other assets
     //todo move it into User class
     public static List<AssetsData> mAssetData;
@@ -24,4 +28,26 @@ public class UserData {
 
     //todo Here is the data from Loader about cars and other assets for API lesser 26
     public static List<AssetsData> mAssetDataAPIBefore26;
+
+    //user's login and password
+    public static String pwd = "";
+    public static String usr = "";
+
+
+    /**
+     * Constant value for the assets loader ID. We can choose any integer.
+     * This comes into play if you're using multiple loaders.
+     */
+    public static final int ASSETS_LOADER_ID = 1;
+
+    /**
+     * URL for assets data from server
+     */
+    public static final String ASSETS_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/Cars";
+
+    public static final String AUTH_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/Auth";
+
+    public static final int AUTH_LOADER_ID = 2;
+
+
 }

@@ -6,13 +6,18 @@ import android.content.Intent;
 import android.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import java.net.HttpURLConnection;
+
+import ru.tradition.lockeymobile.auth.AuthQueryUtils;
 import ru.tradition.lockeymobile.auth.TokenLoader;
 
 
@@ -36,6 +41,8 @@ public class AuthActivity extends AppCompatActivity
 
     private NetworkInfo activeNetwork;
 
+    private TextView infoMessage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +53,15 @@ public class AuthActivity extends AppCompatActivity
         passwordView = (EditText) findViewById(R.id.edit_password);
         loginButton = (Button) findViewById(R.id.login_button);
 
+        infoMessage = (TextView) findViewById(R.id.main_info_message);
+        infoMessage.setVisibility(View.INVISIBLE);
+
         if (!UserData.usr.isEmpty())
             loginView.setText(UserData.usr);
         if (!UserData.pwd.isEmpty())
             passwordView.setText(UserData.pwd);
+
+        mHandler = new Handler();
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,8 +82,8 @@ public class AuthActivity extends AppCompatActivity
             loaderManager.initLoader(UserData.AUTH_LOADER_ID, null, this);
             Log.v(LOG_TAG, "initLoader");
         } else {
-//            progressCircle.setVisibility(View.GONE);
-//            mEmptyStateTextView.setText(R.string.no_connection);
+            infoMessage.setVisibility(View.VISIBLE);
+            infoMessage.setText(R.string.no_connection);
         }
     }
 
@@ -85,9 +97,17 @@ public class AuthActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<String> loader, String message) {
         loaderManager.destroyLoader(2);
-        if (!message.equals("OK")) {
+        if (!message.equals("OK") && AuthQueryUtils.authUrlResponseCode != HttpURLConnection.HTTP_OK) {
+            infoMessage.setVisibility(View.VISIBLE);
+            infoMessage.setText(AuthQueryUtils.authUrlResponseMessage);
             return;
         }
+        if (!message.equals("OK")) {
+            infoMessage.setVisibility(View.VISIBLE);
+            infoMessage.setText(R.string.no_credentials);
+            return;
+        }
+        infoMessage.setVisibility(View.INVISIBLE);
         Log.v(LOG_TAG, "onLoadFinished");
 //        result = (TextView)findViewById(R.id.result);
 //        result.setText(message);
@@ -102,4 +122,50 @@ public class AuthActivity extends AppCompatActivity
 
     }
 
+    @Override
+    protected void onStart() {
+        Log.i(LOG_TAG, "Activity has started..............................");
+        super.onStart();
+        startRepeatingTask();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.i(LOG_TAG, "Activity has stopped..............................");
+        super.onStop();
+        stopRepeatingTask();
+    }
+
+    //The code for assets updating
+    private int mInterval = 5000; // 5 seconds by default, can be changed later
+    private Handler mHandler;
+
+    Runnable mStatusChecker = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                Log.i(LOG_TAG, "checking network");
+                connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                activeNetwork = connectivityManager.getActiveNetworkInfo();
+                if (activeNetwork != null && activeNetwork.isConnected()) {
+                    infoMessage.setVisibility(View.INVISIBLE);
+                    infoMessage.setText("");
+                } else {
+                    infoMessage.setVisibility(View.VISIBLE);
+                    infoMessage.setText(R.string.no_connection);
+                }
+            } finally {
+                // 100% guarantee that this always happens, even if
+                // your update method throws an exception
+                mHandler.postDelayed(mStatusChecker, mInterval);
+            }
+        }
+    };
+    void startRepeatingTask() {
+        mStatusChecker.run();
+    }
+    void stopRepeatingTask() {
+        mHandler.removeCallbacks(mStatusChecker);
+    }
+    //end here
 }

@@ -24,6 +24,12 @@ import java.util.Map;
 public final class AuthQueryUtils {
     public static final String LOG_TAG = AuthQueryUtils.class.getName();
 
+    //Stores the response code for the request
+    public static int authUrlResponseCode;
+
+    //Stores the response message for the request
+    public static String authUrlResponseMessage;
+
     //For getting cookies
     public static java.net.CookieManager authCookieManager = new java.net.CookieManager();
 
@@ -115,8 +121,9 @@ public final class AuthQueryUtils {
                 }
             }
 
-            int httpResult = urlConnection.getResponseCode();
-            if (httpResult == HttpURLConnection.HTTP_OK) {
+            authUrlResponseCode = urlConnection.getResponseCode();
+            authUrlResponseMessage = urlConnection.getResponseMessage();
+            if (authUrlResponseCode == HttpURLConnection.HTTP_OK) {
                 BufferedReader br = new BufferedReader(new InputStreamReader(
                         urlConnection.getInputStream(), "utf-8"));
                 String line = null;
@@ -128,7 +135,7 @@ public final class AuthQueryUtils {
                 return sb.toString();
 
             } else {
-                return String.valueOf(httpResult);
+                return String.valueOf(authUrlResponseCode);
                 //return urlConnection.getResponseMessage();
             }
         } catch (MalformedURLException e) {

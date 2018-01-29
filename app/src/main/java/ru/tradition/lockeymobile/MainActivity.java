@@ -34,6 +34,7 @@ import ru.tradition.lockeymobile.obtainingassets.AssetsLoader;
 import ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils;
 
 import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsUrlResponseCode;
+import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsUrlResponseMessage;
 
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<List<AssetsData>>,
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements
     private ConnectivityManager connectivityManager;
     private NetworkInfo activeNetwork;
     private LoaderManager loaderManager;
+    private TextView infoMessage;
 
     public static final String LOG_TAG = MainActivity.class.getName();
 
@@ -69,7 +71,8 @@ public class MainActivity extends AppCompatActivity implements
 
         progressCircle = (ProgressBar) findViewById(R.id.loading_spinner);
         mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
-
+        infoMessage = (TextView) findViewById(R.id.main_info_message);
+        infoMessage.setVisibility(View.GONE);
 
         if (assetsUrlResponseCode == 0) {
             Intent intent = new Intent(this, AuthActivity.class);
@@ -141,15 +144,13 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
     };
-
     void startRepeatingTask() {
         mStatusChecker.run();
     }
-
     void stopRepeatingTask() {
         mHandler.removeCallbacks(mStatusChecker);
     }
-
+    //the code for assets updating is finished here
 
 
     //For initial data loading
@@ -172,14 +173,10 @@ public class MainActivity extends AppCompatActivity implements
             loaderManager.restartLoader(UserData.ASSETS_LOADER_ID, null, this);
             Log.i(LOG_TAG, "repeatLoader");
         } else {
+            infoMessage.setVisibility(View.VISIBLE);
+            infoMessage.setText(R.string.no_connection);
             //todo set red bar status
             Log.i(LOG_TAG, "No connection");
-
-            //change period if no connection
-//            isFinished = false;
-//            isRepeated = false;
-//            Intent intent = new Intent(this, MainActivity.class);
-//            startActivity(intent);
         }
     }
 
@@ -199,12 +196,16 @@ public class MainActivity extends AppCompatActivity implements
         //whether it can be authorized. The token has not expired
         if (assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             AssetsQueryUtils.needToken = true;
-//            Intent intent = new Intent(this, AuthActivity.class);
-//            isFinished = false;
-//            isRepeated = false;
-//            startActivity(intent);
-//            return;
         }
+
+        //whether it have some problem
+        if (assetsUrlResponseCode != HttpURLConnection.HTTP_OK &&
+                assetsUrlResponseCode != HttpURLConnection.HTTP_UNAUTHORIZED) {
+            infoMessage.setVisibility(View.VISIBLE);
+            infoMessage.setText(assetsUrlResponseMessage);
+            return;
+        }
+        infoMessage.setVisibility(View.GONE);
 
         if (!isRepeated) {
             if (assetData == null || assetData.isEmpty()) {

@@ -2,6 +2,7 @@
     <string name="app_name">Lockey Mobile</string>
     <string name="no_connection">Нет интернет-соединения.</string>
     <string name="no_assets">Нет объектов</string>
+    <string name="no_credentials">Неверный логин или пароль</string>
     <string name="login">Логин</string>
     <string name="hint_login">Имя пользователя</string>
 

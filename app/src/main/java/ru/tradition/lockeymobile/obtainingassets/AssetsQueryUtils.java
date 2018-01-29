@@ -40,6 +40,9 @@ public final class AssetsQueryUtils {
     //Stores the response code for the request
     public static int assetsUrlResponseCode;
 
+    //Stores the response message for the request
+    public static String assetsUrlResponseMessage;
+
     public static boolean needToken = false;
 
     /**
@@ -185,6 +188,7 @@ public final class AssetsQueryUtils {
             // then read the input stream and parse the response.
 
             assetsUrlResponseCode = urlConnection.getResponseCode();
+            assetsUrlResponseMessage = urlConnection.getResponseMessage();
             if (assetsUrlResponseCode == HttpURLConnection.HTTP_OK) {
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);

@@ -12,6 +12,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -40,6 +43,9 @@ public class MainActivity extends AppCompatActivity implements
     private static boolean isRepeated = false;
     private static boolean isInterrupted = false;
     private static boolean isFinished = false;
+
+    //updating period
+    public static long sleepTime = 10000;
 
     private static boolean hasToken = true;
 
@@ -79,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements
                 while (!isInterrupted) {
 
                     try {
-                        Thread.sleep(10000);
+                        Thread.sleep(sleepTime);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -93,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements
         }).start();
     }
 
-        //For initial data loading
+    //For initial data loading
     private void startLoader() {
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
@@ -114,12 +120,29 @@ public class MainActivity extends AppCompatActivity implements
             Log.i(LOG_TAG, "repeatLoader");
         } else {
             //todo set red bar status
+            Log.i(LOG_TAG, "No connection");
+
+            //change period if no connection
 //            isFinished = false;
 //            isRepeated = false;
 //            Intent intent = new Intent(this, MainActivity.class);
 //            startActivity(intent);
         }
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        MainActivity.sleepTime = 1000;
+
+    }
+
+    @Override
+    public void onStop() {
+        MainActivity.sleepTime = Long.MAX_VALUE;
+        super.onStop();
+    }
+
 
     @Override
     public Loader<List<AssetsData>> onCreateLoader(int i, Bundle bundle) {
@@ -194,6 +217,48 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.i(LOG_TAG, "onLoadReset");
 
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu options from the res/menu/menu_catalog.xml file.
+        // This adds menu items to the app bar.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // User clicked on a menu option in the app bar overflow menu
+        switch (item.getItemId()) {
+            // Respond to a click on the "Insert dummy data" menu option
+            case R.id.main_menu_logout:
+                logout();
+                return true;
+            case R.id.main_menu_settings:
+                //todo settings here
+
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void logout() {
+        Intent intent = new Intent(this, AuthActivity.class);
+        isFinished = false;
+        isRepeated = false;
+        startActivity(intent);
+    }
+
+    /**
+     * This method is called when the back button is pressed.
+     */
+    @Override
+    public void onBackPressed() {
+        // If the pet hasn't changed, continue with handling back button press
+        //This button is upper to the left arrow
+        logout();
     }
 
     @Override

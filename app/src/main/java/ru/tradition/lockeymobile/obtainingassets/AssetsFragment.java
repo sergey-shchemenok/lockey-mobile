@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.tradition.lockeymobile.AuthActivity;
+import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
 
 import static ru.tradition.lockeymobile.UserData.mAssetData;
@@ -73,6 +74,13 @@ public class AssetsFragment extends Fragment {
 
         return rootView;
 
+    }
+
+    //when activity is closed it don't need to update data
+    @Override
+    public void onStart() {
+        MainActivity.sleepTime = 10000;
+        super.onStart();
     }
 
     @Override

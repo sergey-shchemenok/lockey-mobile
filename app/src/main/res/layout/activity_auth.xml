@@ -21,7 +21,7 @@
             android:layout_weight="1"
             android:fontFamily="sans-serif-medium"
 
-            android:text="Логин:"
+            android:text="@string/auth_login"
             android:textAppearance="?android:textAppearanceSmall"
             android:textColor="@color/colorAccent" />
 
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="2.5"
             android:fontFamily="sans-serif-light"
-            android:hint="имя пользователя"
+            android:hint="@string/auth_user_hint"
             android:textAppearance="?android:textAppearanceMedium" />
 
     </LinearLayout>
@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="sans-serif-medium"
-            android:text="Пароль:"
+            android:text="@string/auth_password"
             android:textAppearance="?android:textAppearanceSmall"
             android:textColor="@color/colorAccent" />
 
@@ -60,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="2.5"
             android:fontFamily="sans-serif-light"
-            android:hint="пароль"
+            android:hint="@string/auth_password_hint"
             android:inputType="textPassword"
             android:textAppearance="?android:textAppearanceMedium" />
 
@@ -74,7 +74,7 @@
         android:layout_marginRight="8dp"
         android:layout_marginTop="24dp"
         android:background="@color/colorAccent"
-        android:text="Войти"
+        android:text="@string/auth_enter_button"
         android:textColor="@android:color/white" />
 
     <!--<TextView-->

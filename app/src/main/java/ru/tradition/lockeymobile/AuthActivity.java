@@ -17,7 +17,7 @@ import ru.tradition.lockeymobile.auth.TokenLoader;
 
 
 public class AuthActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<String>{
+        implements LoaderManager.LoaderCallbacks<String> {
 
 //    private TextView result;
 
@@ -34,7 +34,7 @@ public class AuthActivity extends AppCompatActivity
 
     private LoaderManager loaderManager;
 
-    private  NetworkInfo activeNetwork;
+    private NetworkInfo activeNetwork;
 
 
     @Override
@@ -42,11 +42,14 @@ public class AuthActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_auth);
 
-        loginView = (EditText)findViewById(R.id.edit_login);
-        passwordView = (EditText)findViewById(R.id.edit_password);
-        loginButton = (Button)findViewById(R.id.login_button);
+        loginView = (EditText) findViewById(R.id.edit_login);
+        passwordView = (EditText) findViewById(R.id.edit_password);
+        loginButton = (Button) findViewById(R.id.login_button);
 
-
+        if (!UserData.usr.isEmpty())
+            loginView.setText(UserData.usr);
+        if (!UserData.pwd.isEmpty())
+            passwordView.setText(UserData.pwd);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,12 +60,9 @@ public class AuthActivity extends AppCompatActivity
             }
         });
 
-        getToken();
-
-
     }
 
-    public void getToken(){
+    public void getToken() {
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {

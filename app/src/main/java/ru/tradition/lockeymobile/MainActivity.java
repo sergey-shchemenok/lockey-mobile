@@ -44,9 +44,9 @@ public class MainActivity extends AppCompatActivity implements
 
 
     //Flags for managing the updating thread
-    private static boolean isRepeated = false;
+    public static boolean isRepeated = false;
     private static boolean isInterrupted = false;
-    private static boolean isFinished = false;
+    public static boolean isFinished = false;
 
     //updating period
     public static long sleepTime = 10000;

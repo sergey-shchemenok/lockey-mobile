@@ -75,6 +75,13 @@ public class OtherFragment extends Fragment {
     }
 
     @Override
+    public void onDestroyView() {
+        MainActivity.isFinished = false;
+        MainActivity.isRepeated = false;
+        super.onDestroyView();
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnFragmentInteractionListener) {

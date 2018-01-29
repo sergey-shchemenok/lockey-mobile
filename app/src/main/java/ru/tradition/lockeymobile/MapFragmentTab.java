@@ -170,6 +170,13 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
 
     }
 
+    @Override
+    public void onDestroyView() {
+        MainActivity.isFinished = false;
+        MainActivity.isRepeated = false;
+        super.onDestroyView();
+    }
+
     //The code for map updating
     private int mInterval = 5000; // 5 seconds by default, can be changed later
     private Handler mHandler;

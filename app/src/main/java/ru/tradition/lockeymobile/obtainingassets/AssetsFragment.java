@@ -76,13 +76,6 @@ public class AssetsFragment extends Fragment {
 
     }
 
-    //when activity is closed it don't need to update data
-    @Override
-    public void onStart() {
-        MainActivity.sleepTime = 10000;
-        super.onStart();
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

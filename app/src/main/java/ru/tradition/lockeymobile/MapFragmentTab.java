@@ -142,7 +142,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onStart() {
-        MainActivity.sleepTime = 10000;
         super.onStart();
         startRepeatingTask();
     }

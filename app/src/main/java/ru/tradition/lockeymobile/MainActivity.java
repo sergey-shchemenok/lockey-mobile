@@ -7,6 +7,7 @@ import android.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -19,8 +20,10 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.net.HttpURLConnection;
 import java.util.List;
@@ -77,27 +80,77 @@ public class MainActivity extends AppCompatActivity implements
 
         //launch loading data from server
         startLoader();
-
         //updating thread
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (!isInterrupted) {
-
-                    try {
-                        Thread.sleep(sleepTime);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    if (isFinished) {
-                        repeatLoader();
-                        isRepeated = true;
-                        Log.i(LOG_TAG, "Repeating loading assets");
-                    }
-                }
-            }
-        }).start();
+        mHandler = new Handler();
+        //startUpdatingThread();
     }
+
+
+//    private void startUpdatingThread() {
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (!isInterrupted) {
+//
+//                    try {
+//                        Thread.sleep(sleepTime);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    if (isFinished) {
+//                        repeatLoader();
+//                        isRepeated = true;
+//                        Log.i(LOG_TAG, "Repeating loading assets");
+//                    }
+//                }
+//            }
+//        }).start();
+//    }
+
+    @Override
+    protected void onStart() {
+        Log.i(LOG_TAG, "Activity has started..............................");
+        super.onStart();
+        startRepeatingTask();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.i(LOG_TAG, "Activity has stoped..............................");
+        super.onStop();
+        stopRepeatingTask();
+    }
+
+    //The code for assets updating
+    private int mInterval = 10000; // 5 seconds by default, can be changed later
+    private Handler mHandler;
+
+    Runnable mStatusChecker = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                if (isFinished) {
+                    repeatLoader();
+                    isRepeated = true;
+                    Log.i(LOG_TAG, "Repeating loading assets");
+                }
+            } finally {
+                // 100% guarantee that this always happens, even if
+                // your update method throws an exception
+                mHandler.postDelayed(mStatusChecker, mInterval);
+            }
+        }
+    };
+
+    void startRepeatingTask() {
+        mStatusChecker.run();
+    }
+
+    void stopRepeatingTask() {
+        mHandler.removeCallbacks(mStatusChecker);
+    }
+
+
 
     //For initial data loading
     private void startLoader() {
@@ -129,20 +182,6 @@ public class MainActivity extends AppCompatActivity implements
 //            startActivity(intent);
         }
     }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        MainActivity.sleepTime = 1000;
-
-    }
-
-    @Override
-    public void onStop() {
-        MainActivity.sleepTime = Long.MAX_VALUE;
-        super.onStop();
-    }
-
 
     @Override
     public Loader<List<AssetsData>> onCreateLoader(int i, Bundle bundle) {

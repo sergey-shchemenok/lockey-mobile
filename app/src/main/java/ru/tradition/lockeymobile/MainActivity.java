@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity implements
         OtherFragment.OnFragmentInteractionListener,
         AssetsFragment.OnFragmentInteractionListener {
 
+    public static MainActivity mainActivity;
+
 
     //Flags for managing the updating thread
     public static boolean isRepeated = false;
@@ -67,90 +69,34 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        progressCircle = (ProgressBar) findViewById(R.id.loading_spinner);
-        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
-        infoMessage = (TextView) findViewById(R.id.main_info_message);
-        infoMessage.setVisibility(View.GONE);
 
         if (assetsUrlResponseCode == 0) {
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
         }
 
+        setContentView(R.layout.activity_main);
+
+        progressCircle = (ProgressBar) findViewById(R.id.loading_spinner);
+        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
+        infoMessage = (TextView) findViewById(R.id.main_info_message);
+        infoMessage.setVisibility(View.GONE);
+        progressCircle.setVisibility(View.VISIBLE);
+
+
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         //launch loading data from server
         startLoader();
-        //updating thread
-        mHandler = new Handler();
-        //startUpdatingThread();
+
+        mainActivity = this;
+
+
     }
 
 
-//    private void startUpdatingThread() {
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while (!isInterrupted) {
-//
-//                    try {
-//                        Thread.sleep(sleepTime);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    if (isFinished) {
-//                        repeatLoader();
-//                        isRepeated = true;
-//                        Log.i(LOG_TAG, "Repeating loading assets");
-//                    }
-//                }
-//            }
-//        }).start();
-//    }
 
-    @Override
-    protected void onStart() {
-        Log.i(LOG_TAG, "Activity has started..............................");
-        super.onStart();
-        startRepeatingTask();
-    }
 
-    @Override
-    protected void onStop() {
-        Log.i(LOG_TAG, "Activity has stoped..............................");
-        super.onStop();
-        stopRepeatingTask();
-    }
-
-    //The code for assets updating
-    private int mInterval = 10000; // 5 seconds by default, can be changed later
-    private Handler mHandler;
-
-    Runnable mStatusChecker = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                if (isFinished) {
-                    repeatLoader();
-                    isRepeated = true;
-                    Log.i(LOG_TAG, "Repeating loading assets");
-                }
-            } finally {
-                // 100% guarantee that this always happens, even if
-                // your update method throws an exception
-                mHandler.postDelayed(mStatusChecker, mInterval);
-            }
-        }
-    };
-    void startRepeatingTask() {
-        mStatusChecker.run();
-    }
-    void stopRepeatingTask() {
-        mHandler.removeCallbacks(mStatusChecker);
-    }
-    //the code for assets updating is finished here
 
 
     //For initial data loading
@@ -162,15 +108,16 @@ public class MainActivity extends AppCompatActivity implements
             Log.i(LOG_TAG, "initLoader");
         } else {
             progressCircle.setVisibility(View.GONE);
-            mEmptyStateTextView.setText(R.string.no_connection);
+            infoMessage.setText(R.string.no_connection);
         }
     }
 
     //For periodic data loading
-    private void repeatLoader() {
+    public void repeatLoader() {
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
-            loaderManager.restartLoader(UserData.ASSETS_LOADER_ID, null, this);
+            loaderManager.destroyLoader(UserData.ASSETS_LOADER_ID);
+            loaderManager.initLoader(UserData.ASSETS_LOADER_ID, null, this);
             Log.i(LOG_TAG, "repeatLoader");
         } else {
             infoMessage.setVisibility(View.VISIBLE);
@@ -212,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements
                 mEmptyStateTextView.setText(R.string.no_assets);
                 return;
             }
+            mEmptyStateTextView.setText("");
             Log.i(LOG_TAG, "onLoadFinished");
 
             UserData.mAssetData = assetData;
@@ -239,6 +187,9 @@ public class MainActivity extends AppCompatActivity implements
             isFinished = true;
         } else {
             UserData.mAssetData = assetData;
+            //here is not good for speed
+            AssetsFragment.assetsDataAdapter.clear();
+            AssetsFragment.assetsDataAdapter.addAll(assetData);
         }
 
     }
@@ -253,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onLoaderReset(Loader<List<AssetsData>> loader) {
-        UserData.mAssetData.clear();
+        //UserData.mAssetData.clear();
 
         Log.i(LOG_TAG, "onLoadReset");
 
@@ -284,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    private void logout() {
+    public void logout() {
         Intent intent = new Intent(this, AuthActivity.class);
         isFinished = false;
         isRepeated = false;

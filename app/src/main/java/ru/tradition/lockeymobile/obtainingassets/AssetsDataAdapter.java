@@ -48,7 +48,9 @@ public class AssetsDataAdapter extends ArrayAdapter<AssetsData> {
         regNumberView.setText(currentAssetsData.getRegNumber());
 
         TextView carModelView = (TextView) listItemView.findViewById(R.id.car_model);
-        carModelView.setText(currentAssetsData.getModel());
+        //carModelView.setText(currentAssetsData.getModel());
+        carModelView.setText(String.valueOf(currentAssetsData.getLastSignalTime()));
+
 
         // Fetch the background from the TextView, which is a GradientDrawable.
         GradientDrawable lastSignalTimeCircle = (GradientDrawable) lastSignalTimeView.getBackground();

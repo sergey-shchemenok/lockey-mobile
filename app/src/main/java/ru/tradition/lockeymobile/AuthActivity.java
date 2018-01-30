@@ -168,4 +168,10 @@ public class AuthActivity extends AppCompatActivity
         mHandler.removeCallbacks(mStatusChecker);
     }
     //end here
+
+
+    @Override
+    public void onBackPressed() {
+
+    }
 }

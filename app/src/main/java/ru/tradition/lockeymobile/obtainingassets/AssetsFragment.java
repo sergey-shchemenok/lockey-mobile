@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -47,7 +48,7 @@ public class AssetsFragment extends Fragment {
      */
     public static final String LOG_TAG = AssetsFragment.class.getName();
 
-    private AssetsDataAdapter assetsDataAdapter;
+    public static AssetsDataAdapter assetsDataAdapter;
 
     private ListView assetsListView;
 
@@ -62,7 +63,13 @@ public class AssetsFragment extends Fragment {
         assetsDataAdapter = new AssetsDataAdapter(getActivity(), new ArrayList<AssetsData>());
         assetsListView.setAdapter(assetsDataAdapter);
 
-        assetsDataAdapter.addAll(mAssetData);
+        //todo update
+        try {
+            assetsDataAdapter.addAll(mAssetData);
+        }catch(NullPointerException e){
+            MainActivity.mainActivity.logout();
+        }
+
 
         //todo this will be made in the near future, i hope
         assetsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -73,15 +80,14 @@ public class AssetsFragment extends Fragment {
         });
 
         return rootView;
-
     }
 
-    @Override
-    public void onDestroyView() {
-        MainActivity.isFinished = false;
-        MainActivity.isRepeated = false;
-        super.onDestroyView();
-    }
+//    @Override
+//    public void onDestroyView() {
+//        MainActivity.isFinished = false;
+//        MainActivity.isRepeated = false;
+//        super.onDestroyView();
+//    }
 
     @Override
     public void onAttach(Context context) {

@@ -18,6 +18,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -153,10 +154,18 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         m_map = map;
         m_map.moveCamera(CameraUpdateFactory.newCameraPosition(UserData.target));
 
-        for (AssetsData asset : UserData.mAssetData) {
-            MarkerOptions marker = new MarkerOptions()
-                    .position(new LatLng(asset.getLatitude(), asset.getLongitude()));
-            m_map.addMarker(marker);
+        try {
+            for (AssetsData asset : UserData.mAssetData) {
+                MarkerOptions marker = new MarkerOptions()
+                        .position(new LatLng(asset.getLatitude(), asset.getLongitude()))
+                        .title(String.valueOf(asset.getId()));
+                if (asset.getLastSignalTime() < 15 && asset.getLastSignalTime() >= 0) {
+                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                }
+                m_map.addMarker(marker);
+            }
+        } catch (NullPointerException e) {
+            MainActivity.mainActivity.logout();
         }
     }
 
@@ -164,27 +173,36 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
     //Save camera position
     @Override
     public void onStop() {
-        UserData.target = m_map.getCameraPosition();
+        try {
+            UserData.target = m_map.getCameraPosition();
+        } catch (NullPointerException e) {
+            MainActivity.mainActivity.logout();
+        }
         stopRepeatingTask();
         super.onStop();
 
     }
 
-    @Override
-    public void onDestroyView() {
-        MainActivity.isFinished = false;
-        MainActivity.isRepeated = false;
-        super.onDestroyView();
-    }
+//    @Override
+//    public void onDestroyView() {
+//        MainActivity.isFinished = false;
+//        MainActivity.isRepeated = false;
+//        super.onDestroyView();
+//    }
 
     //The code for map updating
-    private int mInterval = 5000; // 5 seconds by default, can be changed later
+    private int mInterval = 1000 * 10; // 5 seconds by default, can be changed later
     private Handler mHandler;
 
     Runnable mStatusChecker = new Runnable() {
         @Override
         public void run() {
             try {
+                if (MainActivity.isFinished) {
+                    MainActivity.mainActivity.repeatLoader();
+                    MainActivity.isRepeated = true;
+                    Log.i(LOG_TAG, "Repeating loading assets");
+                }
                 if (m_map != null) {
                     UserData.target = m_map.getCameraPosition();
                     m_map.clear();
@@ -192,7 +210,11 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
 
                     for (AssetsData asset : UserData.mAssetData) {
                         MarkerOptions marker = new MarkerOptions()
-                                .position(new LatLng(asset.getLatitude(), asset.getLongitude()));
+                                .position(new LatLng(asset.getLatitude(), asset.getLongitude()))
+                                .title(String.valueOf(asset.getId()));
+                        if (asset.getLastSignalTime() < 15 && asset.getLastSignalTime() >= 0) {
+                            marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                        }
                         m_map.addMarker(marker);
                     }
                     Log.i(LOG_TAG, "The position of markers was updated");
@@ -212,8 +234,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
     void stopRepeatingTask() {
         mHandler.removeCallbacks(mStatusChecker);
     }
-
-
 
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -254,7 +274,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
 
 
 }

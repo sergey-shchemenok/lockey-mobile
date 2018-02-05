@@ -4,15 +4,13 @@
 
     <uses-feature
         android:glEsVersion="0x00020000"
-        android:required="true"/>
+        android:required="true" />
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -24,17 +22,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AuthActivity"></activity>
-        <activity
-            android:name=".MainActivity">
-            <!--android:configChanges="orientation|screenSize">-->
-            <!--todo think up something in the future-->
+        <activity android:name=".AuthActivity" />
+        <activity android:name=".MainActivity">
+
+            <!-- android:configChanges="orientation|screenSize"> -->
+            <!-- todo think up something in the future -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
         <meta-data
@@ -42,9 +39,9 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyB8lBwEsqiiklGZiWH8HLIM_93bAfPcICI"/>
+            android:value="AIzaSyB8lBwEsqiiklGZiWH8HLIM_93bAfPcICI" />
 
-
+        <activity android:name=".AssetActivity"></activity>
     </application>
 
 </manifest>

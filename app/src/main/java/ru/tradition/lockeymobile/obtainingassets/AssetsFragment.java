@@ -1,6 +1,7 @@
 package ru.tradition.lockeymobile.obtainingassets;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
@@ -23,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+import ru.tradition.lockeymobile.AssetActivity;
 import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
@@ -39,7 +41,8 @@ public class AssetsFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     // Required empty public constructor
-    public AssetsFragment() {}
+    public AssetsFragment() {
+    }
 
     public static final String LOG_TAG = AssetsFragment.class.getName();
     public static AssetsDataAdapter assetsDataAdapter;
@@ -58,15 +61,20 @@ public class AssetsFragment extends Fragment {
         //todo update
         try {
             assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
-        }catch(NullPointerException e){
+        } catch (NullPointerException e) {
             MainActivity.mainActivity.logout();
         }
 
         //todo this will be made in the near future, i hope
         assetsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                //AssetsData assetsData = assetsDataAdapter.getItem(position);
+            public void onItemClick(AdapterView<?> adapterView, View viewItem, int position, long itemId) {
+                Intent intent = new Intent(getActivity(), AssetActivity.class);
+
+                //put data to intent
+                AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
+                intent.putExtra("AssetData", as);
+                startActivity(intent);
             }
         });
         return rootView;

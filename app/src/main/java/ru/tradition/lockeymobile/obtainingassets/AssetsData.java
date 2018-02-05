@@ -1,10 +1,12 @@
 package ru.tradition.lockeymobile.obtainingassets;
 
+import java.io.Serializable;
+
 /**
  * Created by Caelestis on 22.01.2018.
  */
 
-public class AssetsData {
+public class AssetsData implements Serializable {
     private int id;
     private String name;
     private String model;

@@ -212,17 +212,11 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
                             markers.remove(id);
                             markers.put(id, m_map.addMarker(marker));
                             Log.i(LOG_TAG, "The markers have moved");
+                        }else{
+                            if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
+                                savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                            }else savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                         }
-
-
-
-//                        MarkerOptions marker = new MarkerOptions()
-//                                .position(new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude()))
-//                                .title(String.valueOf(pair.getValue().getId()));
-//                        if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
-//                            marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-//                        }
-//                        m_map.addMarker(marker);
                     }
                     Log.i(LOG_TAG, "The position of markers was updated");
                 }

@@ -16,12 +16,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Caelestis on 22.01.2018.
  */
 
-public class AssetsLoader extends AsyncTaskLoader<List<AssetsData>> {
+public class AssetsLoader extends AsyncTaskLoader<Map<Integer, AssetsData>> {
 
     /** Tag for log messages */
     private static final String LOG_TAG = AssetsLoader.class.getName();
@@ -51,7 +52,7 @@ public class AssetsLoader extends AsyncTaskLoader<List<AssetsData>> {
      * This is on a background thread.
      */
     @Override
-    public List<AssetsData> loadInBackground() {
+    public Map<Integer, AssetsData> loadInBackground() {
         if (mUrl == null) {
             return null;
         }
@@ -59,7 +60,7 @@ public class AssetsLoader extends AsyncTaskLoader<List<AssetsData>> {
         Log.v(LOG_TAG, "loadInBackground");
 
         // Perform the network request, parse the response, and extract a list of assets.
-        List<AssetsData> assetsList = AssetsQueryUtils.fetchAssetsData(mUrl);
+        Map<Integer, AssetsData> assetsList = AssetsQueryUtils.fetchAssetsData(mUrl);
         return assetsList;
     }
 }

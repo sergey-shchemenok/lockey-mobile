@@ -20,7 +20,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.obtainingassets.AssetsData;
 
@@ -36,11 +42,12 @@ import ru.tradition.lockeymobile.obtainingassets.AssetsData;
 public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
 
     private final String LOG_TAG = MapFragmentTab.class.getSimpleName();
-
     private static View rootView;
 
     GoogleMap m_map;
     boolean mapReady = false;
+
+    private static TreeMap<Integer, Marker> markers = new TreeMap<>();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -57,7 +64,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         // Required empty public constructor
     }
 
-    MapFragmentTab fragment;
+    //MapFragmentTab fragment;
 
     /**
      * Use this factory method to create a new instance of
@@ -84,9 +91,9 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
 
         /*
-        Note: You cannot inflate a layout into a fragment when that layout includes a <fragment>.
+        Note: We cannot inflate a layout into a fragment when that layout includes a <fragment>.
         Nested fragments are only supported when added to a fragment dynamically.
-        This is perhaps the best solution to the problem
+        This is perhaps the best solution to the issue
          */
         FragmentManager fm = getChildFragmentManager();
         mapFragment = (SupportMapFragment) fm.findFragmentByTag("mapFragment");
@@ -99,37 +106,17 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         }
         mapFragment.getMapAsync(this);
 
-
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        /*
-        Without this, there will be a big problem if we want to restart the app
-        The solution was found here https://stackoverflow.com/questions/14083950/duplicate-id-tag-null-or-parent-id-with-another-fragment-for-com-google-androi/14695397#14695397
-        In fact, the best solution is found, but this code can still come in handy
-*/
-
-//        if (rootView != null) {
-//            ViewGroup parent = (ViewGroup) rootView.getParent();
-//            if (parent != null)
-//                parent.removeView(rootView);
-//        }
-//        try {
-//            rootView = inflater.inflate(R.layout.tab_fragment_map, container, false);
-//        } catch (InflateException e) {
-//        /* map is already there, just return view as it is */
-//        }
 
         rootView = inflater.inflate(R.layout.tab_fragment_map, container, false);
-
         // Inflate the layout for this fragment
         return rootView;
     }
@@ -155,14 +142,15 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         m_map.moveCamera(CameraUpdateFactory.newCameraPosition(UserData.target));
 
         try {
-            for (AssetsData asset : UserData.mAssetData) {
+            markers.clear();
+            for (Map.Entry<Integer, AssetsData> pair  : UserData.mAssetData.entrySet()) {
                 MarkerOptions marker = new MarkerOptions()
-                        .position(new LatLng(asset.getLatitude(), asset.getLongitude()))
-                        .title(String.valueOf(asset.getId()));
-                if (asset.getLastSignalTime() < 15 && asset.getLastSignalTime() >= 0) {
+                        .position(new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude()))
+                        .title(String.valueOf(pair.getValue().getId()));
+                if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
                     marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 }
-                m_map.addMarker(marker);
+                markers.put(pair.getKey(), m_map.addMarker(marker));
             }
         } catch (NullPointerException e) {
             MainActivity.mainActivity.logout();
@@ -191,7 +179,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
 //    }
 
     //The code for map updating
-    private int mInterval = 1000 * 10; // 5 seconds by default, can be changed later
+    private int mInterval = 1000 * 5; // 5 seconds by default, can be changed later
     private Handler mHandler;
 
     Runnable mStatusChecker = new Runnable() {
@@ -205,23 +193,40 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
                 }
                 if (m_map != null) {
                     UserData.target = m_map.getCameraPosition();
-                    m_map.clear();
+                    //m_map.clear();
                     m_map.moveCamera(CameraUpdateFactory.newCameraPosition(UserData.target));
 
-                    for (AssetsData asset : UserData.mAssetData) {
-                        MarkerOptions marker = new MarkerOptions()
-                                .position(new LatLng(asset.getLatitude(), asset.getLongitude()))
-                                .title(String.valueOf(asset.getId()));
-                        if (asset.getLastSignalTime() < 15 && asset.getLastSignalTime() >= 0) {
-                            marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    for (Map.Entry<Integer, AssetsData> pair: UserData.mAssetData.entrySet()) {
+                        int id = pair.getKey();
+                        Marker savedMarker = markers.get(id);
+                        LatLng savedPosition = savedMarker.getPosition();
+                        LatLng newPosition = new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude());
+                        if (!savedPosition.equals(newPosition)){
+                            MarkerOptions marker = new MarkerOptions()
+                                    .position(newPosition)
+                                    .title(String.valueOf(pair.getValue().getId()));
+                            if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
+                                marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                            }
+                            savedMarker.remove();
+                            markers.remove(id);
+                            markers.put(id, m_map.addMarker(marker));
+                            Log.i(LOG_TAG, "The markers have moved");
                         }
-                        m_map.addMarker(marker);
+
+
+
+//                        MarkerOptions marker = new MarkerOptions()
+//                                .position(new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude()))
+//                                .title(String.valueOf(pair.getValue().getId()));
+//                        if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
+//                            marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+//                        }
+//                        m_map.addMarker(marker);
                     }
                     Log.i(LOG_TAG, "The position of markers was updated");
                 }
             } finally {
-                // 100% guarantee that this always happens, even if
-                // your update method throws an exception
                 mHandler.postDelayed(mStatusChecker, mInterval);
             }
         }

@@ -26,7 +26,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.obtainingassets.AssetsData;
 import ru.tradition.lockeymobile.obtainingassets.AssetsFragment;
@@ -37,7 +40,7 @@ import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsU
 import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsUrlResponseMessage;
 
 public class MainActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<List<AssetsData>>,
+        LoaderManager.LoaderCallbacks<Map<Integer, AssetsData>>,
         MapFragmentTab.OnFragmentInteractionListener,
         OtherFragment.OnFragmentInteractionListener,
         AssetsFragment.OnFragmentInteractionListener {
@@ -49,12 +52,6 @@ public class MainActivity extends AppCompatActivity implements
     public static boolean isRepeated = false;
     private static boolean isInterrupted = false;
     public static boolean isFinished = false;
-
-    //updating period
-    public static long sleepTime = 10000;
-
-    private static boolean hasToken = true;
-
 
     private TextView mEmptyStateTextView;
     private ProgressBar progressCircle;
@@ -90,14 +87,7 @@ public class MainActivity extends AppCompatActivity implements
         startLoader();
 
         mainActivity = this;
-
-
     }
-
-
-
-
-
 
     //For initial data loading
     private void startLoader() {
@@ -113,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     //For periodic data loading
-    public void repeatLoader() {
+    public synchronized void repeatLoader() {
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
             loaderManager.destroyLoader(UserData.ASSETS_LOADER_ID);
@@ -128,17 +118,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public Loader<List<AssetsData>> onCreateLoader(int i, Bundle bundle) {
+    public Loader<Map<Integer, AssetsData>> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
         Log.i(LOG_TAG, "onCreateLoader");
         return new AssetsLoader(this, UserData.ASSETS_REQUEST_URL);
     }
 
     @Override
-    public void onLoadFinished(Loader<List<AssetsData>> loader, List<AssetsData> assetData) {
+    public void onLoadFinished(Loader<Map<Integer, AssetsData>> loader, Map<Integer, AssetsData> assetData) {
         // Set empty state text to display "No assets found."
         progressCircle.setVisibility(View.GONE);
-
 
         //whether it can be authorized. The token has not expired
         if (assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
@@ -174,22 +163,20 @@ public class MainActivity extends AppCompatActivity implements
             viewPager.setAdapter(adapter);
 
             //assetsListView.setEmptyView(mEmptyStateTextView);
-
             TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
-            // Connect the tab layout with the view pager. This will
-            //   1. Update the tab layout when the view pager is swiped
-            //   2. Update the view pager when a tab is selected
-            //   3. Set the tab layout's tab names with the view pager's adapter's titles
-            //      by calling onPageTitle()
+            // Connect the tab layout with the view pager.
             tabLayout.setupWithViewPager(viewPager);
 
             isFinished = true;
         } else {
+            if (assetData == null || assetData.isEmpty()) {
+                return;
+            }
             UserData.mAssetData = assetData;
             //here is not good for speed
             AssetsFragment.assetsDataAdapter.clear();
-            AssetsFragment.assetsDataAdapter.addAll(assetData);
+            AssetsFragment.assetsDataAdapter.addAll(new ArrayList<>(assetData.values()));
         }
 
     }
@@ -203,13 +190,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLoaderReset(Loader<List<AssetsData>> loader) {
+    public void onLoaderReset(Loader<Map<Integer, AssetsData>> loader) {
         //UserData.mAssetData.clear();
-
         Log.i(LOG_TAG, "onLoadReset");
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -229,7 +213,6 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.main_menu_settings:
                 //todo settings here
-
                 return true;
         }
         return super.onOptionsItemSelected(item);

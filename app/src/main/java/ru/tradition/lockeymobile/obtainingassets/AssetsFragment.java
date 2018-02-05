@@ -38,20 +38,12 @@ public class AssetsFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public AssetsFragment() {
-        // Required empty public constructor
-    }
+    // Required empty public constructor
+    public AssetsFragment() {}
 
-
-    /**
-     * TextView that is displayed when the list is empty
-     */
     public static final String LOG_TAG = AssetsFragment.class.getName();
-
     public static AssetsDataAdapter assetsDataAdapter;
-
     private ListView assetsListView;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -65,11 +57,10 @@ public class AssetsFragment extends Fragment {
 
         //todo update
         try {
-            assetsDataAdapter.addAll(mAssetData);
+            assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
         }catch(NullPointerException e){
             MainActivity.mainActivity.logout();
         }
-
 
         //todo this will be made in the near future, i hope
         assetsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -78,7 +69,6 @@ public class AssetsFragment extends Fragment {
                 //AssetsData assetsData = assetsDataAdapter.getItem(position);
             }
         });
-
         return rootView;
     }
 

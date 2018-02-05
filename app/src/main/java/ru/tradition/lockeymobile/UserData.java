@@ -4,6 +4,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.obtainingassets.AssetsData;
 
@@ -18,7 +20,7 @@ public final class UserData {
 
     //Here is the data from Loader about cars and other assets
     //todo move it into User class
-    public static List<AssetsData> mAssetData;
+    public static Map<Integer, AssetsData> mAssetData;
     //To save camera position in case of restarting app
     public static CameraPosition target = CameraPosition.builder()
             .target(new LatLng(55.7522200, 37.6155600))

@@ -1,7 +1,5 @@
 package ru.tradition.lockeymobile.obtainingassets;
 
-import android.icu.text.SimpleDateFormat;
-import android.icu.util.Calendar;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -18,12 +16,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.TreeMap;
 
-import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.UserData;
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
 
@@ -51,9 +47,9 @@ public final class AssetsQueryUtils {
     private AssetsQueryUtils() {
     }
 
-    public static ArrayList<AssetsData> extractAssets(String jsonResponse) {
+    public static TreeMap<Integer, AssetsData> extractAssets(String jsonResponse) {
         // Create an empty ArrayList that we can start adding assets to
-        ArrayList<AssetsData> assets = new ArrayList<>();
+        TreeMap<Integer, AssetsData> assets = new TreeMap<>();
 
         // Try to parse the SAMPLE_JSON_RESPONSE. If there's a problem with the way the JSON
         // is formatted, a JSONException exception object will be thrown.
@@ -73,7 +69,7 @@ public final class AssetsQueryUtils {
                 int lastSignalTime = getLastTimeInMilli(asset.getString("PositionTime"));
                 double latitude = asset.getDouble("Latitude");
                 double longitude = asset.getDouble("Longitude");
-                assets.add(new AssetsData(id, name, model, regNumber, lastSignalTime, latitude, longitude));
+                assets.put(id, new AssetsData(id, name, model, regNumber, lastSignalTime, latitude, longitude));
             }
 
         } catch (JSONException e) {
@@ -125,7 +121,7 @@ public final class AssetsQueryUtils {
         return url;
     }
 
-    public static ArrayList<AssetsData> fetchAssetsData(String requestUrl) {
+    public static TreeMap<Integer, AssetsData> fetchAssetsData(String requestUrl) {
         // Create URL object
         URL url = createUrl(requestUrl);
         Log.v(LOG_TAG, "fetchAssetsData");
@@ -142,7 +138,7 @@ public final class AssetsQueryUtils {
         // Extract relevant fields from the JSON response and create an {@link Event} object
         //jsonResponse = "[{\"ID\":2670,\"Name\":\"х808рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х808рт77\"},{\"ID\":5800,\"Name\":\"х108мо77\",\"Model\":\"fh; Volvo\",\"RegNumber\":\"х108мо77\"},{\"ID\":5801,\"Name\":\"с580км777\",\"Model\":\"FH; Вольво\",\"RegNumber\":\"с580км777\"},{\"ID\":6317,\"Name\":\"с416км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с416км777\"},{\"ID\":5807,\"Name\":\"с415км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с415км777\"},{\"ID\":116208,\"Name\":\"о901хк77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"о901хк77\"},{\"ID\":116237,\"Name\":\"х807рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х807рт77\"},{\"ID\":120387,\"Name\":\"х109мо77\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"х109мо77\"}]";
 
-        ArrayList<AssetsData> assetsList = extractAssets(jsonResponse);
+        TreeMap<Integer, AssetsData> assetsList = extractAssets(jsonResponse);
 
         // Return the {@link Event}
         return assetsList;

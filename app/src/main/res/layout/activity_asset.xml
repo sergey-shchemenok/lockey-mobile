@@ -1,133 +1,218 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
-    android:orientation="horizontal"
-    android:paddingEnd="16dp"
+    android:layout_height="match_parent"
+    android:paddingBottom="16dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
-    android:paddingStart="16dp">
-
+    android:paddingTop="16dp">
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
-            android:maxLines="1"
-            android:textAllCaps="true"
-            android:textColor="@color/assetTableHeaderColor"
-            android:textSize="12sp"
-            android:text="Номер БК" />
+            android:orientation="horizontal"
+            android:paddingBottom="16dp">
 
-        <TextView
-            android:id="@+id/asset_kit_number"
-            android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Номер бортового комплекта: "
+                android:textAllCaps="true"
+                android:textColor="@color/assetTableHeaderColor"
+                android:textSize="12sp"
+                android:textStyle="bold"
+
+                />
+
+            <TextView
+                android:id="@+id/asset_kit_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:maxLines="1"
+                android:paddingLeft="16dp"
+                android:textAlignment="viewEnd"
+                android:textColor="@color/assetTableContentColor"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                tools:text="1234" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/assetTableContentColor"
-            android:textSize="16sp"
-            tools:text="1234" />
+            android:orientation="horizontal"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ФИО водителя: "
+                android:textAllCaps="true"
+                android:textColor="@color/assetTableHeaderColor"
+                android:textSize="12sp"
+                android:textStyle="bold"
+
+                />
+
+            <TextView
+                android:id="@+id/asset_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:maxLines="1"
+                android:paddingLeft="16dp"
+                android:textAlignment="viewEnd"
+                android:textColor="@color/assetTableContentColor"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                tools:text="Иванов А.Б." />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Регистрационный номер ТС: "
+                android:textAllCaps="true"
+                android:textColor="@color/assetTableHeaderColor"
+                android:textSize="12sp"
+                android:textStyle="bold"
+
+                />
+
+            <TextView
+                android:id="@+id/asset_reg_number"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:maxLines="1"
+                android:paddingLeft="16dp"
+                android:textAlignment="viewEnd"
+                android:textColor="@color/assetTableContentColor"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                tools:text="К999АВ777" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Марка ТС: "
+                android:textAllCaps="true"
+                android:textColor="@color/assetTableHeaderColor"
+                android:textSize="12sp"
+                android:textStyle="bold"
+
+                />
+
+            <TextView
+                android:id="@+id/asset_car_model"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:maxLines="1"
+                android:paddingLeft="16dp"
+                android:textAlignment="viewEnd"
+                android:textColor="@color/assetTableContentColor"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                tools:text="Вольво" android:paddingStart="16dp" />
+
+        </LinearLayout>
+
+
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:paddingBottom="16dp">-->
+
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="ВПС: "-->
+                <!--android:textAllCaps="true"-->
+                <!--android:textColor="@color/assetTableHeaderColor"-->
+                <!--android:textSize="12sp"-->
+                <!--android:textStyle="bold"-->
+
+                <!--/>-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/asset_last_time"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:ellipsize="end"-->
+                <!--android:gravity="end"-->
+                <!--android:maxLines="1"-->
+                <!--android:paddingLeft="16dp"-->
+                <!--android:textAlignment="viewEnd"-->
+                <!--android:textColor="@color/assetTableContentColor"-->
+                <!--android:textSize="24sp"-->
+                <!--android:textStyle="bold"-->
+                <!--tools:text="0" />-->
+
+        <!--</LinearLayout>-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_marginRight="16dp"
+                android:layout_weight="1"
+                android:background="@color/colorAccent"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Отправить команду 1"
+                android:textColor="@android:color/white" />
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:background="@color/colorAccent"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Отправить команду 2"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1"
-        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
-            android:maxLines="1"
-            android:textAllCaps="true"
-            android:textColor="@color/assetTableHeaderColor"
-            android:textSize="12sp"
-            android:text="Гос номер" />
+</ScrollView>
 
-        <TextView
-            android:id="@+id/asset_reg_number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/assetTableContentColor"
-            android:textSize="16sp"
-            tools:text="к555мм777" />
 
-    </LinearLayout>
-
-    <LinearLayout
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical"
-    android:layout_weight="1"
-    android:orientation="vertical">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:fontFamily="sans-serif-medium"
-        android:maxLines="1"
-        android:textAllCaps="true"
-        android:textColor="@color/assetTableHeaderColor"
-        android:textSize="12sp"
-        android:text="Марка" />
-
-    <TextView
-        android:id="@+id/asset_car_model"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="@color/assetTableContentColor"
-        android:textSize="16sp"
-        tools:text="Вольво" />
-
-</LinearLayout>
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
-            android:maxLines="1"
-            android:textAllCaps="true"
-            android:textColor="@color/assetTableHeaderColor"
-            android:textSize="12sp"
-            android:text="ВПС" />
-
-        <TextView
-            android:id="@+id/asset_last_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="@color/assetTableContentColor"
-            android:textSize="16sp"
-            tools:text="2" />
-
-    </LinearLayout>
-
-</LinearLayout>

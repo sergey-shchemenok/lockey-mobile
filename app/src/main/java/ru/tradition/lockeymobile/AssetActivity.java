@@ -10,6 +10,7 @@ public class AssetActivity extends AppCompatActivity {
     private TextView kitNumber;
     private TextView regNumber;
     private TextView carModel;
+    private TextView name;
     private TextView lastTime;
 
 
@@ -18,17 +19,22 @@ public class AssetActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_asset);
+
+        setTitle(R.string.asset_activity_title);
+
         kitNumber = (TextView)findViewById(R.id.asset_kit_number);
         regNumber = (TextView)findViewById(R.id.asset_reg_number);
         carModel = (TextView)findViewById(R.id.asset_car_model);
-        lastTime = (TextView)findViewById(R.id.asset_last_time);
+        name = (TextView)findViewById(R.id.asset_name);
+        //lastTime = (TextView)findViewById(R.id.asset_last_time);
 
         AssetsData assetData = (AssetsData) getIntent().getSerializableExtra("AssetData");
 
         kitNumber.setText(String.valueOf(assetData.getId()));
         regNumber.setText(assetData.getRegNumber());
         carModel.setText(assetData.getModel());
-        lastTime.setText(String.valueOf(assetData.getLastSignalTime()));
+        name.setText(assetData.getName());
+        //lastTime.setText(String.valueOf(assetData.getLastSignalTime()));
 
     }
 }

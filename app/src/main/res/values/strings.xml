@@ -20,5 +20,6 @@
     <string name="auth_enter_button">Войти</string>
     <string name="menu_logout">Выйти</string>
     <string name="menu_settings">Настройки</string>
+    <string name="asset_activity_title">Инфо о комплекте</string>
 
 </resources>

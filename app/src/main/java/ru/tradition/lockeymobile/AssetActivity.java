@@ -1,18 +1,26 @@
 package ru.tradition.lockeymobile;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
-import ru.tradition.lockeymobile.obtainingassets.AssetsData;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
 public class AssetActivity extends AppCompatActivity {
     private TextView kitNumber;
     private TextView regNumber;
     private TextView carModel;
     private TextView name;
+    //just for debugging
     private TextView lastTime;
 
+    private Button commandButton1;
+    private Button commandButton2;
 
 
     @Override
@@ -27,6 +35,8 @@ public class AssetActivity extends AppCompatActivity {
         carModel = (TextView)findViewById(R.id.asset_car_model);
         name = (TextView)findViewById(R.id.asset_name);
         //lastTime = (TextView)findViewById(R.id.asset_last_time);
+        commandButton1 = (Button)findViewById(R.id.activity_asset_command1);
+        commandButton2 = (Button)findViewById(R.id.activity_asset_command2);
 
         AssetsData assetData = (AssetsData) getIntent().getSerializableExtra("AssetData");
 
@@ -36,5 +46,50 @@ public class AssetActivity extends AppCompatActivity {
         name.setText(assetData.getName());
         //lastTime.setText(String.valueOf(assetData.getLastSignalTime()));
 
+        commandButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        commandButton2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu options from the res/menu/menu_catalog.xml file.
+        // This adds menu items to the app bar.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // User clicked on a menu option in the app bar overflow menu
+        switch (item.getItemId()) {
+            case R.id.main_menu_logout:
+                logout();
+                return true;
+            case R.id.main_menu_settings:
+                //todo settings here
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void logout() {
+        Intent intent = new Intent(this, AuthActivity.class);
+        MainActivity.isFinished = false;
+        MainActivity.isRepeated = false;
+        startActivity(intent);
+    }
+
 }

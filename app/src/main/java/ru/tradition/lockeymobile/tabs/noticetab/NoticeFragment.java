@@ -1,4 +1,4 @@
-package ru.tradition.lockeymobile;
+package ru.tradition.lockeymobile.tabs.noticetab;
 
 import android.content.Context;
 import android.net.Uri;
@@ -8,16 +8,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import ru.tradition.lockeymobile.R;
+
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link OtherFragment.OnFragmentInteractionListener} interface
+ * {@link NoticeFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link OtherFragment#newInstance} factory method to
+ * Use the {@link NoticeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class OtherFragment extends Fragment {
+public class NoticeFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -29,7 +31,7 @@ public class OtherFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public OtherFragment() {
+    public NoticeFragment() {
         // Required empty public constructor
     }
 
@@ -39,11 +41,11 @@ public class OtherFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment OtherFragment.
+     * @return A new instance of fragment NoticeFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static OtherFragment newInstance(String param1, String param2) {
-        OtherFragment fragment = new OtherFragment();
+    public static NoticeFragment newInstance(String param1, String param2) {
+        NoticeFragment fragment = new NoticeFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);

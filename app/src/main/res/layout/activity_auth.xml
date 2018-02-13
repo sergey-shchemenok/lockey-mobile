@@ -8,6 +8,13 @@
     tools:context=".AuthActivity">
 
     <TextView
+        android:id="@+id/main_connection_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"/>
+
+    <TextView
         android:id="@+id/main_info_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

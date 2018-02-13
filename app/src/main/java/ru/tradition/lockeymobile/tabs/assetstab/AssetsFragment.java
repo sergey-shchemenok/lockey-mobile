@@ -1,36 +1,24 @@
-package ru.tradition.lockeymobile.obtainingassets;
+package ru.tradition.lockeymobile.tabs.assetstab;
 
-import android.app.LoaderManager;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.List;
 
 import ru.tradition.lockeymobile.AssetActivity;
-import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
 
 import static ru.tradition.lockeymobile.UserData.mAssetData;
-import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsUrlResponseCode;
 
 /**
  * Created by Caelestis on 25.01.2018.
@@ -65,7 +53,6 @@ public class AssetsFragment extends Fragment {
             MainActivity.mainActivity.logout();
         }
 
-        //todo this will be made in the near future, i hope
         assetsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View viewItem, int position, long itemId) {
@@ -77,6 +64,17 @@ public class AssetsFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        //todo we can use this feature
+        assetsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View viewItem, int position, long itemId) {
+                Toast.makeText(getContext(), String.valueOf(itemId) + "   " + String.valueOf(position),
+                        Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
+
         return rootView;
     }
 

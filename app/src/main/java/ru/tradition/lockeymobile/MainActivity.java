@@ -7,42 +7,36 @@ import android.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
-import ru.tradition.lockeymobile.obtainingassets.AssetsData;
-import ru.tradition.lockeymobile.obtainingassets.AssetsFragment;
-import ru.tradition.lockeymobile.obtainingassets.AssetsLoader;
-import ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils;
+import ru.tradition.lockeymobile.tabs.AppTabAdapter;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragment;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsLoader;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils;
+import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTab;
+import ru.tradition.lockeymobile.tabs.noticetab.NoticeFragment;
 
-import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsUrlResponseCode;
-import static ru.tradition.lockeymobile.obtainingassets.AssetsQueryUtils.assetsUrlResponseMessage;
+import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUrlResponseCode;
+import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUrlResponseMessage;
 
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Map<Integer, AssetsData>>,
         MapFragmentTab.OnFragmentInteractionListener,
-        OtherFragment.OnFragmentInteractionListener,
+        NoticeFragment.OnFragmentInteractionListener,
         AssetsFragment.OnFragmentInteractionListener {
 
     public static MainActivity mainActivity;
@@ -134,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements
             AssetsQueryUtils.needToken = true;
         }
 
-        //whether it have some problem
+        //whether it has some problem
         if (assetsUrlResponseCode != HttpURLConnection.HTTP_OK &&
                 assetsUrlResponseCode != HttpURLConnection.HTTP_UNAUTHORIZED) {
             infoMessage.setVisibility(View.VISIBLE);
@@ -144,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements
         infoMessage.setVisibility(View.GONE);
 
         if (!isRepeated) {
+            isFinished = true;
             if (assetData == null || assetData.isEmpty()) {
                 mEmptyStateTextView.setText(R.string.no_assets);
                 return;
@@ -155,20 +150,16 @@ public class MainActivity extends AppCompatActivity implements
 
             // Find the view pager that will allow the user to swipe between fragments
             ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
-
             // Create an adapter that knows which fragment should be shown on each page
             AppTabAdapter adapter = new AppTabAdapter(this, getSupportFragmentManager());
-
             // Set the adapter onto the view pager
             viewPager.setAdapter(adapter);
-
             //assetsListView.setEmptyView(mEmptyStateTextView);
             TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-
             // Connect the tab layout with the view pager.
             tabLayout.setupWithViewPager(viewPager);
+            isRepeated = true;
 
-            isFinished = true;
         } else {
             if (assetData == null || assetData.isEmpty()) {
                 return;
@@ -207,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
-            // Respond to a click on the "Insert dummy data" menu option
             case R.id.main_menu_logout:
                 logout();
                 return true;

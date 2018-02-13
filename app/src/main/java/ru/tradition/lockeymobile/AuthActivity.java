@@ -31,18 +31,13 @@ public class AuthActivity extends AppCompatActivity
     private Button loginButton;
 
     public static final String LOG_TAG = AuthActivity.class.getName();
-    /**
-     * URL for assets data from the Lockey Server
-     */
 
     private ConnectivityManager connectivityManager;
-
     private LoaderManager loaderManager;
-
     private NetworkInfo activeNetwork;
 
     private TextView infoMessage;
-
+    private TextView connectionStatusMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +50,9 @@ public class AuthActivity extends AppCompatActivity
 
         infoMessage = (TextView) findViewById(R.id.main_info_message);
         infoMessage.setVisibility(View.INVISIBLE);
+
+        connectionStatusMessage = (TextView) findViewById(R.id.main_connection_message);
+        connectionStatusMessage.setVisibility(View.GONE);
 
         if (!UserData.usr.isEmpty())
             loginView.setText(UserData.usr);
@@ -82,8 +80,8 @@ public class AuthActivity extends AppCompatActivity
             loaderManager.initLoader(UserData.AUTH_LOADER_ID, null, this);
             Log.v(LOG_TAG, "initLoader");
         } else {
-            infoMessage.setVisibility(View.VISIBLE);
-            infoMessage.setText(R.string.no_connection);
+            connectionStatusMessage.setVisibility(View.VISIBLE);
+            connectionStatusMessage.setText(R.string.no_connection);
         }
     }
 
@@ -109,11 +107,8 @@ public class AuthActivity extends AppCompatActivity
         }
         infoMessage.setVisibility(View.INVISIBLE);
         Log.v(LOG_TAG, "onLoadFinished");
-//        result = (TextView)findViewById(R.id.result);
-//        result.setText(message);
         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
         startActivity(intent);
-
     }
 
     @Override
@@ -136,8 +131,8 @@ public class AuthActivity extends AppCompatActivity
         stopRepeatingTask();
     }
 
-    //The code for assets updating
-    private int mInterval = 5000; // 5 seconds by default, can be changed later
+    //The code for checking internet connection
+    private int mInterval = 1000*1; // 1 seconds by default, can be changed later
     private Handler mHandler;
 
     Runnable mStatusChecker = new Runnable() {
@@ -148,15 +143,13 @@ public class AuthActivity extends AppCompatActivity
                 connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
                 activeNetwork = connectivityManager.getActiveNetworkInfo();
                 if (activeNetwork != null && activeNetwork.isConnected()) {
-                    infoMessage.setVisibility(View.INVISIBLE);
-                    infoMessage.setText("");
+                    connectionStatusMessage.setVisibility(View.GONE);
+                    connectionStatusMessage.setText("");
                 } else {
-                    infoMessage.setVisibility(View.VISIBLE);
-                    infoMessage.setText(R.string.no_connection);
+                    connectionStatusMessage.setVisibility(View.VISIBLE);
+                    connectionStatusMessage.setText(R.string.no_connection);
                 }
             } finally {
-                // 100% guarantee that this always happens, even if
-                // your update method throws an exception
                 mHandler.postDelayed(mStatusChecker, mInterval);
             }
         }
@@ -170,6 +163,7 @@ public class AuthActivity extends AppCompatActivity
     //end here
 
 
+    //we don't need to move to previous activity from here
     @Override
     public void onBackPressed() {
 

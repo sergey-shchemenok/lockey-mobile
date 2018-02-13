@@ -5,9 +5,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
-import ru.tradition.lockeymobile.obtainingassets.AssetsData;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
 /**
  * Created by Caelestis on 28.01.2018.
@@ -19,7 +18,6 @@ public final class UserData {
     public static boolean hasToken = false;
 
     //Here is the data from Loader about cars and other assets
-    //todo move it into User class
     public static Map<Integer, AssetsData> mAssetData;
     //To save camera position in case of restarting app
     public static CameraPosition target = CameraPosition.builder()

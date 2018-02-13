@@ -1,4 +1,4 @@
-package ru.tradition.lockeymobile;
+package ru.tradition.lockeymobile.tabs.maptab;
 
 import android.content.Context;
 import android.net.Uri;
@@ -23,12 +23,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import ru.tradition.lockeymobile.obtainingassets.AssetsData;
+import ru.tradition.lockeymobile.MainActivity;
+import ru.tradition.lockeymobile.R;
+import ru.tradition.lockeymobile.UserData;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
 
 /**
@@ -188,7 +189,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
             try {
                 if (MainActivity.isFinished) {
                     MainActivity.mainActivity.repeatLoader();
-                    MainActivity.isRepeated = true;
                     Log.i(LOG_TAG, "Repeating loading assets");
                 }
                 if (m_map != null) {

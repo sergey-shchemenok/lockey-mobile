@@ -188,6 +188,7 @@
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/activity_asset_command1"
                 android:layout_width="0dp"
                 android:layout_height="32dp"
                 android:layout_marginRight="16dp"
@@ -195,17 +196,18 @@
                 android:background="@color/colorAccent"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Отправить команду 1"
+                android:text="Команда 1"
                 android:textColor="@android:color/white" />
 
             <Button
+                android:id="@+id/activity_asset_command2"
                 android:layout_width="0dp"
                 android:layout_height="32dp"
                 android:layout_weight="1"
                 android:background="@color/colorAccent"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Отправить команду 2"
+                android:text="Команда 2"
                 android:textColor="@android:color/white" />
 
         </LinearLayout>

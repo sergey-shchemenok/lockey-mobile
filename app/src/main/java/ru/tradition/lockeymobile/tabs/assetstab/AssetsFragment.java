@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import ru.tradition.lockeymobile.AssetActivity;
 import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
+import ru.tradition.lockeymobile.UserData;
 
 import static ru.tradition.lockeymobile.UserData.mAssetData;
 
@@ -26,6 +27,10 @@ import static ru.tradition.lockeymobile.UserData.mAssetData;
 public class AssetsFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
+
+    private int selectedAssetCounter = 0;
+
+    private boolean isSelectedMode = false;
 
     // Required empty public constructor
     public AssetsFragment() {
@@ -56,12 +61,25 @@ public class AssetsFragment extends Fragment {
         assetsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View viewItem, int position, long itemId) {
-                Intent intent = new Intent(getActivity(), AssetActivity.class);
-
-                //put data to intent
-                AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
-                intent.putExtra("AssetData", as);
-                startActivity(intent);
+                if (!isSelectedMode) {
+                    Intent intent = new Intent(getActivity(), AssetActivity.class);
+                    //put data to intent
+                    AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
+                    intent.putExtra("AssetData", as);
+                    startActivity(intent);
+                } else {
+                    AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
+                    int id = as.getId();
+                    if (!UserData.selectedAsset.contains(id)) {
+                        UserData.selectedAsset.add(id);
+                        MainActivity.mainActivity.setTitle(String.valueOf(++selectedAssetCounter));
+                        MainActivity.mainActivity.updateListView();
+                    } else {
+                        UserData.selectedAsset.remove(id);
+                        MainActivity.mainActivity.setTitle(String.valueOf(--selectedAssetCounter));
+                        MainActivity.mainActivity.updateListView();
+                    }
+                }
             }
         });
 
@@ -72,28 +90,30 @@ public class AssetsFragment extends Fragment {
             public boolean onItemLongClick(AdapterView<?> adapterView, View viewItem, int position, long itemId) {
 //                Toast.makeText(getContext(), String.valueOf(itemId) + "   " + String.valueOf(position),
 //                        Toast.LENGTH_SHORT).show();
-               // MainActivity.mainActivity.viewPager.setCurrentItem(1);
+                // MainActivity.mainActivity.viewPager.setCurrentItem(1);
+                isSelectedMode = true;
+                AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
+                int id = as.getId();
+                UserData.selectedAsset.add(id);
 
-                MainActivity.mainActivity.setTitle(R.string.asset_activity_title);
-
-
+                MainActivity.mainActivity.setTitle(String.valueOf(++selectedAssetCounter));
+                MainActivity.mainActivity.updateListView();
+                //todo let's continue tomorrow
                 return true;
             }
         });
-
         return rootView;
     }
 
-    @Override
-    public void onStart() {
-        MainActivity.mainActivity.setTitle(R.string.app_name);
-        super.onStart();
-    }
+//    @Override
+//    public void onStop() {
+//        MainActivity.mainActivity.setTitle(R.string.app_name);
+//        super.onStop();
+//    }
 
-    //    @Override
+//    @Override
 //    public void onDestroyView() {
-//        MainActivity.isFinished = false;
-//        MainActivity.isRepeated = false;
+//        MainActivity.mainActivity.setTitle(R.string.app_name);
 //        super.onDestroyView();
 //    }
 

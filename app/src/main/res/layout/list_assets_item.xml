@@ -7,6 +7,7 @@
     android:paddingEnd="16dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
+    android:id="@+id/list_asset_root"
     android:paddingStart="16dp">
 
     <RelativeLayout
@@ -14,26 +15,40 @@
         android:layout_height="24dp"
         android:layout_gravity="center_vertical">
 
+        <RelativeLayout
+            android:id="@+id/list_assets_circles"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <ImageView
+                android:id="@+id/last_signal_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:background="@drawable/signal_state_circle" />
+
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:background="@drawable/signal_state_circle_white" />
+
+            <ImageView
+                android:id="@+id/last_signal_time_inner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:background="@drawable/signal_state_circle_little" />
+        </RelativeLayout>
+
         <ImageView
-            android:id="@+id/last_signal_time"
+            android:id="@+id/list_assets_checkmark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:background="@drawable/signal_state_circle" />
-
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@drawable/signal_state_circle_white" />
-
-        <ImageView
-            android:id="@+id/last_signal_time_inner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@drawable/signal_state_circle_little" />
+            android:background="@drawable/checkmark" />
 
 
     </RelativeLayout>
@@ -54,10 +69,10 @@
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
             android:maxLines="1"
+            android:text="Номер БК"
             android:textAllCaps="true"
             android:textColor="@color/assetTableHeaderColor"
-            android:textSize="12sp"
-            android:text="Номер БК" />
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/kit_number"
@@ -86,10 +101,10 @@
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
             android:maxLines="1"
+            android:text="Гос номер"
             android:textAllCaps="true"
             android:textColor="@color/assetTableHeaderColor"
-            android:textSize="12sp"
-            android:text="Гос номер" />
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/reg_number"
@@ -118,10 +133,10 @@
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
             android:maxLines="1"
+            android:text="Марка"
             android:textAllCaps="true"
             android:textColor="@color/assetTableHeaderColor"
-            android:textSize="12sp"
-            android:text="Марка" />
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/car_model"

@@ -168,10 +168,14 @@ public class MainActivity extends AppCompatActivity implements
             }
             UserData.mAssetData = assetData;
             //here is not good for speed
-            AssetsFragment.assetsDataAdapter.clear();
-            AssetsFragment.assetsDataAdapter.addAll(new ArrayList<>(assetData.values()));
-        }
+            updateListView();
 
+        }
+    }
+
+    public void updateListView(){
+        AssetsFragment.assetsDataAdapter.clear();
+        AssetsFragment.assetsDataAdapter.addAll(new ArrayList<>(UserData.mAssetData.values()));
     }
 
     @Override

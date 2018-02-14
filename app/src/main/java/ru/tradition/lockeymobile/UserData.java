@@ -5,6 +5,9 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
@@ -25,6 +28,8 @@ public final class UserData {
             .zoom(10)
             .build();
 
+    //This set determines which kit is selected
+    public static Set<Integer> selectedAsset = new TreeSet<>();
 
     //todo Here is the data from Loader about cars and other assets for API lesser 26
     public static List<AssetsData> mAssetDataAPIBefore26;

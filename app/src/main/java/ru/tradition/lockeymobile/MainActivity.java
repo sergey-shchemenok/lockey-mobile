@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity implements
         AssetsFragment.OnFragmentInteractionListener {
 
     public static MainActivity mainActivity;
+    public ViewPager viewPager;
+    public AppTabAdapter adapter;
 
 
     //Flags for managing the updating thread
@@ -149,9 +151,9 @@ public class MainActivity extends AppCompatActivity implements
             UserData.mAssetData = assetData;
 
             // Find the view pager that will allow the user to swipe between fragments
-            ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+            viewPager = (ViewPager) findViewById(R.id.viewpager);
             // Create an adapter that knows which fragment should be shown on each page
-            AppTabAdapter adapter = new AppTabAdapter(this, getSupportFragmentManager());
+            adapter = new AppTabAdapter(this, getSupportFragmentManager());
             // Set the adapter onto the view pager
             viewPager.setAdapter(adapter);
             //assetsListView.setEmptyView(mEmptyStateTextView);

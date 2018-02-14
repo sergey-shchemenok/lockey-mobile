@@ -16,7 +16,9 @@ import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragment;
 
 public class AppTabAdapter extends FragmentPagerAdapter {
 
-    /** Context of the app */
+    /**
+     * Context of the app
+     */
     private Context mContext;
 
     /**
@@ -58,8 +60,8 @@ public class AppTabAdapter extends FragmentPagerAdapter {
             return mContext.getString(R.string.tab_assets);
         } else if (position == 1) {
             return mContext.getString(R.string.tab_map);
-        } else  {
-            return mContext.getString(R.string.tab_other);//todo add tab here
+        } else {
+            return mContext.getString(R.string.tab_notice);//todo add tab here
         }
     }
 

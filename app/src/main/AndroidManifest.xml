@@ -41,17 +41,13 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyB8lBwEsqiiklGZiWH8HLIM_93bAfPcICI" />
 
-        <activity android:name=".AssetActivity"
-            android:parentActivityName=".MainActivity" >
+        <activity
+            android:name=".AssetActivity"
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
-
-
-
-
     </application>
 
 </manifest>

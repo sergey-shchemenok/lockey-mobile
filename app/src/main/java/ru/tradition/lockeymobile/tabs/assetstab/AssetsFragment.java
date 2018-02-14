@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -46,6 +45,7 @@ public class AssetsFragment extends Fragment {
         assetsDataAdapter = new AssetsDataAdapter(getActivity(), new ArrayList<AssetsData>());
         assetsListView.setAdapter(assetsDataAdapter);
 
+
         //todo update
         try {
             assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
@@ -65,12 +65,18 @@ public class AssetsFragment extends Fragment {
             }
         });
 
+
         //todo we can use this feature
         assetsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View viewItem, int position, long itemId) {
-                Toast.makeText(getContext(), String.valueOf(itemId) + "   " + String.valueOf(position),
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), String.valueOf(itemId) + "   " + String.valueOf(position),
+//                        Toast.LENGTH_SHORT).show();
+               // MainActivity.mainActivity.viewPager.setCurrentItem(1);
+
+                MainActivity.mainActivity.setTitle(R.string.asset_activity_title);
+
+
                 return true;
             }
         });
@@ -78,7 +84,13 @@ public class AssetsFragment extends Fragment {
         return rootView;
     }
 
-//    @Override
+    @Override
+    public void onStart() {
+        MainActivity.mainActivity.setTitle(R.string.app_name);
+        super.onStart();
+    }
+
+    //    @Override
 //    public void onDestroyView() {
 //        MainActivity.isFinished = false;
 //        MainActivity.isRepeated = false;

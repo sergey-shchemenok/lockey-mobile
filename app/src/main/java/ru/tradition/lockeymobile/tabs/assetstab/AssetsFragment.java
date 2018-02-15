@@ -28,10 +28,6 @@ public class AssetsFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    private int selectedAssetCounter = 0;
-
-    private boolean isSelectedMode = false;
-
     // Required empty public constructor
     public AssetsFragment() {
     }
@@ -58,10 +54,15 @@ public class AssetsFragment extends Fragment {
             MainActivity.mainActivity.logout();
         }
 
+        if (UserData.isSelectedMode) {
+            MainActivity.mainActivity.setTitle(String.valueOf(UserData.selectedAssetCounter));
+            MainActivity.mainActivity.setUpButton();
+        }
+
         assetsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View viewItem, int position, long itemId) {
-                if (!isSelectedMode) {
+                if (!UserData.isSelectedMode) {
                     Intent intent = new Intent(getActivity(), AssetActivity.class);
                     //put data to intent
                     AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
@@ -72,11 +73,11 @@ public class AssetsFragment extends Fragment {
                     int id = as.getId();
                     if (!UserData.selectedAsset.contains(id)) {
                         UserData.selectedAsset.add(id);
-                        MainActivity.mainActivity.setTitle(String.valueOf(++selectedAssetCounter));
+                        MainActivity.mainActivity.setTitle(String.valueOf(++UserData.selectedAssetCounter));
                         MainActivity.mainActivity.updateListView();
                     } else {
                         UserData.selectedAsset.remove(id);
-                        MainActivity.mainActivity.setTitle(String.valueOf(--selectedAssetCounter));
+                        MainActivity.mainActivity.setTitle(String.valueOf(--UserData.selectedAssetCounter));
                         MainActivity.mainActivity.updateListView();
                     }
                 }
@@ -91,12 +92,16 @@ public class AssetsFragment extends Fragment {
 //                Toast.makeText(getContext(), String.valueOf(itemId) + "   " + String.valueOf(position),
 //                        Toast.LENGTH_SHORT).show();
                 // MainActivity.mainActivity.viewPager.setCurrentItem(1);
-                isSelectedMode = true;
+                UserData.isSelectedMode = true;
+
+                MainActivity.mainActivity.setUpButton();
+
+                UserData.mMenu.getItem(2).setVisible(true);
                 AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
                 int id = as.getId();
                 UserData.selectedAsset.add(id);
 
-                MainActivity.mainActivity.setTitle(String.valueOf(++selectedAssetCounter));
+                MainActivity.mainActivity.setTitle(String.valueOf(++UserData.selectedAssetCounter));
                 MainActivity.mainActivity.updateListView();
                 //todo let's continue tomorrow
                 return true;

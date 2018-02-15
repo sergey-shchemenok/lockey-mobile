@@ -1,5 +1,7 @@
 package ru.tradition.lockeymobile;
 
+import android.view.Menu;
+
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -30,6 +32,11 @@ public final class UserData {
 
     //This set determines which kit is selected
     public static Set<Integer> selectedAsset = new TreeSet<>();
+    public static boolean isSelectedMode = false;
+    public static int selectedAssetCounter = 0;
+    //to prevent crash save menu here
+    public static Menu mMenu;
+
 
     //todo Here is the data from Loader about cars and other assets for API lesser 26
     public static List<AssetsData> mAssetDataAPIBefore26;

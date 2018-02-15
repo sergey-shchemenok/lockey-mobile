@@ -1,6 +1,7 @@
 package ru.tradition.lockeymobile;
 
 import android.app.LoaderManager;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
@@ -11,6 +12,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements
     public ViewPager viewPager;
     public AppTabAdapter adapter;
 
+    private Toolbar toolbar;
 
     //Flags for managing the updating thread
     public static boolean isRepeated = false;
@@ -70,12 +73,15 @@ public class MainActivity extends AppCompatActivity implements
 
         setContentView(R.layout.activity_main);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //toolbar.setTitle("title");
+
         progressCircle = (ProgressBar) findViewById(R.id.loading_spinner);
         mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
         infoMessage = (TextView) findViewById(R.id.main_info_message);
         infoMessage.setVisibility(View.GONE);
         progressCircle.setVisibility(View.VISIBLE);
-
 
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -83,6 +89,22 @@ public class MainActivity extends AppCompatActivity implements
         startLoader();
 
         mainActivity = this;
+    }
+
+    //The method adds "up" button to toolbar
+    public void setUpButton() {
+        if (toolbar != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
+    }
+
+    //The method adds "up" button to toolbar
+    public void removeUpButton() {
+        if (toolbar != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            getSupportActionBar().setHomeButtonEnabled(false);
+        }
     }
 
     //For initial data loading
@@ -160,6 +182,25 @@ public class MainActivity extends AppCompatActivity implements
             TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
             // Connect the tab layout with the view pager.
             tabLayout.setupWithViewPager(viewPager);
+
+            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                @Override
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                    //changeMode();
+                }
+
+                @Override
+                public void onPageSelected(int position) {
+                    changeMode();
+                }
+
+                @Override
+                public void onPageScrollStateChanged(int state) {
+
+                }
+            });
+
+
             isRepeated = true;
 
         } else {
@@ -173,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void updateListView(){
+    public void updateListView() {
         AssetsFragment.assetsDataAdapter.clear();
         AssetsFragment.assetsDataAdapter.addAll(new ArrayList<>(UserData.mAssetData.values()));
     }
@@ -197,8 +238,14 @@ public class MainActivity extends AppCompatActivity implements
         // Inflate the menu options from the res/menu/menu_catalog.xml file.
         // This adds menu items to the app bar.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        UserData.mMenu = menu;
+        //MenuItem item = (MenuItem) findViewById(R.id.main_menu_back);
+//        item.setVisible(true);
+        if (!UserData.isSelectedMode)
+            UserData.mMenu.getItem(2).setVisible(false);
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -210,6 +257,10 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.main_menu_settings:
                 //todo settings here
                 return true;
+            case R.id.main_menu_back:
+                changeMode();
+                updateListView();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -218,7 +269,26 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = new Intent(this, AuthActivity.class);
         isFinished = false;
         isRepeated = false;
+        if (UserData.isSelectedMode)
+            changeMode();
         startActivity(intent);
+
+    }
+
+    public void changeMode() {
+        UserData.isSelectedMode = false;
+        UserData.selectedAsset.clear();
+        UserData.selectedAssetCounter = 0;
+        setTitle(R.string.app_name);
+        UserData.mMenu.getItem(2).setVisible(false);
+        removeUpButton();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        changeMode();
+        updateListView();
+        return true;
     }
 
     /**
@@ -228,7 +298,11 @@ public class MainActivity extends AppCompatActivity implements
     public void onBackPressed() {
         // If the pet hasn't changed, continue with handling back button press
         //This button is upper to the left arrow
-        logout();
+        if (UserData.isSelectedMode) {
+            changeMode();
+            updateListView();
+        } else
+            logout();
     }
 
     @Override

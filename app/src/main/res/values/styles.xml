@@ -2,6 +2,14 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="actionMenuTextColor">@color/text_and_button_color</item>
+        <item name="drawerArrowStyle">@color/text_and_button_color</item>
+        <item name="colorControlNormal">@color/text_and_button_color</item>
+
+
+
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -11,6 +19,11 @@
         <item name="actionBarStyle">@style/LockeyMobileBarStyle</item>
         <item name="android:windowContentOverlay">@null</item>
 
+    </style>
+
+    <!-- Toolbar button style -->
+    <style name="DrawerIcon" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="color">@color/color_icon</item>
     </style>
 
     <!-- App bar style -->

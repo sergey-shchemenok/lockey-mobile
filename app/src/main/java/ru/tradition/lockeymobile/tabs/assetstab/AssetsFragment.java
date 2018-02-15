@@ -11,14 +11,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.ArrayList;
 
+import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.AssetActivity;
 import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
-import ru.tradition.lockeymobile.UserData;
 
-import static ru.tradition.lockeymobile.UserData.mAssetData;
+import static ru.tradition.lockeymobile.AppData.mAssetData;
 
 /**
  * Created by Caelestis on 25.01.2018.
@@ -47,63 +51,81 @@ public class AssetsFragment extends Fragment {
         assetsListView.setAdapter(assetsDataAdapter);
 
 
-        //todo update
+        //to prevent crash in some killing process situations
         try {
             assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
         } catch (NullPointerException e) {
-            MainActivity.mainActivity.logout();
+            AppData.mainActivity.logout();
         }
 
-        if (UserData.isSelectedMode) {
-            MainActivity.mainActivity.setTitle(String.valueOf(UserData.selectedAssetCounter));
-            MainActivity.mainActivity.setUpButton();
+        //selecting mode has the other title
+        if (AppData.isSelectingMode) {
+            AppData.mainActivity.setTitle(String.valueOf(AppData.selectedAssetCounter));
+            AppData.mainActivity.setUpButton();
         }
 
         assetsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View viewItem, int position, long itemId) {
-                if (!UserData.isSelectedMode) {
+                //if it is normal mode go to asset activity
+                if (!AppData.isSelectingMode) {
                     Intent intent = new Intent(getActivity(), AssetActivity.class);
                     //put data to intent
                     AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
                     intent.putExtra("AssetData", as);
                     startActivity(intent);
-                } else {
+                }
+                //if it is selecting mode. Select or deselect asset
+                else {
                     AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
                     int id = as.getId();
-                    if (!UserData.selectedAsset.contains(id)) {
-                        UserData.selectedAsset.add(id);
-                        MainActivity.mainActivity.setTitle(String.valueOf(++UserData.selectedAssetCounter));
-                        MainActivity.mainActivity.updateListView();
+                    if (!AppData.selectedAsset.contains(id)) {
+                        AppData.selectedAsset.add(id);
+                        AppData.mainActivity.setTitle(String.valueOf(++AppData.selectedAssetCounter));
+                        AppData.mainActivity.updateListView();
                     } else {
-                        UserData.selectedAsset.remove(id);
-                        MainActivity.mainActivity.setTitle(String.valueOf(--UserData.selectedAssetCounter));
-                        MainActivity.mainActivity.updateListView();
+                        AppData.selectedAsset.remove(id);
+                        AppData.mainActivity.setTitle(String.valueOf(--AppData.selectedAssetCounter));
+                        AppData.mainActivity.updateListView();
                     }
                 }
             }
         });
 
 
-        //todo we can use this feature
+        //Long click changes mode into selecting
+        //in selecting mode go to map
         assetsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View viewItem, int position, long itemId) {
 //                Toast.makeText(getContext(), String.valueOf(itemId) + "   " + String.valueOf(position),
 //                        Toast.LENGTH_SHORT).show();
                 // MainActivity.mainActivity.viewPager.setCurrentItem(1);
-                UserData.isSelectedMode = true;
+                if (!AppData.isSelectingMode) {
+                    AppData.isSelectingMode = true;
 
-                MainActivity.mainActivity.setUpButton();
+                    AppData.mainActivity.setUpButton();
 
-                UserData.mMenu.getItem(2).setVisible(true);
-                AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
-                int id = as.getId();
-                UserData.selectedAsset.add(id);
+                    AppData.mMenu.getItem(2).setVisible(true);
+                    AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
+                    int id = as.getId();
+                    AppData.selectedAsset.add(id);
 
-                MainActivity.mainActivity.setTitle(String.valueOf(++UserData.selectedAssetCounter));
-                MainActivity.mainActivity.updateListView();
-                //todo let's continue tomorrow
+                    //todo change tab and toolbar color in selecting mode
+                    AppData.mainActivity.setTitle(String.valueOf(++AppData.selectedAssetCounter));
+                    AppData.mainActivity.updateListView();
+                }else {
+                    AppData.mainActivity.changeMode();
+                    AppData.mainActivity.updateListView();
+                    AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
+                    AppData.target = CameraPosition.builder()
+                            .target(new LatLng(as.getLatitude(), as.getLongitude()))
+                            .zoom(13)
+                            .build();
+                    //go to map tab
+                    AppData.viewPager.setCurrentItem(1);
+                    AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+                }
                 return true;
             }
         });

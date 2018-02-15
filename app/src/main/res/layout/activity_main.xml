@@ -16,6 +16,7 @@
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
+            app:titleTextAppearance="@style/Toolbar.TitleText"
             android:layout_height="50dp"
             app:titleTextColor="@android:color/white"
             android:background="@color/colorPrimary" />

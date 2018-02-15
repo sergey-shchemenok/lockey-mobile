@@ -1,7 +1,6 @@
 package ru.tradition.lockeymobile;
 
 import android.app.LoaderManager;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
@@ -41,16 +40,9 @@ public class MainActivity extends AppCompatActivity implements
         NoticeFragment.OnFragmentInteractionListener,
         AssetsFragment.OnFragmentInteractionListener {
 
-    public static MainActivity mainActivity;
-    public ViewPager viewPager;
-    public AppTabAdapter adapter;
+    private AppTabAdapter adapter;
 
     private Toolbar toolbar;
-
-    //Flags for managing the updating thread
-    public static boolean isRepeated = false;
-    private static boolean isInterrupted = false;
-    public static boolean isFinished = false;
 
     private TextView mEmptyStateTextView;
     private ProgressBar progressCircle;
@@ -66,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        //go to auth activity
         if (assetsUrlResponseCode == 0) {
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
@@ -75,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         //toolbar.setTitle("title");
 
         progressCircle = (ProgressBar) findViewById(R.id.loading_spinner);
@@ -88,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements
         //launch loading data from server
         startLoader();
 
-        mainActivity = this;
+        AppData.mainActivity = this;
     }
 
     //The method adds "up" button to toolbar
@@ -99,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    //The method adds "up" button to toolbar
+    //The method adds "up" button from toolbar
     public void removeUpButton() {
         if (toolbar != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -112,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
             loaderManager = getLoaderManager();
-            loaderManager.initLoader(UserData.ASSETS_LOADER_ID, null, this);
+            loaderManager.initLoader(AppData.ASSETS_LOADER_ID, null, this);
             Log.i(LOG_TAG, "initLoader");
         } else {
             progressCircle.setVisibility(View.GONE);
@@ -124,8 +118,8 @@ public class MainActivity extends AppCompatActivity implements
     public synchronized void repeatLoader() {
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
-            loaderManager.destroyLoader(UserData.ASSETS_LOADER_ID);
-            loaderManager.initLoader(UserData.ASSETS_LOADER_ID, null, this);
+            loaderManager.destroyLoader(AppData.ASSETS_LOADER_ID);
+            loaderManager.initLoader(AppData.ASSETS_LOADER_ID, null, this);
             Log.i(LOG_TAG, "repeatLoader");
         } else {
             infoMessage.setVisibility(View.VISIBLE);
@@ -139,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements
     public Loader<Map<Integer, AssetsData>> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
         Log.i(LOG_TAG, "onCreateLoader");
-        return new AssetsLoader(this, UserData.ASSETS_REQUEST_URL);
+        return new AssetsLoader(this, AppData.ASSETS_REQUEST_URL);
     }
 
     @Override
@@ -161,8 +155,8 @@ public class MainActivity extends AppCompatActivity implements
         }
         infoMessage.setVisibility(View.GONE);
 
-        if (!isRepeated) {
-            isFinished = true;
+        if (!AppData.isRepeated) {
+            AppData.isFinished = true;
             if (assetData == null || assetData.isEmpty()) {
                 mEmptyStateTextView.setText(R.string.no_assets);
                 return;
@@ -170,79 +164,73 @@ public class MainActivity extends AppCompatActivity implements
             mEmptyStateTextView.setText("");
             Log.i(LOG_TAG, "onLoadFinished");
 
-            UserData.mAssetData = assetData;
+            AppData.mAssetData = assetData;
 
             // Find the view pager that will allow the user to swipe between fragments
-            viewPager = (ViewPager) findViewById(R.id.viewpager);
+            AppData.viewPager = (ViewPager) findViewById(R.id.viewpager);
             // Create an adapter that knows which fragment should be shown on each page
             adapter = new AppTabAdapter(this, getSupportFragmentManager());
             // Set the adapter onto the view pager
-            viewPager.setAdapter(adapter);
+            AppData.viewPager.setAdapter(adapter);
             //assetsListView.setEmptyView(mEmptyStateTextView);
             TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
             // Connect the tab layout with the view pager.
-            tabLayout.setupWithViewPager(viewPager);
+            tabLayout.setupWithViewPager(AppData.viewPager);
 
-            viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            //listen to tab changes
+            AppData.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                    //changeMode();
-                }
-
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
                 @Override
                 public void onPageSelected(int position) {
                     changeMode();
                 }
-
                 @Override
-                public void onPageScrollStateChanged(int state) {
-
-                }
+                public void onPageScrollStateChanged(int state) {}
             });
-
-
-            isRepeated = true;
+            AppData.isRepeated = true;
 
         } else {
             if (assetData == null || assetData.isEmpty()) {
                 return;
             }
-            UserData.mAssetData = assetData;
+            AppData.mAssetData = assetData;
             //here is not good for speed
             updateListView();
 
         }
     }
 
+    //update the list of assets
     public void updateListView() {
         AssetsFragment.assetsDataAdapter.clear();
-        AssetsFragment.assetsDataAdapter.addAll(new ArrayList<>(UserData.mAssetData.values()));
+        AssetsFragment.assetsDataAdapter.addAll(new ArrayList<>(AppData.mAssetData.values()));
     }
 
+    //we need to interrupt the loading thread
     @Override
     protected void onDestroy() {
-        //we need to interrupt this thread
-        isFinished = false;
-        isRepeated = false;
+        AppData.isFinished = false;
+        AppData.isRepeated = false;
         super.onDestroy();
     }
 
     @Override
     public void onLoaderReset(Loader<Map<Integer, AssetsData>> loader) {
-        //UserData.mAssetData.clear();
+        //AppData.mAssetData.clear();
         Log.i(LOG_TAG, "onLoadReset");
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu options from the res/menu/menu_catalog.xml file.
         // This adds menu items to the app bar.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        UserData.mMenu = menu;
+        AppData.mMenu = menu;
         //MenuItem item = (MenuItem) findViewById(R.id.main_menu_back);
 //        item.setVisible(true);
-        if (!UserData.isSelectedMode)
-            UserData.mMenu.getItem(2).setVisible(false);
+        //in normal mode this item should not be shown
+        if (!AppData.isSelectingMode)
+            AppData.mMenu.getItem(2).setVisible(false);
         return true;
     }
 
@@ -267,20 +255,21 @@ public class MainActivity extends AppCompatActivity implements
 
     public void logout() {
         Intent intent = new Intent(this, AuthActivity.class);
-        isFinished = false;
-        isRepeated = false;
-        if (UserData.isSelectedMode)
+        AppData.isFinished = false;
+        AppData.isRepeated = false;
+        if (AppData.isSelectingMode)
             changeMode();
         startActivity(intent);
 
     }
 
+    //to change mode from selecting to normal
     public void changeMode() {
-        UserData.isSelectedMode = false;
-        UserData.selectedAsset.clear();
-        UserData.selectedAssetCounter = 0;
+        AppData.isSelectingMode = false;
+        AppData.selectedAsset.clear();
+        AppData.selectedAssetCounter = 0;
         setTitle(R.string.app_name);
-        UserData.mMenu.getItem(2).setVisible(false);
+        AppData.mMenu.getItem(2).setVisible(false);
         removeUpButton();
     }
 
@@ -298,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onBackPressed() {
         // If the pet hasn't changed, continue with handling back button press
         //This button is upper to the left arrow
-        if (UserData.isSelectedMode) {
+        if (AppData.isSelectingMode) {
             changeMode();
             updateListView();
         } else

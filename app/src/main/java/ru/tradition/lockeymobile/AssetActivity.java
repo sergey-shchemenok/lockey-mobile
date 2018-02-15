@@ -23,7 +23,6 @@ public class AssetActivity extends AppCompatActivity {
     private Button commandButton1;
     private Button commandButton2;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +31,7 @@ public class AssetActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //to add up button
         if (toolbar != null) {
             setSupportActionBar(toolbar);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -76,7 +76,6 @@ public class AssetActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu options from the res/menu/menu_catalog.xml file.
         // This adds menu items to the app bar.
         getMenuInflater().inflate(R.menu.menu_asset, menu);
         return true;
@@ -98,8 +97,8 @@ public class AssetActivity extends AppCompatActivity {
 
     public void logout() {
         Intent intent = new Intent(this, AuthActivity.class);
-        MainActivity.isFinished = false;
-        MainActivity.isRepeated = false;
+        AppData.isFinished = false;
+        AppData.isRepeated = false;
         startActivity(intent);
     }
 

@@ -1,7 +1,9 @@
 package ru.tradition.lockeymobile;
 
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -15,12 +17,13 @@ import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
 /**
  * Created by Caelestis on 28.01.2018.
+ *
+ * Stores variables for the entire application
  */
 
-public final class UserData {
+public final class AppData {
 
-    //for getting token without starting MainActivity
-    public static boolean hasToken = false;
+    public static MainActivity mainActivity;
 
     //Here is the data from Loader about cars and other assets
     public static Map<Integer, AssetsData> mAssetData;
@@ -32,14 +35,19 @@ public final class UserData {
 
     //This set determines which kit is selected
     public static Set<Integer> selectedAsset = new TreeSet<>();
-    public static boolean isSelectedMode = false;
+    //for selectingMode
+    public static boolean isSelectingMode = false;
     public static int selectedAssetCounter = 0;
-    //to prevent crash save menu here
+
+    //store main menu
     public static Menu mMenu;
+    public static ViewPager viewPager;
 
+    public static GoogleMap m_map;
 
-    //todo Here is the data from Loader about cars and other assets for API lesser 26
-    public static List<AssetsData> mAssetDataAPIBefore26;
+    //Flags for managing the updating thread
+    public static boolean isRepeated = false;
+    public static boolean isFinished = false;
 
     //user's login and password
     public static String pwd = "";
@@ -51,15 +59,15 @@ public final class UserData {
      * This comes into play if you're using multiple loaders.
      */
     public static final int ASSETS_LOADER_ID = 1;
+    public static final int AUTH_LOADER_ID = 2;
 
     /**
      * URL for assets data from server
      */
     public static final String ASSETS_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/Cars";
-
     public static final String AUTH_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/Auth";
 
-    public static final int AUTH_LOADER_ID = 2;
+
 
 
 }

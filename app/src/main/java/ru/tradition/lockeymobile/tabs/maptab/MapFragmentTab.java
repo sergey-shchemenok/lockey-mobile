@@ -26,9 +26,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.Map;
 import java.util.TreeMap;
 
+import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
-import ru.tradition.lockeymobile.UserData;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
 
@@ -45,7 +45,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
     private final String LOG_TAG = MapFragmentTab.class.getSimpleName();
     private static View rootView;
 
-    GoogleMap m_map;
     boolean mapReady = false;
 
     private static TreeMap<Integer, Marker> markers = new TreeMap<>();
@@ -119,6 +118,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
 
         rootView = inflater.inflate(R.layout.tab_fragment_map, container, false);
         // Inflate the layout for this fragment
+
         return rootView;
     }
 
@@ -139,22 +139,22 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap map) {
         mapReady = true;
-        m_map = map;
-        m_map.moveCamera(CameraUpdateFactory.newCameraPosition(UserData.target));
+        AppData.m_map = map;
+        AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
 
         try {
             markers.clear();
-            for (Map.Entry<Integer, AssetsData> pair  : UserData.mAssetData.entrySet()) {
+            for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetData.entrySet()) {
                 MarkerOptions marker = new MarkerOptions()
                         .position(new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude()))
                         .title(String.valueOf(pair.getValue().getId()));
                 if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
                     marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 }
-                markers.put(pair.getKey(), m_map.addMarker(marker));
+                markers.put(pair.getKey(), AppData.m_map.addMarker(marker));
             }
         } catch (NullPointerException e) {
-            MainActivity.mainActivity.logout();
+            AppData.mainActivity.logout();
         }
     }
 
@@ -163,9 +163,9 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
     @Override
     public void onStop() {
         try {
-            UserData.target = m_map.getCameraPosition();
+            AppData.target = AppData.m_map.getCameraPosition();
         } catch (NullPointerException e) {
-            MainActivity.mainActivity.logout();
+            AppData.mainActivity.logout();
         }
         stopRepeatingTask();
         super.onStop();
@@ -187,35 +187,44 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         @Override
         public void run() {
             try {
-                if (MainActivity.isFinished) {
-                    MainActivity.mainActivity.repeatLoader();
+                //first we need to update data
+                if (AppData.isFinished) {
+                    AppData.mainActivity.repeatLoader();
                     Log.i(LOG_TAG, "Repeating loading assets");
                 }
-                if (m_map != null) {
-                    UserData.target = m_map.getCameraPosition();
-                    //m_map.clear();
-                    m_map.moveCamera(CameraUpdateFactory.newCameraPosition(UserData.target));
 
-                    for (Map.Entry<Integer, AssetsData> pair: UserData.mAssetData.entrySet()) {
+                if (AppData.m_map != null) {
+                    AppData.target = AppData.m_map.getCameraPosition();
+                    //m_map.clear();
+                    AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+
+                    //updating marker position
+                    for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetData.entrySet()) {
                         int id = pair.getKey();
                         Marker savedMarker = markers.get(id);
-                        LatLng savedPosition = savedMarker.getPosition();
-                        LatLng newPosition = new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude());
-                        if (!savedPosition.equals(newPosition)){
-                            MarkerOptions marker = new MarkerOptions()
-                                    .position(newPosition)
-                                    .title(String.valueOf(pair.getValue().getId()));
-                            if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
-                                marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                        LatLng savedPosition;
+                        //need this check in case killing process
+                        if (savedMarker != null) {
+                            savedPosition = savedMarker.getPosition();
+                            //compare saved and new position
+                            LatLng newPosition = new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude());
+                            if (!savedPosition.equals(newPosition)) {
+                                MarkerOptions marker = new MarkerOptions()
+                                        .position(newPosition)
+                                        .title(String.valueOf(pair.getValue().getId()));
+                                if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
+                                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                                }
+                                savedMarker.remove();
+                                markers.remove(id);
+                                markers.put(id, AppData.m_map.addMarker(marker));
+                                Log.i(LOG_TAG, "The markers have moved");
+                            } else {
+                                if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
+                                    savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                                } else
+                                    savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                             }
-                            savedMarker.remove();
-                            markers.remove(id);
-                            markers.put(id, m_map.addMarker(marker));
-                            Log.i(LOG_TAG, "The markers have moved");
-                        }else{
-                            if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
-                                savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                            }else savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                         }
                     }
                     Log.i(LOG_TAG, "The position of markers was updated");

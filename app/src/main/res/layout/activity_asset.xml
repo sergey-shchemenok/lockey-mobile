@@ -15,6 +15,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            app:titleTextAppearance="@style/Toolbar.TitleText"
             app:titleTextColor="@android:color/white"
             android:background="@color/colorPrimary" />
 

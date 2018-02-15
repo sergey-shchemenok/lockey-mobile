@@ -4,7 +4,6 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
@@ -60,18 +59,19 @@ public class AuthActivity extends AppCompatActivity
         connectionStatusMessage = (TextView) findViewById(R.id.main_connection_message);
         connectionStatusMessage.setVisibility(View.GONE);
 
-        if (!UserData.usr.isEmpty())
-            loginView.setText(UserData.usr);
-        if (!UserData.pwd.isEmpty())
-            passwordView.setText(UserData.pwd);
+        if (!AppData.usr.isEmpty())
+            loginView.setText(AppData.usr);
+        if (!AppData.pwd.isEmpty())
+            passwordView.setText(AppData.pwd);
 
         mHandler = new Handler();
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UserData.pwd = passwordView.getText().toString();
-                UserData.usr = loginView.getText().toString();
+                AppData.pwd = passwordView.getText().toString();
+                AppData.usr = loginView.getText().toString();
+                //get token. If it is correct start main activity
                 getToken();
             }
         });
@@ -83,7 +83,7 @@ public class AuthActivity extends AppCompatActivity
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
             loaderManager = getLoaderManager();
-            loaderManager.initLoader(UserData.AUTH_LOADER_ID, null, this);
+            loaderManager.initLoader(AppData.AUTH_LOADER_ID, null, this);
             Log.v(LOG_TAG, "initLoader");
         } else {
             connectionStatusMessage.setVisibility(View.VISIBLE);
@@ -95,7 +95,7 @@ public class AuthActivity extends AppCompatActivity
     public Loader<String> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
         Log.v(LOG_TAG, "onCreateLoader");
-        return new TokenLoader(this, UserData.AUTH_REQUEST_URL, UserData.pwd, UserData.usr);
+        return new TokenLoader(this, AppData.AUTH_REQUEST_URL, AppData.pwd, AppData.usr);
     }
 
     @Override
@@ -167,7 +167,6 @@ public class AuthActivity extends AppCompatActivity
         mHandler.removeCallbacks(mStatusChecker);
     }
     //end here
-
 
     //we don't need to move to previous activity from here
     @Override

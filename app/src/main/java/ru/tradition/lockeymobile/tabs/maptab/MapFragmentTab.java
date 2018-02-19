@@ -229,7 +229,10 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
                             }
                         }
                     }
+                    Log.i(LOG_TAG, String.valueOf(AppData.isFinished));
+                    Log.i(LOG_TAG, String.valueOf(AppData.isRepeated));
                     Log.i(LOG_TAG, "The position of markers was updated");
+
                 } else
                     Log.i(LOG_TAG, "the map................. is null");
 

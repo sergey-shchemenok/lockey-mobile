@@ -19,6 +19,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Map;
@@ -71,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        FirebaseMessaging.getInstance().subscribeToTopic("NEWS");
+
         //toolbar.setTitle("title");
 
         progressCircle = (ProgressBar) findViewById(R.id.loading_spinner);
@@ -84,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements
         //launch loading data from server
         startLoader();
     }
-
 
 
     //The method adds "up" button to toolbar
@@ -104,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     //For initial data loading
-    private void startLoader() {
+    public void startLoader() {
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
             loaderManager = getLoaderManager();
@@ -206,6 +209,13 @@ public class MainActivity extends AppCompatActivity implements
 
             AppData.isRepeated = true;
 
+            //this for notices
+            if (AppData.noticeReceived == true) {
+                //restart activity
+                //recreate();
+                AppData.viewPager.setCurrentItem(2);
+            }
+
         } else {
             Log.i(LOG_TAG, "the second load has finished");
             if (assetData == null || assetData.isEmpty()) {
@@ -214,6 +224,14 @@ public class MainActivity extends AppCompatActivity implements
             AppData.mAssetData = assetData;
             //here is not good for speed
             updateListView();
+
+            //this for notices
+            if (AppData.noticeReceived == true) {
+                //restart activity
+                //recreate();
+                //AppData.viewPager.setCurrentItem(2);
+            }
+
 
         }
     }

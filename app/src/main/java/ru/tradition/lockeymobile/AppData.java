@@ -25,6 +25,8 @@ public final class AppData {
 
     public static MainActivity mainActivity;
 
+    public static boolean noticeReceived = false;
+
     //Here is the data from Loader about cars and other assets
     public static Map<Integer, AssetsData> mAssetData;
     //To save camera position in case of restarting app

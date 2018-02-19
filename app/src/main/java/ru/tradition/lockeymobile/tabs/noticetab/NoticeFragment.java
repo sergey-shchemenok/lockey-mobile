@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.R;
 
 
@@ -66,7 +67,11 @@ public class NoticeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        AppData.noticeReceived = false;
+
         return inflater.inflate(R.layout.fragment_other, container, false);
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event

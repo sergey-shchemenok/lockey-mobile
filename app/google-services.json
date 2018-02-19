@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "255116143254",
+    "firebase_url": "https://lockeymobile.firebaseio.com",
+    "project_id": "lockeymobile",
+    "storage_bucket": "lockeymobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255116143254:android:91f702cf36630855",
+        "android_client_info": {
+          "package_name": "ru.tradition.lockeymobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "255116143254-k4guptohb2te7m0e20s9l0kf0qn9rrf0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ru.tradition.lockeymobile",
+            "certificate_hash": "403301eccc1cbdf27671c3f2e5469b1d6e851d93"
+          }
+        },
+        {
+          "client_id": "255116143254-952d99c9l3913rkoiu7ml8lnban5jtub.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_SbH744p8Yt0Dae6Ls9EGlnq4OpW7cew"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "255116143254-952d99c9l3913rkoiu7ml8lnban5jtub.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -39,7 +39,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyB8lBwEsqiiklGZiWH8HLIM_93bAfPcICI" />
+            android:value="AIzaSyA6z7lSGkevNiSOt9iLmzVTCFbaAreHM2E" />
 
         <activity
             android:name=".AssetActivity"
@@ -48,6 +48,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <service android:name="ru.tradition.lockeymobile.firebasecm.FirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service android:name="ru.tradition.lockeymobile.firebasecm.FirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

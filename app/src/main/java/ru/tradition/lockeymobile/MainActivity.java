@@ -62,7 +62,9 @@ public class MainActivity extends AppCompatActivity implements
         if (assetsUrlResponseCode == 0) {
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
+            Log.i(LOG_TAG, ".............assetsUrlResponseCode == 0");
         }
+        AppData.mainActivity = this;
 
         setContentView(R.layout.activity_main);
 
@@ -81,9 +83,9 @@ public class MainActivity extends AppCompatActivity implements
 
         //launch loading data from server
         startLoader();
-
-        AppData.mainActivity = this;
     }
+
+
 
     //The method adds "up" button to toolbar
     public void setUpButton() {
@@ -162,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements
                 return;
             }
             mEmptyStateTextView.setText("");
-            Log.i(LOG_TAG, "onLoadFinished");
+            Log.i(LOG_TAG, "the first load has finished");
 
             AppData.mAssetData = assetData;
 
@@ -180,17 +182,32 @@ public class MainActivity extends AppCompatActivity implements
             //listen to tab changes
             AppData.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                }
+
                 @Override
                 public void onPageSelected(int position) {
                     changeMode();
+                    updateListView();
                 }
+
                 @Override
-                public void onPageScrollStateChanged(int state) {}
+                public void onPageScrollStateChanged(int state) {
+                }
             });
+
+//            Intent intent = getIntent();
+//            Bundle bundle = intent.getExtras();
+//            if (bundle != null && bundle.containsKey("TabNumber")) {
+//                int tabNumber = bundle.getInt("TabNumber");
+//                if (tabNumber == 2)
+//                    AppData.viewPager.setCurrentItem(2);
+//            }
+
             AppData.isRepeated = true;
 
         } else {
+            Log.i(LOG_TAG, "the second load has finished");
             if (assetData == null || assetData.isEmpty()) {
                 return;
             }

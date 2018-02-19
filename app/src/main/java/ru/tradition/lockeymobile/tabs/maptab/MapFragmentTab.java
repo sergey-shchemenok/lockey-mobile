@@ -155,6 +155,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
             }
         } catch (NullPointerException e) {
             AppData.mainActivity.logout();
+            Log.i(LOG_TAG, "onMapReady..........NullPointerException");
         }
     }
 
@@ -166,6 +167,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
             AppData.target = AppData.m_map.getCameraPosition();
         } catch (NullPointerException e) {
             AppData.mainActivity.logout();
+            Log.i(LOG_TAG, "onMapStop..........NullPointerException");
         }
         stopRepeatingTask();
         super.onStop();
@@ -228,7 +230,9 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
                         }
                     }
                     Log.i(LOG_TAG, "The position of markers was updated");
-                }
+                } else
+                    Log.i(LOG_TAG, "the map................. is null");
+
             } finally {
                 mHandler.postDelayed(mStatusChecker, mInterval);
             }

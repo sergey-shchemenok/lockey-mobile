@@ -78,6 +78,8 @@ public class AuthActivity extends AppCompatActivity
 
     }
 
+
+
     public void getToken() {
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         activeNetwork = connectivityManager.getActiveNetworkInfo();
@@ -111,6 +113,8 @@ public class AuthActivity extends AppCompatActivity
             infoMessage.setText(R.string.no_credentials);
             return;
         }
+        AppData.isFinished = false;
+        AppData.isRepeated = false;
         infoMessage.setVisibility(View.INVISIBLE);
         Log.v(LOG_TAG, "onLoadFinished");
         Intent intent = new Intent(AuthActivity.this, MainActivity.class);

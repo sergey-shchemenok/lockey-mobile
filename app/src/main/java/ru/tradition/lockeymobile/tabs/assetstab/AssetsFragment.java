@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +57,8 @@ public class AssetsFragment extends Fragment {
             assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
         } catch (NullPointerException e) {
             AppData.mainActivity.logout();
+            Log.i(LOG_TAG, "onAssetsFragmentCreateView..........NullPointerException");
+
         }
 
         //selecting mode has the other title

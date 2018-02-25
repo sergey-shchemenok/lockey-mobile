@@ -44,12 +44,12 @@ public class AuthActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //firebase notification
-        if(AppData.noticeReceived == true){
-//            AppData.pwd = passwordView.getText().toString();
-//            AppData.usr = loginView.getText().toString();
-            //get token. If it is correct start main activity
-            getToken();
-        }
+//        if(AppData.noticeReceived == true){
+////            AppData.pwd = passwordView.getText().toString();
+////            AppData.usr = loginView.getText().toString();
+//            //get token. If it is correct start main activity
+//            getToken();
+//        }
 
         setContentView(R.layout.activity_auth);
 

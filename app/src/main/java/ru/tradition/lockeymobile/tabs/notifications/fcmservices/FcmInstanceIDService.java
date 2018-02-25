@@ -1,4 +1,4 @@
-package ru.tradition.lockeymobile.firebasecm;
+package ru.tradition.lockeymobile.tabs.notifications.fcmservices;
 
 import android.util.Log;
 
@@ -8,9 +8,9 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 /**
  * Created by NgocTri on 8/9/2016.
  */
-public class LockeyFirebaseInstanceIDService extends FirebaseInstanceIdService {
+public class FcmInstanceIDService extends FirebaseInstanceIdService {
 
-    private static final String LOG_TAG = LockeyFirebaseInstanceIDService.class.getSimpleName();
+    private static final String LOG_TAG = FcmInstanceIDService.class.getSimpleName();
 
     @Override
     public void onTokenRefresh() {

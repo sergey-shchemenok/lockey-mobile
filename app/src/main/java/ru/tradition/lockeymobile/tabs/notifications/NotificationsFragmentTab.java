@@ -1,4 +1,4 @@
-package ru.tradition.lockeymobile.tabs.noticetab;
+package ru.tradition.lockeymobile.tabs.notifications;
 
 import android.content.Context;
 import android.net.Uri;
@@ -8,19 +8,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.R;
 
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link NoticeFragment.OnFragmentInteractionListener} interface
+ * {@link NotificationsFragmentTab.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link NoticeFragment#newInstance} factory method to
+ * Use the {@link NotificationsFragmentTab#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NoticeFragment extends Fragment {
+public class NotificationsFragmentTab extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -32,7 +31,7 @@ public class NoticeFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public NoticeFragment() {
+    public NotificationsFragmentTab() {
         // Required empty public constructor
     }
 
@@ -42,11 +41,11 @@ public class NoticeFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment NoticeFragment.
+     * @return A new instance of fragment NotificationsFragmentTab.
      */
     // TODO: Rename and change types and number of parameters
-    public static NoticeFragment newInstance(String param1, String param2) {
-        NoticeFragment fragment = new NoticeFragment();
+    public static NotificationsFragmentTab newInstance(String param1, String param2) {
+        NotificationsFragmentTab fragment = new NotificationsFragmentTab();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -68,7 +67,7 @@ public class NoticeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        AppData.noticeReceived = false;
+       // AppData.noticeReceived = false;
 
         return inflater.inflate(R.layout.fragment_other, container, false);
 

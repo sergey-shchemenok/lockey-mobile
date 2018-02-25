@@ -1,4 +1,4 @@
-package ru.tradition.lockeymobile.firebasecm;
+package ru.tradition.lockeymobile.tabs.notifications.fcmservices;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -19,8 +19,6 @@ import com.google.firebase.messaging.RemoteMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ru.tradition.lockeymobile.AppData;
-import ru.tradition.lockeymobile.AssetActivity;
 import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
@@ -28,9 +26,9 @@ import ru.tradition.lockeymobile.R;
 /**
  * Created by NgocTri on 8/9/2016.
  */
-public class LockeyFirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
+public class FcmMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
 
-    private static final String LOG_TAG = LockeyFirebaseInstanceIDService.class.getSimpleName();
+    private static final String LOG_TAG = FcmInstanceIDService.class.getSimpleName();
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -74,7 +72,7 @@ public class LockeyFirebaseMessagingService extends com.google.firebase.messagin
             Log.i(LOG_TAG, "Message Notification Body: " + message);
             Log.i(LOG_TAG, "Message Notification click_action: " + click_action);
 
-            sendNotification(title, message, "AUTHACTIVITY");
+            sendNotification(title, message, click_action);
         }
 
 
@@ -89,33 +87,17 @@ public class LockeyFirebaseMessagingService extends com.google.firebase.messagin
         Log.i(LOG_TAG, messageBody + ".........");
 
         Intent intent;
-        if (click_action.equals("ASSETACTIVITY")) {
-            intent = new Intent(this, AssetActivity.class);
-            //AppData.noticeReceived = true;
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        } else if (click_action.equals("AUTHACTIVITY")) {
+        if (click_action.equals("AUTHACTIVITY")) {
             intent = new Intent(this, AuthActivity.class);
-            AppData.noticeReceived = true;
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         } else if (click_action.equals("MAINACTIVITY")) {
             intent = new Intent(getApplicationContext(), MainActivity.class);
-            //AppData.isFinished = false;
-            //AppData.isRepeated = false;
-            AppData.noticeReceived = true;
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         } else {
             intent = new Intent(this, MainActivity.class);
-            //AppData.isFinished = false;
-            //AppData.isRepeated = false;
-            AppData.noticeReceived = true;
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
 
-
-//        Intent intent = new Intent(this, MainActivity.class);
-//        //intent.putExtra("TabNumber", 2);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        intent.setAction("OPEN_TAB_2");
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0/*Request code*/, intent, PendingIntent.FLAG_ONE_SHOT);
         //Set sound of notification
         Log.i(LOG_TAG, click_action + ".........pending intent");
@@ -141,12 +123,10 @@ public class LockeyFirebaseMessagingService extends com.google.firebase.messagin
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Firebase Cloud Messaging")
+                .setContentTitle(title)
                 .setPriority(Notification.PRIORITY_MAX) // this is deprecated in API 26 but we can still use for below 26.
                 .setContentText(messageBody)
-                .setContentTitle("Default notification")
-                .setContentText("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
-                .setContentInfo("Info")
+                //.setContentInfo("Info")
                 .setAutoCancel(true)
                 .setSound(notificationSound)
                 .setContentIntent(pendingIntent);

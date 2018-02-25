@@ -32,7 +32,6 @@
         <activity android:name=".MainActivity">
 
             <!-- android:configChanges="orientation|screenSize"> -->
-            <!-- todo think up something in the future -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -59,18 +58,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
 
-            <intent-filter>
-                <action android:name="ASSETACTIVITY"></action>
-                <category android:name="android.intent.category.DEFAULT"></category>
-            </intent-filter>
         </activity>
 
-        <service android:name="ru.tradition.lockeymobile.firebasecm.LockeyFirebaseMessagingService">
+        <service android:name=".tabs.notifications.fcmservices.FcmMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name="ru.tradition.lockeymobile.firebasecm.LockeyFirebaseInstanceIDService">
+        <service android:name=".tabs.notifications.fcmservices.FcmInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>

@@ -27,11 +27,11 @@ import java.util.Map;
 
 import ru.tradition.lockeymobile.tabs.AppTabAdapter;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragment;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragmentTab;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsLoader;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTab;
-import ru.tradition.lockeymobile.tabs.noticetab.NoticeFragment;
+import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 
 import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUrlResponseCode;
 import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUrlResponseMessage;
@@ -39,8 +39,8 @@ import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUr
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Map<Integer, AssetsData>>,
         MapFragmentTab.OnFragmentInteractionListener,
-        NoticeFragment.OnFragmentInteractionListener,
-        AssetsFragment.OnFragmentInteractionListener {
+        NotificationsFragmentTab.OnFragmentInteractionListener,
+        AssetsFragmentTab.OnFragmentInteractionListener {
 
     private AppTabAdapter adapter;
 
@@ -190,7 +190,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 @Override
                 public void onPageSelected(int position) {
-                    changeMode();
+                    changeModeToNormal();
                     updateListView();
                 }
 
@@ -209,12 +209,12 @@ public class MainActivity extends AppCompatActivity implements
 
             AppData.isRepeated = true;
 
-            //this for notices
-            if (AppData.noticeReceived == true) {
-                //restart activity
-                //recreate();
-                AppData.viewPager.setCurrentItem(2);
-            }
+//            //this for notices
+//            if (AppData.noticeReceived == true) {
+//                //restart activity
+//                //recreate();
+//                AppData.viewPager.setCurrentItem(2);
+//            }
 
         } else {
             Log.i(LOG_TAG, "the second load has finished");
@@ -225,12 +225,12 @@ public class MainActivity extends AppCompatActivity implements
             //here is not good for speed
             updateListView();
 
-            //this for notices
-            if (AppData.noticeReceived == true) {
-                //restart activity
-                //recreate();
-                //AppData.viewPager.setCurrentItem(2);
-            }
+//            //this for notices
+//            if (AppData.noticeReceived == true) {
+//                //restart activity
+//                //recreate();
+//                //AppData.viewPager.setCurrentItem(2);
+//            }
 
 
         }
@@ -238,8 +238,8 @@ public class MainActivity extends AppCompatActivity implements
 
     //update the list of assets
     public void updateListView() {
-        AssetsFragment.assetsDataAdapter.clear();
-        AssetsFragment.assetsDataAdapter.addAll(new ArrayList<>(AppData.mAssetData.values()));
+        AssetsFragmentTab.assetsDataAdapter.clear();
+        AssetsFragmentTab.assetsDataAdapter.addAll(new ArrayList<>(AppData.mAssetData.values()));
     }
 
     //we need to interrupt the loading thread
@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements
                 //todo settings here
                 return true;
             case R.id.main_menu_back:
-                changeMode();
+                changeModeToNormal();
                 updateListView();
                 return true;
         }
@@ -293,13 +293,13 @@ public class MainActivity extends AppCompatActivity implements
         AppData.isFinished = false;
         AppData.isRepeated = false;
         if (AppData.isSelectingMode)
-            changeMode();
+            changeModeToNormal();
         startActivity(intent);
 
     }
 
     //to change mode from selecting to normal
-    public void changeMode() {
+    public void changeModeToNormal() {
         AppData.isSelectingMode = false;
         AppData.selectedAsset.clear();
         AppData.selectedAssetCounter = 0;
@@ -310,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onSupportNavigateUp() {
-        changeMode();
+        changeModeToNormal();
         updateListView();
         return true;
     }
@@ -323,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements
         // If the pet hasn't changed, continue with handling back button press
         //This button is upper to the left arrow
         if (AppData.isSelectingMode) {
-            changeMode();
+            changeModeToNormal();
             updateListView();
         } else
             logout();

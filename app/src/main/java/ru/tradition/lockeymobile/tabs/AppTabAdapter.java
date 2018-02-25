@@ -6,9 +6,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTab;
-import ru.tradition.lockeymobile.tabs.noticetab.NoticeFragment;
+import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 import ru.tradition.lockeymobile.R;
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragment;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragmentTab;
 
 /**
  * Created by Caelestis on 25.01.2018.
@@ -38,11 +38,11 @@ public class AppTabAdapter extends FragmentPagerAdapter {
     @Override
     public Fragment getItem(int position) {
         if (position == 0) {
-            return new AssetsFragment();
+            return new AssetsFragmentTab();
         } else if (position == 1) {
             return new MapFragmentTab();
         } else {
-            return new NoticeFragment();
+            return new NotificationsFragmentTab();
         }
     }
 

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.AssetActivity;
-import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
 
 import static ru.tradition.lockeymobile.AppData.mAssetData;
@@ -29,15 +28,15 @@ import static ru.tradition.lockeymobile.AppData.mAssetData;
  * Created by Caelestis on 25.01.2018.
  */
 
-public class AssetsFragment extends Fragment {
+public class AssetsFragmentTab extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
     // Required empty public constructor
-    public AssetsFragment() {
+    public AssetsFragmentTab() {
     }
 
-    public static final String LOG_TAG = AssetsFragment.class.getName();
+    public static final String LOG_TAG = AssetsFragmentTab.class.getName();
     public static AssetsDataAdapter assetsDataAdapter;
     private ListView assetsListView;
 
@@ -118,7 +117,7 @@ public class AssetsFragment extends Fragment {
                     AppData.mainActivity.setTitle(String.valueOf(++AppData.selectedAssetCounter));
                     AppData.mainActivity.updateListView();
                 }else {
-                    AppData.mainActivity.changeMode();
+                    AppData.mainActivity.changeModeToNormal();
                     AppData.mainActivity.updateListView();
                     AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
                     AppData.target = CameraPosition.builder()

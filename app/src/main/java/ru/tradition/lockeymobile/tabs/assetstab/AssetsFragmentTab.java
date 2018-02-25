@@ -43,7 +43,7 @@ public class AssetsFragmentTab extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.asset_list, container, false);
+        View rootView = inflater.inflate(R.layout.tab_fragment_asset_list, container, false);
 
         assetsListView = (ListView) rootView.findViewById(R.id.assets_list);
 

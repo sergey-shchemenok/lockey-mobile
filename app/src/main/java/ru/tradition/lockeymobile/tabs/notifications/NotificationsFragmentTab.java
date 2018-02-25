@@ -1,14 +1,21 @@
 package ru.tradition.lockeymobile.tabs.notifications;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import ru.tradition.lockeymobile.R;
+import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
 
 /**
@@ -16,77 +23,89 @@ import ru.tradition.lockeymobile.R;
  * Activities that contain this fragment must implement the
  * {@link NotificationsFragmentTab.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link NotificationsFragmentTab#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NotificationsFragmentTab extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class NotificationsFragmentTab extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private NotificationCursorAdapter adapter;
+    private static final int CURSOR_LOADER_ID = 1;
 
-    private OnFragmentInteractionListener mListener;
+    public NotificationsFragmentTab(){}
 
-    public NotificationsFragmentTab() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment NotificationsFragmentTab.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static NotificationsFragmentTab newInstance(String param1, String param2) {
-        NotificationsFragmentTab fragment = new NotificationsFragmentTab();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        View rootView = inflater.inflate(R.layout.tab_fragment_notification, container, false);
 
-       // AppData.noticeReceived = false;
+        ListView petListView = (ListView) rootView.findViewById(R.id.notification_list);
+        adapter = new NotificationCursorAdapter(getActivity(), null);
+        petListView.setAdapter(adapter);
 
-        return inflater.inflate(R.layout.fragment_other, container, false);
+        // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
+        View emptyView = rootView.findViewById(R.id.empty_view);
+        petListView.setEmptyView(emptyView);
+
+        //listener for items
+        petListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View viewItem, int itemPosition, long itemId) {
+                //todo mage NotificationActivity
+//                Intent intent = new Intent(getActivity(), NotificationActivity.class);
+//                //Make an URI for intent
+//                Uri currentPetUri = ContentUris.withAppendedId(NotificationContract.NotificationEntry.CONTENT_URI, itemId);
+//                intent.setData(currentPetUri);
+//                startActivity(intent);
+            }
+        });
+
+        //kick off loader
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+
+        return rootView;
 
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = {
+                //id column is always needed for the cursor
+                NotificationContract.NotificationEntry._ID,
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE,
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY,
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME,
+
+
+        };
+
+        String sortOrder =
+        NotificationContract.NotificationEntry._ID + " DESC";
+        return new CursorLoader(getContext(), NotificationContract.NotificationEntry.CONTENT_URI, projection,
+                null, null, sortOrder);
     }
 
-//    @Override
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        adapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
+    }
+
+    //    @Override
 //    public void onDestroyView() {
 //        MainActivity.isFinished = false;
 //        MainActivity.isRepeated = false;
 //        super.onDestroyView();
 //    }
 
+
+
+
+    private OnFragmentInteractionListener mListener;
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

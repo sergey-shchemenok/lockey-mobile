@@ -151,6 +151,12 @@ public class NotificationProvider extends ContentProvider {
             throw new IllegalArgumentException("Notification requires a body");
         }
 
+        // Check that the sending time message is not null
+        String sendingTime = values.getAsString(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME);
+        if (sendingTime.isEmpty() || sendingTime == null) {
+            throw new IllegalArgumentException("Notification requires a sending time");
+        }
+
         // No need to check the other column values, any value is valid (including null).
 
         SQLiteDatabase database = mDbHelper.getReadableDatabase();
@@ -210,6 +216,12 @@ public class NotificationProvider extends ContentProvider {
         String body = values.getAsString(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY);
         if (body.isEmpty() || body == null) {
             throw new IllegalArgumentException("Notification requires a body");
+        }
+
+        // Check that the sending time message is not null
+        String sendingTime = values.getAsString(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME);
+        if (sendingTime.isEmpty() || sendingTime == null) {
+            throw new IllegalArgumentException("Notification requires a sending time");
         }
 
         // No need to check the other column values, any value is valid (including null).

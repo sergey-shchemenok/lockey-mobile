@@ -2,11 +2,11 @@ package ru.tradition.lockeymobile.tabs.notifications;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import ru.tradition.lockeymobile.R;
@@ -55,19 +55,25 @@ public class NotificationCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         // Find fields to populate in inflated template
-        TextView nameTextView = (TextView) view.findViewById(R.id.notification_title);
-        TextView summaryTextView = (TextView) view.findViewById(R.id.notification_body);
+        TextView titleTextView = (TextView) view.findViewById(R.id.notification_title);
+        TextView bodyTextView = (TextView) view.findViewById(R.id.notification_body);
+        TextView sendingTimeTextView = (TextView) view.findViewById(R.id.notification_sending_time);
+
+
         // Extract properties from cursor
         String notificationTitle = cursor.getString(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE));
         String notificationBody = cursor.getString(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY));
+        String notificationSendingTime = cursor.getString(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME));
         // Populate fields with extracted properties
-        nameTextView.setText(notificationTitle);
+        titleTextView.setText(notificationTitle);
+        sendingTimeTextView.setText(notificationSendingTime);
+
 
         //We need something to show if breed field is empty
         if (!TextUtils.isEmpty(notificationBody)) {
-            summaryTextView.setText(notificationBody);
+            bodyTextView.setText(notificationBody);
         } else {
-            summaryTextView.setText("Empty message");
+            bodyTextView.setText("Empty message");
         }
     }
 }

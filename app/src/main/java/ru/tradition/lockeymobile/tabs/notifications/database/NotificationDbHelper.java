@@ -30,9 +30,9 @@ public class NotificationDbHelper extends SQLiteOpenHelper {
             + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID + " INTEGER NOT NULL, "
             + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE + " TEXT NOT NULL, "
             + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY + " TEXT NOT NULL, "
-            + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME + " TEXT, "
+            + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME + " TEXT NOT NULL, "
             + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE + " REAL, "
-            + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE + " REAL);";
+            + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE + " REAL);";
 
     /*
      * Constructs a new instance of {@link NotificationDbHelper}.

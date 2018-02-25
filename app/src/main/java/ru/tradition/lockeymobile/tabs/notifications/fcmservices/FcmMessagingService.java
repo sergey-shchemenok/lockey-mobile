@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -22,9 +23,11 @@ import org.json.JSONObject;
 import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
+import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
+import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
 /**
- * Created by NgocTri on 8/9/2016.
+ * Created by Caelestis on 24.12.2017.
  */
 public class FcmMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
 
@@ -34,20 +37,6 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
         Log.i(LOG_TAG, "FROM:" + remoteMessage.getFrom());
-
-//        //Check if the message contains data
-//        if(remoteMessage.getData().size() > 0) {
-//            Log.d(LOG_TAG, "Message data: " + remoteMessage.getData());
-//        }
-//
-//        //Check if the message contains notification
-//
-//        if(remoteMessage.getNotification() != null) {
-//            Log.d(LOG_TAG, "Mesage body:" + remoteMessage.getNotification().getBody());
-//            sendNotification(remoteMessage.getNotification().getBody());
-//        }
-        //Log.i(TAG, "Содержимое" + remoteMessage.getNotification().get);
-
 
         // Check if message contains a data payload.
         if (remoteMessage.getData().size() > 0) {
@@ -64,17 +53,31 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
 
         // Check if message contains a notification payload.
         if (remoteMessage.getNotification() != null) {
-            String title = remoteMessage.getNotification().getTitle(); //get title
-            String message = remoteMessage.getNotification().getBody(); //get message
             String click_action = remoteMessage.getNotification().getClickAction(); //get click_action
+            String title = String.valueOf(remoteMessage.getData().get("title"));
+            String body = String.valueOf(remoteMessage.getData().get("body"));
+            String date = String.valueOf(remoteMessage.getData().get("date"));
+            int id = 0;
+            double latitude = 0.0;
+            double longitude = 0.0;
+            try {
+                id = Integer.parseInt(String.valueOf(remoteMessage.getData().get("id")));
+                latitude = Double.parseDouble(String.valueOf(remoteMessage.getData().get("latitude")));
+                longitude = Double.parseDouble(String.valueOf(remoteMessage.getData().get("longitude")));
+            } catch (NumberFormatException e) {
+            }
 
             Log.i(LOG_TAG, "Message Notification Title: " + title);
-            Log.i(LOG_TAG, "Message Notification Body: " + message);
+            Log.i(LOG_TAG, "Message Notification Body: " + body);
             Log.i(LOG_TAG, "Message Notification click_action: " + click_action);
+            Log.i(LOG_TAG, "Message Notification id: " + id);
+            Log.i(LOG_TAG, "Message Notification date: " + date);
+            Log.i(LOG_TAG, "Message Notification latitude: " + latitude);
+            Log.i(LOG_TAG, "Message Notification longitude: " + longitude);
 
-            sendNotification(title, message, click_action);
+
+            sendNotification(id, title, body, click_action, date, latitude, longitude);
         }
-
 
     }
 
@@ -83,8 +86,8 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
      */
 //    private void sendNotification(String body) {
 //
-    private void sendNotification(String title, String messageBody, String click_action) {
-        Log.i(LOG_TAG, messageBody + ".........");
+    private void sendNotification(int id, String title, String body, String click_action, String date, double latitude, double longitude) {
+        Log.i(LOG_TAG, body + ".........");
 
         Intent intent;
         if (click_action.equals("AUTHACTIVITY")) {
@@ -97,6 +100,22 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
             intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         }
+
+        NotificationsData notificationsData = null;
+
+        if (id != 0 && title != null
+                && body != null
+                && date != null
+                && latitude != 0.0
+                && longitude != 0.0) {
+            notificationsData = new NotificationsData(id, title, body, date, latitude, longitude);
+        } else if (id != 0 && title != null
+                && body != null
+                && date != null) {
+            notificationsData = new NotificationsData(id, title, body, date);
+        }
+        if (notificationsData != null)
+            insertNotification(notificationsData);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0/*Request code*/, intent, PendingIntent.FLAG_ONE_SHOT);
         //Set sound of notification
@@ -125,7 +144,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)
                 .setPriority(Notification.PRIORITY_MAX) // this is deprecated in API 26 but we can still use for below 26.
-                .setContentText(messageBody)
+                .setContentText(body)
                 //.setContentInfo("Info")
                 .setAutoCancel(true)
                 .setSound(notificationSound)
@@ -135,6 +154,19 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
         notificationManager.notify(0 /*ID of notification*/, notifiBuilder.build());
 
 
+    }
+
+    private void insertNotification(NotificationsData nd) {
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID, nd.getId());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE, nd.getTitle());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY, nd.getBody());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME, nd.getSending_time());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE, nd.getLatitude());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE, nd.getLongitude());
+
+        Uri newUri = getContentResolver().insert(NotificationContract.NotificationEntry.CONTENT_URI, values);
     }
 
 

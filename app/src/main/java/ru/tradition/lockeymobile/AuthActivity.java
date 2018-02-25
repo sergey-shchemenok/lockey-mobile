@@ -1,11 +1,13 @@
 package ru.tradition.lockeymobile;
 
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,10 +18,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+
 import java.net.HttpURLConnection;
 
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
 import ru.tradition.lockeymobile.auth.TokenLoader;
+import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
+import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
 
 public class AuthActivity extends AppCompatActivity
@@ -52,6 +58,15 @@ public class AuthActivity extends AppCompatActivity
 //        }
 
         setContentView(R.layout.activity_auth);
+
+        //token for firebase cloud messaging
+        String fcmToken = FirebaseInstanceId.getInstance().getToken();
+        Log.i(LOG_TAG, "the token is: " + fcmToken);
+
+        NotificationsData notificationsData = getNotificationData();
+        if (notificationsData != null) {
+            insertNotification(notificationsData);
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -86,7 +101,84 @@ public class AuthActivity extends AppCompatActivity
 
     }
 
+    private NotificationsData getNotificationData() {
+        int id = 0;
+        String title = null;
+        String body = null;
+        String sending_time = null;
+        double latitude = 0.0;
+        double longitude = 0.0;
 
+        if (getIntent().getExtras() != null) {
+            for (String key : getIntent().getExtras().keySet()) {
+                Object value = getIntent().getExtras().get(key);
+                Log.i("MainActivity: ", "Key: " + key + " Value: " + value);
+                if (key.equals("id")) {
+                    try {
+                        id = Integer.parseInt(String.valueOf(value));
+                    } catch (NumberFormatException e) {
+                    }
+                }
+                if (key.equals("title")) {
+                    title = String.valueOf(value);
+                }
+                if (key.equals("body")) {
+                    body = String.valueOf(value);
+                }
+                if (key.equals("date")) {
+                    sending_time = String.valueOf(value);
+                }
+                if (key.equals("latitude")) {
+                    try {
+                        latitude = Double.parseDouble(String.valueOf(value));
+                    } catch (NumberFormatException e) {
+                    }
+
+                }
+                if (key.equals("longitude")) {
+                    try {
+                        longitude = Double.parseDouble(String.valueOf(value));
+                    } catch (NumberFormatException e) {
+                    }
+
+                }
+            }
+        }
+        if (id != 0 && title != null
+                && body != null
+                && sending_time != null
+                && latitude != 0.0
+                && longitude != 0.0) {
+            return new NotificationsData(id, title, body, sending_time, latitude, longitude);
+        } else if (id != 0 && title != null
+                && body != null
+                && sending_time != null) {
+            return new NotificationsData(id, title, body, sending_time);
+        }
+        //todo add other datas (longitude and latitude)
+        else return null;
+    }
+
+    private void insertNotification(NotificationsData nd) {
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID, nd.getId());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE, nd.getTitle());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY, nd.getBody());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME, nd.getSending_time());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE, nd.getLatitude());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE, nd.getLongitude());
+
+        // Insert a new row for Toto in the database, returning the ID of that new row.
+        // The first argument for db.insert() is the pets table name.
+        // The second argument provides the name of a column in which the framework
+        // can insert NULL in the event that the ContentValues is empty (if
+        // this is set to "null", then the framework will not insert a row when
+        // there are no values).
+        // The third argument is the ContentValues object containing the info for Toto.
+        //long newRowId = db.insert(PetContract.PetEntry.TABLE_NAME, null, values);
+        Uri newUri = getContentResolver().insert(NotificationContract.NotificationEntry.CONTENT_URI, values);
+    }
 
     public void getToken() {
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -150,7 +242,7 @@ public class AuthActivity extends AppCompatActivity
     }
 
     //The code for checking internet connection
-    private int mInterval = 1000*1; // 1 seconds by default, can be changed later
+    private int mInterval = 1000 * 1; // 1 seconds by default, can be changed later
     private Handler mHandler;
 
     Runnable mStatusChecker = new Runnable() {
@@ -172,9 +264,11 @@ public class AuthActivity extends AppCompatActivity
             }
         }
     };
+
     void startRepeatingTask() {
         mStatusChecker.run();
     }
+
     void stopRepeatingTask() {
         mHandler.removeCallbacks(mStatusChecker);
     }

@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import ru.tradition.lockeymobile.R;
@@ -55,9 +56,18 @@ public class NotificationCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         // Find fields to populate in inflated template
+
+        LinearLayout notificationItemShort = (LinearLayout)view.findViewById(R.id.notification_item_short);
+        LinearLayout notificationItemLong = (LinearLayout)view.findViewById(R.id.notification_item_long);
+        notificationItemLong.setVisibility(View.GONE);
+
         TextView titleTextView = (TextView) view.findViewById(R.id.notification_title);
         TextView bodyTextView = (TextView) view.findViewById(R.id.notification_body);
         TextView sendingTimeTextView = (TextView) view.findViewById(R.id.notification_sending_time);
+
+        TextView titleTextViewOptional = (TextView) view.findViewById(R.id.notification_title_optional);
+        TextView bodyTextViewOptional = (TextView) view.findViewById(R.id.notification_body_optional);
+        TextView sendingTimeTextViewOptional = (TextView) view.findViewById(R.id.notification_sending_time_optional);
 
 
         // Extract properties from cursor
@@ -68,12 +78,17 @@ public class NotificationCursorAdapter extends CursorAdapter {
         titleTextView.setText(notificationTitle);
         sendingTimeTextView.setText(notificationSendingTime);
 
+        titleTextViewOptional.setText(notificationTitle);
+        sendingTimeTextViewOptional.setText(notificationSendingTime);
+
 
         //We need something to show if breed field is empty
         if (!TextUtils.isEmpty(notificationBody)) {
             bodyTextView.setText(notificationBody);
+            bodyTextViewOptional.setText(notificationBody);
         } else {
             bodyTextView.setText("Empty message");
+            bodyTextViewOptional.setText(notificationBody);
         }
     }
 }

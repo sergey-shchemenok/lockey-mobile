@@ -22,7 +22,9 @@ import org.json.JSONObject;
 
 import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.MainActivity;
+import ru.tradition.lockeymobile.NotificationActivity;
 import ru.tradition.lockeymobile.R;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
@@ -91,7 +93,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
 
         Intent intent;
         if (click_action.equals("AUTHACTIVITY")) {
-            intent = new Intent(this, AuthActivity.class);
+            intent = new Intent(this, NotificationActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         } else if (click_action.equals("MAINACTIVITY")) {
             intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -114,9 +116,11 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
                 && date != null) {
             notificationsData = new NotificationsData(id, title, body, date);
         }
-        if (notificationsData != null)
+        if (notificationsData != null) {
+            //todo nd could be empty
             insertNotification(notificationsData);
-
+            intent.putExtra("NotificationData", notificationsData);
+        }
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0/*Request code*/, intent, PendingIntent.FLAG_ONE_SHOT);
         //Set sound of notification
         Log.i(LOG_TAG, click_action + ".........pending intent");

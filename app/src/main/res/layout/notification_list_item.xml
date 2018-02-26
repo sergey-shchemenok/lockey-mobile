@@ -3,65 +3,119 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:padding="@dimen/activity_margin">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:id="@+id/notification_item_short"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="4"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/notification_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/notificationTitleColor"
+                tools:text="Title" />
+
+            <TextView
+                android:id="@+id/notification_body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif"
+                android:maxLines="1"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@color/notificationBodyColor"
+                tools:text="Body" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/notificationBodyColor" />
+
+            <TextView
+                android:id="@+id/notification_sending_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif"
+                android:gravity="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textAlignment="viewEnd"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@color/notificationBodyColor"
+                tools:text="25 февраля" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/notification_item_long"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-
         <TextView
-            android:id="@+id/notification_title"
+            android:id="@+id/notification_title_optional"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
-            android:maxLines="1"
+            android:maxLines="2"
             android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="#2B3D4D"
+            android:textColor="@color/notificationTitleColor"
             tools:text="Title" />
 
         <TextView
-            android:id="@+id/notification_body"
+            android:id="@+id/notification_body_optional"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:fontFamily="sans-serif"
-            android:maxLines="1"
+            android:maxLines="15"
             android:textAppearance="?android:textAppearanceSmall"
-            android:textColor="#AEB6BD"
+            android:textColor="@color/notificationBodyColor"
             tools:text="Body" />
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="vertical">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/notification_sending_time_optional"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-medium"
-            android:maxLines="1"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="#2B3D4D" />
-
-        <TextView
-            android:id="@+id/notification_sending_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
             android:fontFamily="sans-serif"
-            android:maxLines="1"
+            android:gravity="end"
+            android:textAlignment="viewEnd"
             android:textAppearance="?android:textAppearanceSmall"
-            android:textColor="#AEB6BD"
-            tools:text="25.11" />
+            android:textColor="@color/notificationBodyColor"
+            tools:text="25 февраля" />
 
     </LinearLayout>
+
 
 </LinearLayout>

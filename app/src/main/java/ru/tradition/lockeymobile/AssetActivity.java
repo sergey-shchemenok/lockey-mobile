@@ -39,7 +39,7 @@ public class AssetActivity extends AppCompatActivity {
 
         }
 
-        setTitle(R.string.asset_activity_title);
+        toolbar.setTitle(R.string.asset_activity_title);
 
         kitNumber = (TextView)findViewById(R.id.asset_kit_number);
         regNumber = (TextView)findViewById(R.id.asset_reg_number);
@@ -101,5 +101,12 @@ public class AssetActivity extends AppCompatActivity {
         AppData.isRepeated = false;
         startActivity(intent);
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        super.onBackPressed();
+        return true;
+    }
+
 
 }

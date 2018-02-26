@@ -50,6 +50,7 @@ public final class AppData {
     public static boolean isFinished = false;
 
     //user's login and password
+    public static boolean isAuthorized = false;
     public static String pwd = "";
     public static String usr = "";
 

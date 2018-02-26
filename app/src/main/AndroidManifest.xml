@@ -24,23 +24,23 @@
         android:theme="@style/AppTheme">
         <activity android:name=".AuthActivity">
             <intent-filter>
-                <action android:name="AUTHACTIVITY"></action>
-                <category android:name="android.intent.category.DEFAULT"></category>
-            </intent-filter>
+                <action android:name="AUTHACTIVITY" />
 
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
         <activity android:name=".MainActivity">
 
             <!-- android:configChanges="orientation|screenSize"> -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-
             <intent-filter>
-                <action android:name="MAINACTIVITY"></action>
-                <category android:name="android.intent.category.DEFAULT"></category>
+                <action android:name="MAINACTIVITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
@@ -57,7 +57,6 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-
         </activity>
 
         <provider
@@ -76,6 +75,13 @@
             </intent-filter>
         </service>
 
+        <activity
+            android:name=".NotificationActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
     </application>
 
 </manifest>

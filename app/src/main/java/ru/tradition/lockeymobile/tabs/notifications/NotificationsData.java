@@ -1,10 +1,12 @@
 package ru.tradition.lockeymobile.tabs.notifications;
 
+import java.io.Serializable;
+
 /**
  * Created by Caelestis on 26.02.2018.
  */
 
-public class NotificationsData {
+public class NotificationsData implements Serializable {
     private int id;
     private String title;
     private String body;

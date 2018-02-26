@@ -34,4 +34,10 @@
     <!-- No signal -->
     <color name="lst5">#6f6f6f</color>
 
+    <!-- Text color for the notification title -->
+    <color name="notificationTitleColor">#2B3D4D</color>
+
+    <!-- Text color for the notification body -->
+    <color name="notificationBodyColor">#797e83</color>
+
 </resources>

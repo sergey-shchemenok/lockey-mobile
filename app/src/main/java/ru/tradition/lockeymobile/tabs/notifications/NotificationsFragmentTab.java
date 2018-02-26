@@ -1,6 +1,8 @@
 package ru.tradition.lockeymobile.tabs.notifications;
 
+import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,9 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import ru.tradition.lockeymobile.AssetActivity;
+import ru.tradition.lockeymobile.NotificationActivity;
 import ru.tradition.lockeymobile.R;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
 
@@ -30,8 +37,8 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
     private NotificationCursorAdapter adapter;
     private static final int CURSOR_LOADER_ID = 1;
 
-    public NotificationsFragmentTab(){}
-
+    public NotificationsFragmentTab() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,26 +46,53 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.tab_fragment_notification, container, false);
 
-        ListView petListView = (ListView) rootView.findViewById(R.id.notification_list);
+        ListView notificationListView = (ListView) rootView.findViewById(R.id.notification_list);
         adapter = new NotificationCursorAdapter(getActivity(), null);
-        petListView.setAdapter(adapter);
+        notificationListView.setAdapter(adapter);
 
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
         View emptyView = rootView.findViewById(R.id.empty_view);
-        petListView.setEmptyView(emptyView);
+        notificationListView.setEmptyView(emptyView);
 
         //listener for items
-        petListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        notificationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View viewItem, int itemPosition, long itemId) {
-                //todo mage NotificationActivity
-//                Intent intent = new Intent(getActivity(), NotificationActivity.class);
-//                //Make an URI for intent
-//                Uri currentPetUri = ContentUris.withAppendedId(NotificationContract.NotificationEntry.CONTENT_URI, itemId);
-//                intent.setData(currentPetUri);
-//                startActivity(intent);
+                //todo magic for NotificationActivity
+
+                Intent intent = new Intent(getActivity(), NotificationActivity.class);
+                //Make an URI for intent
+                Uri currentNotificationUri = ContentUris.withAppendedId(NotificationContract.NotificationEntry.CONTENT_URI, itemId);
+                intent.setData(currentNotificationUri);
+                startActivity(intent);
             }
         });
+
+        notificationListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                LinearLayout notificationItemShort = (LinearLayout)view.findViewById(R.id.notification_item_short);
+                LinearLayout notificationItemLong = (LinearLayout)view.findViewById(R.id.notification_item_long);
+
+                if (notificationItemShort.getVisibility() == View.VISIBLE){
+                    notificationItemShort.setVisibility(View.GONE);
+                    notificationItemLong.setVisibility(View.VISIBLE);
+                }else {
+                    notificationItemShort.setVisibility(View.VISIBLE);
+                    notificationItemLong.setVisibility(View.GONE);
+                }
+
+
+//                TextView notificationBody = (TextView) view.findViewById(R.id.notification_body);
+//                if (notificationBody.getMaxLines() == 1) {
+//                    notificationBody.setMaxLines(15);
+//                } else
+//                    notificationBody.setMaxLines(1);
+                return true;
+            }
+        });
+
+
 
         //kick off loader
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
@@ -80,7 +114,7 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         };
 
         String sortOrder =
-        NotificationContract.NotificationEntry._ID + " DESC";
+                NotificationContract.NotificationEntry._ID + " DESC";
         return new CursorLoader(getContext(), NotificationContract.NotificationEntry.CONTENT_URI, projection,
                 null, null, sortOrder);
     }
@@ -103,9 +137,8 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
 //    }
 
 
-
-
     private OnFragmentInteractionListener mListener;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

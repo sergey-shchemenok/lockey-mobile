@@ -66,6 +66,13 @@ public class MainActivity extends AppCompatActivity implements
             startActivity(intent);
             Log.i(LOG_TAG, ".............assetsUrlResponseCode == 0");
         }
+        //go to auth activity
+        if (AppData.usr.equals("")||AppData.pwd.equals("")) {
+            Intent intent = new Intent(this, AuthActivity.class);
+            startActivity(intent);
+            Log.i(LOG_TAG, ".............no credentials");
+        }
+
         AppData.mainActivity = this;
 
         setContentView(R.layout.activity_main);
@@ -73,9 +80,8 @@ public class MainActivity extends AppCompatActivity implements
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //todo later
         FirebaseMessaging.getInstance().subscribeToTopic("NEWS");
-
-        //toolbar.setTitle("title");
 
         progressCircle = (ProgressBar) findViewById(R.id.loading_spinner);
         mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
@@ -199,22 +205,7 @@ public class MainActivity extends AppCompatActivity implements
                 }
             });
 
-//            Intent intent = getIntent();
-//            Bundle bundle = intent.getExtras();
-//            if (bundle != null && bundle.containsKey("TabNumber")) {
-//                int tabNumber = bundle.getInt("TabNumber");
-//                if (tabNumber == 2)
-//                    AppData.viewPager.setCurrentItem(2);
-//            }
-
             AppData.isRepeated = true;
-
-//            //this for notices
-//            if (AppData.noticeReceived == true) {
-//                //restart activity
-//                //recreate();
-//                AppData.viewPager.setCurrentItem(2);
-//            }
 
         } else {
             Log.i(LOG_TAG, "the second load has finished");
@@ -224,15 +215,6 @@ public class MainActivity extends AppCompatActivity implements
             AppData.mAssetData = assetData;
             //here is not good for speed
             updateListView();
-
-//            //this for notices
-//            if (AppData.noticeReceived == true) {
-//                //restart activity
-//                //recreate();
-//                //AppData.viewPager.setCurrentItem(2);
-//            }
-
-
         }
     }
 
@@ -281,8 +263,8 @@ public class MainActivity extends AppCompatActivity implements
                 //todo settings here
                 return true;
             case R.id.main_menu_back:
-                changeModeToNormal();
-                updateListView();
+                //changeModeToNormal();
+                //updateListView();
                 return true;
         }
         return super.onOptionsItemSelected(item);

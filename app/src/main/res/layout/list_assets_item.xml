@@ -4,10 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:orientation="horizontal"
-    android:paddingEnd="16dp"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
     android:id="@+id/list_asset_root"
+    android:paddingEnd="16dp"
     android:paddingStart="16dp">
 
     <RelativeLayout

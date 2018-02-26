@@ -68,6 +68,7 @@ public class AuthActivity extends AppCompatActivity
             insertNotification(notificationsData);
         }
 
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -81,6 +82,17 @@ public class AuthActivity extends AppCompatActivity
 
         connectionStatusMessage = (TextView) findViewById(R.id.main_connection_message);
         connectionStatusMessage.setVisibility(View.GONE);
+
+        //to prevent authorization from notification activity
+        if (getIntent().getExtras() != null) {
+            boolean hasCredentials = true;
+            if (getIntent().getExtras().containsKey("hasCredentials"))
+                hasCredentials = getIntent().getExtras().getBoolean("hasCredentials");
+            if (hasCredentials == false) {
+                infoMessage.setVisibility(View.VISIBLE);
+                infoMessage.setText("Требуется авторизация");
+            }
+        }
 
         if (!AppData.usr.isEmpty())
             loginView.setText(AppData.usr);
@@ -218,6 +230,7 @@ public class AuthActivity extends AppCompatActivity
         infoMessage.setVisibility(View.INVISIBLE);
         Log.v(LOG_TAG, "onLoadFinished");
         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
+        AppData.isAuthorized = true;
         startActivity(intent);
     }
 
@@ -231,6 +244,7 @@ public class AuthActivity extends AppCompatActivity
     protected void onStart() {
         Log.i(LOG_TAG, "Activity has started..............................");
         super.onStart();
+        AppData.isAuthorized = false;
         startRepeatingTask();
     }
 

@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements
             Log.i(LOG_TAG, ".............assetsUrlResponseCode == 0");
         }
         //go to auth activity
-        if (AppData.usr.equals("")||AppData.pwd.equals("")) {
+        if (AppData.usr.equals("") || AppData.pwd.equals("")) {
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
             Log.i(LOG_TAG, ".............no credentials");
@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements
 //        item.setVisible(true);
         //in normal mode this item should not be shown
         if (!AppData.isSelectingMode)
-            AppData.mMenu.getItem(2).setVisible(false);
+            AppData.mMenu.getItem(3).setVisible(false);
         return true;
     }
 
@@ -258,6 +258,18 @@ public class MainActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.main_menu_logout:
                 logout();
+                return true;
+            case R.id.main_menu_item_selection:
+                //todo settings here
+                if (!AppData.isSelectingMode) {
+                    if (AppData.viewPager.getCurrentItem() == 0) {
+                        AppData.isSelectingMode = true;
+                        AppData.mainActivity.setUpButton();
+                        AppData.mMenu.getItem(3).setVisible(true);
+                        AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(AppData.selectedAssetCounter));
+                        AppData.mainActivity.updateListView();
+                    }
+                }
                 return true;
             case R.id.main_menu_settings:
                 //todo settings here
@@ -286,7 +298,7 @@ public class MainActivity extends AppCompatActivity implements
         AppData.selectedAsset.clear();
         AppData.selectedAssetCounter = 0;
         setTitle(R.string.app_name);
-        AppData.mMenu.getItem(2).setVisible(false);
+        AppData.mMenu.getItem(3).setVisible(false);
         removeUpButton();
     }
 

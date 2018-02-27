@@ -83,11 +83,11 @@ public class AssetsFragmentTab extends Fragment {
                     int id = as.getId();
                     if (!AppData.selectedAsset.contains(id)) {
                         AppData.selectedAsset.add(id);
-                        AppData.mainActivity.setTitle(String.valueOf(++AppData.selectedAssetCounter));
+                        AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(++AppData.selectedAssetCounter));
                         AppData.mainActivity.updateListView();
                     } else {
                         AppData.selectedAsset.remove(id);
-                        AppData.mainActivity.setTitle(String.valueOf(--AppData.selectedAssetCounter));
+                        AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(--AppData.selectedAssetCounter));
                         AppData.mainActivity.updateListView();
                     }
                 }
@@ -104,18 +104,28 @@ public class AssetsFragmentTab extends Fragment {
 //                        Toast.LENGTH_SHORT).show();
                 // MainActivity.mainActivity.viewPager.setCurrentItem(1);
                 if (!AppData.isSelectingMode) {
-                    AppData.isSelectingMode = true;
-
-                    AppData.mainActivity.setUpButton();
-
-                    AppData.mMenu.getItem(2).setVisible(true);
-                    AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
-                    int id = as.getId();
-                    AppData.selectedAsset.add(id);
-
-                    //todo change tab and toolbar color in selecting mode
-                    AppData.mainActivity.setTitle(String.valueOf(++AppData.selectedAssetCounter));
+//                    AppData.isSelectingMode = true;
+//
+//                    AppData.mainActivity.setUpButton();
+//
+//                    AppData.mMenu.getItem(3).setVisible(true);
+//                    AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
+//                    int id = as.getId();
+//                    AppData.selectedAsset.add(id);
+//
+//                    //todo change tab and toolbar color in selecting mode
+//                    AppData.mainActivity.setTitle(String.valueOf(++AppData.selectedAssetCounter));
+//                    AppData.mainActivity.updateListView();
                     AppData.mainActivity.updateListView();
+                    AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
+                    AppData.target = CameraPosition.builder()
+                            .target(new LatLng(as.getLatitude(), as.getLongitude()))
+                            .zoom(13)
+                            .build();
+                    //go to map tab
+                    AppData.viewPager.setCurrentItem(1);
+                    AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+
                 }else {
                     AppData.mainActivity.changeModeToNormal();
                     AppData.mainActivity.updateListView();

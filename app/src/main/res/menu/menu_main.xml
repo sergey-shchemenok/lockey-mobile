@@ -10,9 +10,15 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/main_menu_item_selection"
+        android:title="@string/menu_item_selection"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/main_menu_settings"
         android:title="@string/menu_settings"
         app:showAsAction="never" />
+
     <item
         android:id="@+id/main_menu_back"
         android:title="back"

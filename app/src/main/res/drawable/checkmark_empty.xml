@@ -10,19 +10,6 @@
     <path
         android:pathData="M59.632906 30.964333A28.912907 28.695992 0 0 1 30.719999 59.660324 28.912907 28.695992 0 0 1 1.8070927 30.964333 28.912907 28.695992 0 0 1 30.719999 2.2683411 28.912907 28.695992 0 0 1 59.632906 30.964333Z"
         android:strokeWidth="3.586662"
-        android:fillColor="#6f6f6f"
         android:strokeMiterLimit="10"
         android:strokeColor="#6f6f6f" />
-    <group
-        android:scaleX="0.7931397"
-        android:scaleY="0.7871892"
-        android:translateX="-20.04039"
-        android:translateY="-19.49195">
-        <path
-            android:pathData="M42 69L55.55 81 86 46"
-            android:strokeWidth="8.873359"
-            android:strokeLineCap="round"
-            android:strokeMiterLimit="10"
-            android:strokeColor="#ffffff" />
-    </group>
 </vector>

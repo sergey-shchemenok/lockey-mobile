@@ -196,8 +196,14 @@ public class MainActivity extends AppCompatActivity implements
 
                 @Override
                 public void onPageSelected(int position) {
-                    changeModeToNormal();
-                    updateListView();
+                    if (AppData.isAssetSelectingMode && position != 0) {
+                        changeModeToNormal();
+                        updateListView();
+                    }
+                    if (AppData.isNotificationSelectingMode && position != 2) {
+                        changeModeToNormal();
+                        NotificationsFragmentTab.nft.updateList();
+                    }
                 }
 
                 @Override
@@ -246,8 +252,12 @@ public class MainActivity extends AppCompatActivity implements
         //MenuItem item = (MenuItem) findViewById(R.id.main_menu_back);
 //        item.setVisible(true);
         //in normal mode this item should not be shown
-        if (!AppData.isSelectingMode)
+        if (!AppData.isAssetSelectingMode)
             AppData.mMenu.getItem(3).setVisible(false);
+        if (!AppData.isNotificationSelectingMode)
+            AppData.mMenu.getItem(4).setVisible(false);
+        if (AppData.isAssetSelectingMode || AppData.isNotificationSelectingMode)
+            AppData.mMenu.getItem(1).setVisible(false);
         return true;
     }
 
@@ -261,18 +271,32 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.main_menu_item_selection:
                 //todo settings here
-                if (!AppData.isSelectingMode) {
+                if (!AppData.isAssetSelectingMode && !AppData.isNotificationSelectingMode) {
                     if (AppData.viewPager.getCurrentItem() == 0) {
-                        AppData.isSelectingMode = true;
+                        AppData.isAssetSelectingMode = true;
                         AppData.mainActivity.setUpButton();
                         AppData.mMenu.getItem(3).setVisible(true);
+                        AppData.mMenu.getItem(1).setVisible(false);
                         AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(AppData.selectedAssetCounter));
                         AppData.mainActivity.updateListView();
+                    } else if (AppData.viewPager.getCurrentItem() == 2) {
+                        AppData.isNotificationSelectingMode = true;
+                        Log.i(LOG_TAG, "the mode......... has changed");
+                        AppData.mainActivity.setUpButton();
+                        AppData.mMenu.getItem(4).setVisible(true);
+                        AppData.mMenu.getItem(1).setVisible(false);
+                        AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(AppData.selectedNotificationCounter));
+                        NotificationsFragmentTab.nft.updateList();
                     }
                 }
                 return true;
             case R.id.main_menu_settings:
                 //todo settings here
+                return true;
+            case R.id.main_menu_delete:
+                //Let it be here for a while
+                NotificationsFragmentTab.nft.deleteNotifications();
+                NotificationsFragmentTab.nft.updateList();
                 return true;
             case R.id.main_menu_back:
                 //changeModeToNormal();
@@ -286,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = new Intent(this, AuthActivity.class);
         AppData.isFinished = false;
         AppData.isRepeated = false;
-        if (AppData.isSelectingMode)
+        if (AppData.isAssetSelectingMode || AppData.isNotificationSelectingMode)
             changeModeToNormal();
         startActivity(intent);
 
@@ -294,18 +318,29 @@ public class MainActivity extends AppCompatActivity implements
 
     //to change mode from selecting to normal
     public void changeModeToNormal() {
-        AppData.isSelectingMode = false;
+        AppData.isAssetSelectingMode = false;
         AppData.selectedAsset.clear();
         AppData.selectedAssetCounter = 0;
+        AppData.isNotificationSelectingMode = false;
+        AppData.selectedNotification.clear();
+        AppData.selectedNotificationCounter = 0;
         setTitle(R.string.app_name);
         AppData.mMenu.getItem(3).setVisible(false);
+        AppData.mMenu.getItem(4).setVisible(false);
+        AppData.mMenu.getItem(1).setVisible(true);
         removeUpButton();
+
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-        changeModeToNormal();
-        updateListView();
+        if (AppData.isAssetSelectingMode) {
+            changeModeToNormal();
+            updateListView();
+        } else if (AppData.isNotificationSelectingMode) {
+            changeModeToNormal();
+            NotificationsFragmentTab.nft.updateList();
+        }
         return true;
     }
 
@@ -316,9 +351,12 @@ public class MainActivity extends AppCompatActivity implements
     public void onBackPressed() {
         // If the pet hasn't changed, continue with handling back button press
         //This button is upper to the left arrow
-        if (AppData.isSelectingMode) {
+        if (AppData.isAssetSelectingMode) {
             changeModeToNormal();
             updateListView();
+        } else if (AppData.isNotificationSelectingMode) {
+            changeModeToNormal();
+            NotificationsFragmentTab.nft.updateList();
         } else
             logout();
     }

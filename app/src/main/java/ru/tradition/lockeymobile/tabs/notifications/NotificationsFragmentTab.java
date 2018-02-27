@@ -10,18 +10,21 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import ru.tradition.lockeymobile.AssetActivity;
+import java.util.Set;
+import java.util.TreeSet;
+
+import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.NotificationActivity;
 import ru.tradition.lockeymobile.R;
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
 
@@ -34,8 +37,16 @@ import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContrac
  */
 public class NotificationsFragmentTab extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    public static final String LOG_TAG = NotificationsFragmentTab.class.getName();
+
     private NotificationCursorAdapter adapter;
-    private static final int CURSOR_LOADER_ID = 1;
+    private static int loaderSwitch = 0;
+    private static final int CURSOR_LOADER_ID = 3;
+    private static final int CURSOR_UPDATE_LOADER_ID = 4;
+
+
+    //to access methods from other tabs
+    public static NotificationsFragmentTab nft;
 
     public NotificationsFragmentTab() {
     }
@@ -47,58 +58,139 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         View rootView = inflater.inflate(R.layout.tab_fragment_notification, container, false);
 
         ListView notificationListView = (ListView) rootView.findViewById(R.id.notification_list);
+
         adapter = new NotificationCursorAdapter(getActivity(), null);
         notificationListView.setAdapter(adapter);
 
-        // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
-        View emptyView = rootView.findViewById(R.id.empty_view);
-        notificationListView.setEmptyView(emptyView);
+        //selecting mode has the other title
+        if (AppData.isNotificationSelectingMode) {
+            Log.i(LOG_TAG, "AppData.isNotificationSelectingMode:......." + AppData.isNotificationSelectingMode);
+            AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(AppData.selectedNotificationCounter));
+            AppData.mainActivity.setUpButton();
+            AppData.mMenu.getItem(1).setVisible(false);
+        }
 
         //listener for items
         notificationListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View viewItem, int itemPosition, long itemId) {
+            public void onItemClick(AdapterView<?> adapterView, View viewItem, int position, long itemId) {
                 //todo magic for NotificationActivity
-
-                Intent intent = new Intent(getActivity(), NotificationActivity.class);
-                //Make an URI for intent
-                Uri currentNotificationUri = ContentUris.withAppendedId(NotificationContract.NotificationEntry.CONTENT_URI, itemId);
-                intent.setData(currentNotificationUri);
-                startActivity(intent);
+                //if it is normal mode go to asset activity
+                if (!AppData.isNotificationSelectingMode) {
+                    Intent intent = new Intent(getActivity(), NotificationActivity.class);
+                    //Make an URI for intent
+                    Uri currentNotificationUri = ContentUris.withAppendedId(NotificationContract.NotificationEntry.CONTENT_URI, itemId);
+                    intent.setData(currentNotificationUri);
+                    startActivity(intent);
+                }
+                //if it is selecting mode. Select or deselect asset
+                else {
+                    Uri currentNotificationUri = ContentUris.withAppendedId(NotificationContract.NotificationEntry.CONTENT_URI, itemId);
+                    if (!AppData.selectedNotification.contains(currentNotificationUri.toString())) {
+                        AppData.selectedNotification.add(currentNotificationUri.toString());
+                        AppData.selectedNotificationUri.add(currentNotificationUri);
+                        AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(++AppData.selectedNotificationCounter));
+                        updateList();
+                        Log.i(LOG_TAG, "currentNotificationUri.........." + currentNotificationUri.toString());
+                    } else {
+                        AppData.selectedNotification.remove(currentNotificationUri.toString());
+                        AppData.selectedNotificationUri.remove(currentNotificationUri);
+                        AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(--AppData.selectedNotificationCounter));
+                        updateList();
+                    }
+                }
             }
         });
 
         notificationListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                LinearLayout notificationItemShort = (LinearLayout)view.findViewById(R.id.notification_item_short);
-                LinearLayout notificationItemLong = (LinearLayout)view.findViewById(R.id.notification_item_long);
+                LinearLayout notificationItemShort = (LinearLayout) view.findViewById(R.id.notification_item_short);
+                LinearLayout notificationItemLong = (LinearLayout) view.findViewById(R.id.notification_item_long);
 
-                if (notificationItemShort.getVisibility() == View.VISIBLE){
+                if (notificationItemShort.getVisibility() == View.VISIBLE) {
                     notificationItemShort.setVisibility(View.GONE);
                     notificationItemLong.setVisibility(View.VISIBLE);
-                }else {
+                } else {
                     notificationItemShort.setVisibility(View.VISIBLE);
                     notificationItemLong.setVisibility(View.GONE);
                 }
-
-
-//                TextView notificationBody = (TextView) view.findViewById(R.id.notification_body);
-//                if (notificationBody.getMaxLines() == 1) {
-//                    notificationBody.setMaxLines(15);
-//                } else
-//                    notificationBody.setMaxLines(1);
                 return true;
             }
         });
-
-
-
         //kick off loader
-        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+
+        nft = this;
+        getList();
 
         return rootView;
 
+    }
+
+    //to delete all notifications
+    public void deleteAllNotifications() {
+        int rowsDeleted = getActivity().getContentResolver().delete(NotificationContract.NotificationEntry.CONTENT_URI, null, null);
+        Toast.makeText(getContext(), getString(R.string.notifications_deleted),
+                Toast.LENGTH_SHORT).show();
+        Log.v(LOG_TAG, rowsDeleted + " rows deleted from notifications database");
+    }
+
+    //to delete selected notification
+    public void deleteNotifications() {
+        if (AppData.selectedNotificationUri != null && !AppData.selectedNotificationUri.isEmpty()) {
+            Set<Uri> uris = AppData.selectedNotificationUri;
+            int toDelete = AppData.selectedNotificationCounter;
+            Log.i(LOG_TAG, "toDelete initial........." + toDelete);
+            AppData.mainActivity.changeModeToNormal();
+            for (Uri u: uris){
+                if (u != null) {
+                    int rowsAffected = getActivity().getContentResolver().delete(u, null, null);
+                    toDelete -= rowsAffected;
+                    Log.i(LOG_TAG, "toDelete initial........." + toDelete);
+                }
+            }
+
+            // Show a toast message depending on whether or not the delete was successful.
+
+            if (toDelete != 0) {
+                // If no rows were affected, then there was an error with the delete.
+                Toast.makeText(getContext(), getString(R.string.editor_delete_notification_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the delete was successful and we can display a toast.
+                Toast.makeText(getContext(), getString(R.string.editor_delete_notification_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
+            uris.clear();
+        }
+    }
+
+    public void getList() {
+        getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+    }
+
+    public void updateList() {
+        if (loaderSwitch == 0) {
+            getLoaderManager().initLoader(CURSOR_UPDATE_LOADER_ID, null, this);
+            getLoaderManager().getLoader(CURSOR_LOADER_ID).reset();
+            loaderSwitch = 1;
+        } else if (loaderSwitch == 1) {
+            getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
+            getLoaderManager().getLoader(CURSOR_UPDATE_LOADER_ID).reset();
+            loaderSwitch = 2;
+        } else if (loaderSwitch == 2) {
+            getLoaderManager().restartLoader(CURSOR_UPDATE_LOADER_ID, null, this);
+            getLoaderManager().getLoader(CURSOR_LOADER_ID).reset();
+            loaderSwitch = 1;
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        getLoaderManager().destroyLoader(CURSOR_LOADER_ID);
+        getLoaderManager().destroyLoader(CURSOR_UPDATE_LOADER_ID);
+        loaderSwitch = 0;
+        super.onDestroyView();
     }
 
     @Override

@@ -68,6 +68,9 @@ public class AuthActivity extends AppCompatActivity
             insertNotification(notificationsData);
         }
 
+        try {
+            AppData.mainActivity.changeModeToNormal();
+        }catch (NullPointerException e){}
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

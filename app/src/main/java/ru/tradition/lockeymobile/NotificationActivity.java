@@ -79,8 +79,6 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             notificationBody.setText(nd.getBody());
             notificationSendingTime.setText(nd.getSending_time());
         }
-
-
     }
 
     //Loader methods
@@ -93,7 +91,9 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY,
-                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME,
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE,
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE
         };
 
         return new CursorLoader(this, mCurrentNotificationUri, projection, null, null, null);

@@ -23,5 +23,8 @@
     <string name="asset_activity_title">Инфо о комплекте</string>
     <string name="notification_activity_title">Уведомление</string>
     <string name="menu_item_selection">Выберите элемент</string>
+    <string name="notifications_deleted">Уведомления удалены</string>
+    <string name="editor_delete_notification_failed">Удаление выполнено с ошибками</string>
+    <string name="editor_delete_notification_successful">Уведомления удалены</string>
 
 </resources>

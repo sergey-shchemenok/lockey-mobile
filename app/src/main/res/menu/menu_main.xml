@@ -24,5 +24,10 @@
         android:title="back"
         app:showAsAction="always" />
 
+    <item
+        android:id="@+id/main_menu_delete"
+        android:title="delete"
+        app:showAsAction="always" />
+
 </menu>
     <!--android:visible="false"-->

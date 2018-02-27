@@ -61,16 +61,17 @@ public class AssetsFragmentTab extends Fragment {
         }
 
         //selecting mode has the other title
-        if (AppData.isSelectingMode) {
-            AppData.mainActivity.setTitle(String.valueOf(AppData.selectedAssetCounter));
+        if (AppData.isAssetSelectingMode) {
+            AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(AppData.selectedAssetCounter));
             AppData.mainActivity.setUpButton();
+            AppData.mMenu.getItem(1).setVisible(false);
         }
 
         assetsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View viewItem, int position, long itemId) {
                 //if it is normal mode go to asset activity
-                if (!AppData.isSelectingMode) {
+                if (!AppData.isAssetSelectingMode) {
                     Intent intent = new Intent(getActivity(), AssetActivity.class);
                     //put data to intent
                     AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
@@ -103,8 +104,8 @@ public class AssetsFragmentTab extends Fragment {
 //                Toast.makeText(getContext(), String.valueOf(itemId) + "   " + String.valueOf(position),
 //                        Toast.LENGTH_SHORT).show();
                 // MainActivity.mainActivity.viewPager.setCurrentItem(1);
-                if (!AppData.isSelectingMode) {
-//                    AppData.isSelectingMode = true;
+                if (!AppData.isAssetSelectingMode) {
+//                    AppData.isAssetSelectingMode = true;
 //
 //                    AppData.mainActivity.setUpButton();
 //

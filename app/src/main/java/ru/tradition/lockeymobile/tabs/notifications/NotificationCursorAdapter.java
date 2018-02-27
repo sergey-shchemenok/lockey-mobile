@@ -2,14 +2,19 @@ package ru.tradition.lockeymobile.tabs.notifications;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.R;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
@@ -57,9 +62,33 @@ public class NotificationCursorAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         // Find fields to populate in inflated template
 
-        LinearLayout notificationItemShort = (LinearLayout)view.findViewById(R.id.notification_item_short);
-        LinearLayout notificationItemLong = (LinearLayout)view.findViewById(R.id.notification_item_long);
+        //to make the unfolding
+        LinearLayout notificationItemShort = (LinearLayout) view.findViewById(R.id.notification_item_short);
+        LinearLayout notificationItemLong = (LinearLayout) view.findViewById(R.id.notification_item_long);
         notificationItemLong.setVisibility(View.GONE);
+
+        //checkbox
+        LinearLayout rootView = (LinearLayout) view.findViewById(R.id.list_notification_root);
+        rootView.setBackgroundColor(Color.WHITE);
+        RelativeLayout checkBox = (RelativeLayout) view.findViewById(R.id.list_notifications_checkbox);
+        ImageView checkmark = (ImageView) view.findViewById(R.id.list_notifications_checkmark);
+        ImageView checkmarkEmpty = (ImageView) view.findViewById(R.id.list_notifications_checkmark_empty);
+        if (!AppData.isNotificationSelectingMode) {
+            checkBox.setVisibility(View.GONE);
+            checkmark.setVisibility(View.INVISIBLE);
+            checkmarkEmpty.setVisibility(View.INVISIBLE);
+        } else {
+            checkBox.setVisibility(View.VISIBLE);
+            checkmarkEmpty.setVisibility(View.VISIBLE);
+            checkmark.setVisibility(View.INVISIBLE);
+            if (AppData.selectedNotification.contains(
+                    "content://ru.tradition.lockeymobile/notifications/"
+                    + cursor.getInt(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry._ID)))){
+                rootView.setBackgroundColor(Color.LTGRAY);
+                checkmark.setVisibility(View.VISIBLE);
+            }
+        }
+
 
         TextView titleTextView = (TextView) view.findViewById(R.id.notification_title);
         TextView bodyTextView = (TextView) view.findViewById(R.id.notification_body);

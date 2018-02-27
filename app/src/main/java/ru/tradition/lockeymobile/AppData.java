@@ -1,5 +1,6 @@
 package ru.tradition.lockeymobile;
 
+import android.net.Uri;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
@@ -35,9 +36,14 @@ public final class AppData {
 
     //This set determines which kit is selected
     public static Set<Integer> selectedAsset = new TreeSet<>();
+    public static Set<String> selectedNotification = new TreeSet<>();
+    public static Set<Uri> selectedNotificationUri = new TreeSet<>();
+
     //for selectingMode
-    public static boolean isSelectingMode = false;
+    public static boolean isAssetSelectingMode = false;
     public static int selectedAssetCounter = 0;
+    public static boolean isNotificationSelectingMode = false;
+    public static int selectedNotificationCounter = 0;
 
     //store main menu
     public static Menu mMenu;

@@ -92,7 +92,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
         Log.i(LOG_TAG, body + ".........");
 
         Intent intent;
-        if (click_action.equals("AUTHACTIVITY")) {
+        if (click_action.equals("NOTIFICATIONACTIVITY")) {
             intent = new Intent(this, NotificationActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         } else if (click_action.equals("MAINACTIVITY")) {

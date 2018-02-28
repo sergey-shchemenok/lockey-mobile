@@ -3,7 +3,6 @@ package ru.tradition.lockeymobile.tabs.notifications;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.net.Uri;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -66,6 +65,7 @@ public class NotificationCursorAdapter extends CursorAdapter {
         LinearLayout notificationItemShort = (LinearLayout) view.findViewById(R.id.notification_item_short);
         LinearLayout notificationItemLong = (LinearLayout) view.findViewById(R.id.notification_item_long);
         notificationItemLong.setVisibility(View.GONE);
+        notificationItemShort.setVisibility(View.VISIBLE);
 
         //checkbox
         LinearLayout rootView = (LinearLayout) view.findViewById(R.id.list_notification_root);
@@ -89,6 +89,12 @@ public class NotificationCursorAdapter extends CursorAdapter {
             }
         }
 
+        if (AppData.selectedNotificationLong.contains(
+                "content://ru.tradition.lockeymobile/notifications/"
+                        + cursor.getInt(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry._ID)))) {
+            notificationItemShort.setVisibility(View.GONE);
+            notificationItemLong.setVisibility(View.VISIBLE);
+        }
 
         TextView titleTextView = (TextView) view.findViewById(R.id.notification_title);
         TextView bodyTextView = (TextView) view.findViewById(R.id.notification_body);

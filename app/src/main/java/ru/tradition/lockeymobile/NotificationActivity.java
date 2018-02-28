@@ -1,6 +1,7 @@
 package ru.tradition.lockeymobile;
 
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -37,6 +38,14 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //to get data from background notifications
+        NotificationsData notificationsData = getNotificationData();
+        if (notificationsData != null) {
+            insertNotification(notificationsData);
+        }
+
+
         setContentView(R.layout.activity_notification);
 
         //go to auth activity
@@ -74,11 +83,9 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         notificationBody = (TextView) findViewById(R.id.notification_activity_body);
         notificationSendingTime = (TextView) findViewById(R.id.notification_activity_sending_time);
 
-        if (nd != null){
-            notificationTitle.setText(nd.getTitle());
-            notificationBody.setText(nd.getBody());
-            notificationSendingTime.setText(nd.getSending_time());
-        }
+        showData(notificationsData);
+        showData(nd);
+
     }
 
     //Loader methods
@@ -176,5 +183,83 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+    }
+
+    private NotificationsData getNotificationData() {
+        int id = 0;
+        String title = null;
+        String body = null;
+        String sending_time = null;
+        double latitude = 0.0;
+        double longitude = 0.0;
+
+        if (getIntent().getExtras() != null) {
+            for (String key : getIntent().getExtras().keySet()) {
+                Object value = getIntent().getExtras().get(key);
+                Log.i("MainActivity: ", "Key: " + key + " Value: " + value);
+                if (key.equals("id")) {
+                    try {
+                        id = Integer.parseInt(String.valueOf(value));
+                    } catch (NumberFormatException e) {
+                    }
+                }
+                if (key.equals("title")) {
+                    title = String.valueOf(value);
+                }
+                if (key.equals("body")) {
+                    body = String.valueOf(value);
+                }
+                if (key.equals("date")) {
+                    sending_time = String.valueOf(value);
+                }
+                if (key.equals("latitude")) {
+                    try {
+                        latitude = Double.parseDouble(String.valueOf(value));
+                    } catch (NumberFormatException e) {
+                    }
+
+                }
+                if (key.equals("longitude")) {
+                    try {
+                        longitude = Double.parseDouble(String.valueOf(value));
+                    } catch (NumberFormatException e) {
+                    }
+
+                }
+            }
+        }
+        if (id != 0 && title != null
+                && body != null
+                && sending_time != null
+                && latitude != 0.0
+                && longitude != 0.0) {
+            return new NotificationsData(id, title, body, sending_time, latitude, longitude);
+        } else if (id != 0 && title != null
+                && body != null
+                && sending_time != null) {
+            return new NotificationsData(id, title, body, sending_time);
+        }
+        //todo add other datas (longitude and latitude)
+        else return null;
+    }
+
+    private void insertNotification(NotificationsData nd) {
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID, nd.getId());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE, nd.getTitle());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY, nd.getBody());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME, nd.getSending_time());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE, nd.getLatitude());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE, nd.getLongitude());
+        Uri newUri = getContentResolver().insert(NotificationContract.NotificationEntry.CONTENT_URI, values);
+    }
+
+    private void showData(NotificationsData nd) {
+        if (nd != null){
+            notificationTitle.setText(nd.getTitle());
+            notificationBody.setText(nd.getBody());
+            notificationSendingTime.setText(nd.getSending_time());
+        }
     }
 }

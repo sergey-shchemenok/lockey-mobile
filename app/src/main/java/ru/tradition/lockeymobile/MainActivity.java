@@ -192,6 +192,7 @@ public class MainActivity extends AppCompatActivity implements
             AppData.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
                 }
 
                 @Override
@@ -199,15 +200,32 @@ public class MainActivity extends AppCompatActivity implements
                     if (AppData.isAssetSelectingMode && position != 0) {
                         changeModeToNormal();
                         updateListView();
-                    }
-                    if (AppData.isNotificationSelectingMode && position != 2) {
+//                        if (position == 1) {
+//                            AppData.mMenu.getItem(1).setVisible(false);
+//                        }
+                    } else if (AppData.isNotificationSelectingMode && position != 2) {
                         changeModeToNormal();
                         NotificationsFragmentTab.nft.updateList();
+//                        if (position == 1) {
+//                            AppData.mMenu.getItem(1).setVisible(false);
+//                        }
                     }
+
+                    if (!AppData.isAssetSelectingMode && position == 0) {
+                        AppData.mMenu.getItem(1).setVisible(true);
+                    }
+                    if (!AppData.isNotificationSelectingMode && position == 2) {
+                        AppData.mMenu.getItem(1).setVisible(true);
+                    }
+                    if (position == 1) {
+                        AppData.mMenu.getItem(1).setVisible(false);
+                    }
+
                 }
 
                 @Override
                 public void onPageScrollStateChanged(int state) {
+
                 }
             });
 
@@ -258,6 +276,11 @@ public class MainActivity extends AppCompatActivity implements
             AppData.mMenu.getItem(4).setVisible(false);
         if (AppData.isAssetSelectingMode || AppData.isNotificationSelectingMode)
             AppData.mMenu.getItem(1).setVisible(false);
+        try {
+            if (AppData.viewPager.getCurrentItem() != 0 && AppData.viewPager.getCurrentItem() != 2)
+                AppData.mMenu.getItem(1).setVisible(false);
+        } catch (NullPointerException e) {
+        }
         return true;
     }
 
@@ -323,6 +346,7 @@ public class MainActivity extends AppCompatActivity implements
         AppData.selectedAssetCounter = 0;
         AppData.isNotificationSelectingMode = false;
         AppData.selectedNotification.clear();
+        AppData.selectedNotificationUri.clear();
         AppData.selectedNotificationCounter = 0;
         setTitle(R.string.app_name);
         AppData.mMenu.getItem(3).setVisible(false);

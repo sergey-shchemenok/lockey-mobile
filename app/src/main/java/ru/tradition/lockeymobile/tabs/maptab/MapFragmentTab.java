@@ -119,8 +119,10 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         rootView = inflater.inflate(R.layout.tab_fragment_map, container, false);
         // Inflate the layout for this fragment
 
-        return rootView;
+       return rootView;
     }
+
+
 
     //Handler for map updating here
     @Override

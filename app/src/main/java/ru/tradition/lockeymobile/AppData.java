@@ -37,6 +37,7 @@ public final class AppData {
     //This set determines which kit is selected
     public static Set<Integer> selectedAsset = new TreeSet<>();
     public static Set<String> selectedNotification = new TreeSet<>();
+    public static Set<String> selectedNotificationLong = new TreeSet<>();
     public static Set<Uri> selectedNotificationUri = new TreeSet<>();
 
     //for selectingMode

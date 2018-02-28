@@ -24,7 +24,7 @@
     <string name="notification_activity_title">Уведомление</string>
     <string name="menu_item_selection">Выберите элемент</string>
     <string name="notifications_deleted">Уведомления удалены</string>
-    <string name="editor_delete_notification_failed">Удаление выполнено с ошибками</string>
-    <string name="editor_delete_notification_successful">Уведомления удалены</string>
+    <string name="editor_delete_notification_failed">Операция выполнена с ошибками, количество удаленных элементов - </string>
+    <string name="editor_delete_notification_successful">Операция выполнена успешно, количество удаленных элементов - </string>
 
 </resources>

@@ -15,12 +15,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.Set;
-import java.util.TreeSet;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.NotificationActivity;
@@ -104,17 +102,26 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
 
         notificationListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                LinearLayout notificationItemShort = (LinearLayout) view.findViewById(R.id.notification_item_short);
-                LinearLayout notificationItemLong = (LinearLayout) view.findViewById(R.id.notification_item_long);
-
-                if (notificationItemShort.getVisibility() == View.VISIBLE) {
-                    notificationItemShort.setVisibility(View.GONE);
-                    notificationItemLong.setVisibility(View.VISIBLE);
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long itemId) {
+                Uri currentNotificationUri = ContentUris.withAppendedId(NotificationContract.NotificationEntry.CONTENT_URI, itemId);
+                if (!AppData.selectedNotificationLong.contains(currentNotificationUri.toString())) {
+                    AppData.selectedNotificationLong.add(currentNotificationUri.toString());
+                    updateList();
                 } else {
-                    notificationItemShort.setVisibility(View.VISIBLE);
-                    notificationItemLong.setVisibility(View.GONE);
+                    AppData.selectedNotificationLong.remove(currentNotificationUri.toString());
+                    updateList();
                 }
+
+//                LinearLayout notificationItemShort = (LinearLayout) view.findViewById(R.id.notification_item_short);
+//                LinearLayout notificationItemLong = (LinearLayout) view.findViewById(R.id.notification_item_long);
+//
+//                if (notificationItemShort.getVisibility() == View.VISIBLE) {
+//                    notificationItemShort.setVisibility(View.GONE);
+//                    notificationItemLong.setVisibility(View.VISIBLE);
+//                } else {
+//                    notificationItemShort.setVisibility(View.VISIBLE);
+//                    notificationItemLong.setVisibility(View.GONE);
+//                }
                 return true;
             }
         });
@@ -138,30 +145,27 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
     //to delete selected notification
     public void deleteNotifications() {
         if (AppData.selectedNotificationUri != null && !AppData.selectedNotificationUri.isEmpty()) {
-            Set<Uri> uris = AppData.selectedNotificationUri;
             int toDelete = AppData.selectedNotificationCounter;
             Log.i(LOG_TAG, "toDelete initial........." + toDelete);
-            AppData.mainActivity.changeModeToNormal();
-            for (Uri u: uris){
+            for (Uri u: AppData.selectedNotificationUri){
                 if (u != null) {
                     int rowsAffected = getActivity().getContentResolver().delete(u, null, null);
                     toDelete -= rowsAffected;
                     Log.i(LOG_TAG, "toDelete initial........." + toDelete);
                 }
             }
-
             // Show a toast message depending on whether or not the delete was successful.
 
             if (toDelete != 0) {
                 // If no rows were affected, then there was an error with the delete.
-                Toast.makeText(getContext(), getString(R.string.editor_delete_notification_failed),
+                Toast.makeText(getContext(), getString(R.string.editor_delete_notification_failed) + " " + AppData.selectedNotificationCounter,
                         Toast.LENGTH_SHORT).show();
             } else {
                 // Otherwise, the delete was successful and we can display a toast.
-                Toast.makeText(getContext(), getString(R.string.editor_delete_notification_successful),
+                Toast.makeText(getContext(), getString(R.string.editor_delete_notification_successful) + " " + AppData.selectedNotificationCounter,
                         Toast.LENGTH_SHORT).show();
             }
-            uris.clear();
+            AppData.mainActivity.changeModeToNormal();
         }
     }
 

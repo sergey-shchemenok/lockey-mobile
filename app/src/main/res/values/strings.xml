@@ -26,5 +26,9 @@
     <string name="notifications_deleted">Уведомления удалены</string>
     <string name="editor_delete_notification_failed">Операция выполнена с ошибками, количество удаленных элементов - </string>
     <string name="editor_delete_notification_successful">Операция выполнена успешно, количество удаленных элементов - </string>
+    <string name="delete_all_notifications">Удалить все уведомления?</string>
+    <string name="delete">Удалить</string>
+    <string name="cancel">Отмена</string>
+    <string name="delete_notifications">Удалить выбранные уведомления?</string>
 
 </resources>

@@ -1,7 +1,9 @@
 package ru.tradition.lockeymobile.tabs.notifications;
 
+import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -111,17 +113,6 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
                     AppData.selectedNotificationLong.remove(currentNotificationUri.toString());
                     updateList();
                 }
-
-//                LinearLayout notificationItemShort = (LinearLayout) view.findViewById(R.id.notification_item_short);
-//                LinearLayout notificationItemLong = (LinearLayout) view.findViewById(R.id.notification_item_long);
-//
-//                if (notificationItemShort.getVisibility() == View.VISIBLE) {
-//                    notificationItemShort.setVisibility(View.GONE);
-//                    notificationItemLong.setVisibility(View.VISIBLE);
-//                } else {
-//                    notificationItemShort.setVisibility(View.VISIBLE);
-//                    notificationItemLong.setVisibility(View.GONE);
-//                }
                 return true;
             }
         });
@@ -134,8 +125,38 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
 
     }
 
+
+    /*
+    Methods for deleting pet from database
+     */
+    public void showDeleteConfirmationDialog() {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the positive and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setMessage(R.string.delete_notifications);
+        builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Delete" button, so delete the notifications.
+                deleteNotifications();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Cancel" button, so dismiss the dialog
+                // and continue editing the pet.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     //to delete all notifications
-    public void deleteAllNotifications() {
+    private void deleteAllNotifications() {
         int rowsDeleted = getActivity().getContentResolver().delete(NotificationContract.NotificationEntry.CONTENT_URI, null, null);
         Toast.makeText(getContext(), getString(R.string.notifications_deleted),
                 Toast.LENGTH_SHORT).show();
@@ -143,7 +164,7 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
     }
 
     //to delete selected notification
-    public void deleteNotifications() {
+    private void deleteNotifications() {
         if (AppData.selectedNotificationUri != null && !AppData.selectedNotificationUri.isEmpty()) {
             int toDelete = AppData.selectedNotificationCounter;
             Log.i(LOG_TAG, "toDelete initial........." + toDelete);

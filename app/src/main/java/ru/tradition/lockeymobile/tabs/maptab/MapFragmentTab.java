@@ -160,7 +160,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
                 int padding = 0; // offset from edges of the map in pixels
                 CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
 
-                AppData.m_map.moveCamera(cu);
+                AppData.m_map.animateCamera(cu);
                 return true;
             }
         });

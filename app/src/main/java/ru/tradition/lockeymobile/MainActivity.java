@@ -19,6 +19,12 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.net.HttpURLConnection;
@@ -94,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements
         //launch loading data from server
         startLoader();
     }
-
 
     //The method adds "up" button to toolbar
     public void setUpButton() {
@@ -277,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements
         if (AppData.isAssetSelectingMode || AppData.isNotificationSelectingMode)
             AppData.mMenu.getItem(1).setVisible(false);
         try {
-            if (AppData.viewPager.getCurrentItem() != 0 && AppData.viewPager.getCurrentItem() != 2)
+            if (AppData.viewPager.getCurrentItem() == 1)
                 AppData.mMenu.getItem(1).setVisible(false);
         } catch (NullPointerException e) {
         }
@@ -321,9 +326,58 @@ public class MainActivity extends AppCompatActivity implements
                 NotificationsFragmentTab.nft.deleteNotifications();
                 NotificationsFragmentTab.nft.updateList();
                 return true;
-            case R.id.main_menu_back:
-                //changeModeToNormal();
-                //updateListView();
+            case R.id.main_menu_zoom_out:
+                if (!AppData.selectedAsset.isEmpty() && AppData.selectedAsset != null) {
+//                    long maxLat = Long.MIN_VALUE, minLat = Long.MAX_VALUE, maxLon = Long.MIN_VALUE, minLon = Long.MAX_VALUE;
+//                    int assetCount = 0;
+//                    for (Integer id : AppData.selectedAsset) {
+//                        AssetsData as = AppData.mAssetData.get(id);
+//                        long tempLat = (long) (as.getLatitude() * 10000000);
+//                        long tempLon = (long) (as.getLongitude() * 10000000);
+//                        Log.i(LOG_TAG, "temLat and tempLon........" + tempLat + " " + tempLon);
+//                        if (maxLat < tempLat)
+//                            maxLat = tempLat;
+//                        if (minLat > tempLat)
+//                            minLat = tempLat;
+//                        if (maxLon < tempLon)
+//                            maxLon = tempLon;
+//                        if (minLon > tempLon)
+//                            minLon = tempLon;
+//                        assetCount++;
+//                    }
+//                    double latitude = maxLat/10000000.0;
+//                    double longitude = maxLon/10000000.0;
+//                    Log.i(LOG_TAG, "latitude and longitude........" + latitude + " " + longitude);
+//                    if (assetCount > 1) {
+//                        latitude = (maxLat + minLat) / 20000000.0;
+//                        longitude = (maxLon + minLon) / 20000000.0;
+//                    }
+//                    int zoom = 5;
+//
+//                    AppData.target = CameraPosition.builder()
+//                            .target(new LatLng(latitude, longitude))
+//                            .zoom(zoom)
+//                            .build();
+//                    //go to map tab
+
+
+                    //first calculate the bounds of all the markers like so:
+                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                    for (Integer id : AppData.selectedAsset) {
+                        AssetsData as = AppData.mAssetData.get(id);
+                        builder.include(new LatLng(as.getLatitude(), as.getLongitude()));
+                    }
+                    LatLngBounds bounds = builder.build();
+
+                    //Then obtain a movement description object by using the factory: CameraUpdateFactory:
+                    int padding = 0; // offset from edges of the map in pixels
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                    changeModeToNormal();
+                    updateListView();
+                    AppData.viewPager.setCurrentItem(1);
+                    AppData.m_map.moveCamera(cu);
+
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -336,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements
         if (AppData.isAssetSelectingMode || AppData.isNotificationSelectingMode)
             changeModeToNormal();
         startActivity(intent);
-
+//        AppData.viewPager.setCurrentItem(0);
     }
 
     //to change mode from selecting to normal

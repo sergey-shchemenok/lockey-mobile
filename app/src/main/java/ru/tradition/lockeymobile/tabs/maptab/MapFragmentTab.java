@@ -16,12 +16,14 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -145,6 +147,24 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
             }
         });
 
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                for (Map.Entry<Integer, Marker> pair : markers.entrySet()) {
+                    Marker marker = pair.getValue();
+                    builder.include(marker.getPosition());
+                }
+                LatLngBounds bounds = builder.build();
+
+                int padding = 0; // offset from edges of the map in pixels
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+                AppData.m_map.moveCamera(cu);
+                return true;
+            }
+        });
+
         return rootView;
     }
 
@@ -169,10 +189,11 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         AppData.m_map = map;
         AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
 
+        //clicking on marker
         AppData.m_map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(getContext(), marker.getTitle(), Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), marker.getTitle() + " " + marker.getPosition(), Toast.LENGTH_LONG).show();
                 return true;
             }
         });

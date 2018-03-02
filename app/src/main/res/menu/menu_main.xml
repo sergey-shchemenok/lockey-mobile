@@ -12,6 +12,7 @@
     <item
         android:id="@+id/main_menu_item_selection"
         android:title="@string/menu_item_selection"
+        android:visible="true"
         app:showAsAction="never" />
 
     <item
@@ -20,14 +21,17 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/main_menu_back"
-        android:title="back"
+        android:id="@+id/main_menu_zoom_out"
+        android:title="zoom_out"
+        android:icon="@drawable/ic_zoom_out_map"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/main_menu_delete"
         android:title="delete"
-        app:showAsAction="always" />
+        android:icon="@drawable/ic_delete_forever"
+        app:showAsAction="always"
+        />
 
 </menu>
     <!--android:visible="false"-->

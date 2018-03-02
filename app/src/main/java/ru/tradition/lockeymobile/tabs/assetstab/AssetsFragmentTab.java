@@ -101,44 +101,19 @@ public class AssetsFragmentTab extends Fragment {
         assetsListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View viewItem, int position, long itemId) {
-//                Toast.makeText(getContext(), String.valueOf(itemId) + "   " + String.valueOf(position),
-//                        Toast.LENGTH_SHORT).show();
-                // MainActivity.mainActivity.viewPager.setCurrentItem(1);
-                if (!AppData.isAssetSelectingMode) {
-//                    AppData.isAssetSelectingMode = true;
-//
-//                    AppData.mainActivity.setUpButton();
-//
-//                    AppData.mMenu.getItem(3).setVisible(true);
-//                    AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
-//                    int id = as.getId();
-//                    AppData.selectedAsset.add(id);
-//
-//                    //todo change tab and toolbar color in selecting mode
-//                    AppData.mainActivity.setTitle(String.valueOf(++AppData.selectedAssetCounter));
-//                    AppData.mainActivity.updateListView();
-                    AppData.mainActivity.updateListView();
-                    AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
-                    AppData.target = CameraPosition.builder()
-                            .target(new LatLng(as.getLatitude(), as.getLongitude()))
-                            .zoom(13)
-                            .build();
-                    //go to map tab
-                    AppData.viewPager.setCurrentItem(1);
-                    AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
-
-                }else {
+                if (AppData.isAssetSelectingMode) {
                     AppData.mainActivity.changeModeToNormal();
-                    AppData.mainActivity.updateListView();
-                    AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
-                    AppData.target = CameraPosition.builder()
-                            .target(new LatLng(as.getLatitude(), as.getLongitude()))
-                            .zoom(13)
-                            .build();
-                    //go to map tab
-                    AppData.viewPager.setCurrentItem(1);
-                    AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
                 }
+                AppData.mainActivity.updateListView();
+                AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
+                AppData.target = CameraPosition.builder()
+                        .target(new LatLng(as.getLatitude(), as.getLongitude()))
+                        .zoom(13)
+                        .build();
+                //go to map tab
+                AppData.viewPager.setCurrentItem(1);
+                AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+
                 return true;
             }
         });

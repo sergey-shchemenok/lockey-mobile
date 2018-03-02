@@ -48,6 +48,7 @@ public class AuthActivity extends AppCompatActivity
 
     //token of device
     String fcmToken;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +74,8 @@ public class AuthActivity extends AppCompatActivity
 
         try {
             AppData.mainActivity.changeModeToNormal();
-        }catch (NullPointerException e){}
+        } catch (NullPointerException e) {
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -256,6 +258,8 @@ public class AuthActivity extends AppCompatActivity
         }
         AppData.isFinished = false;
         AppData.isRepeated = false;
+        if (AppData.viewPager != null)
+            AppData.viewPager.setCurrentItem(0);
         infoMessage.setVisibility(View.INVISIBLE);
         Log.v(LOG_TAG, "onLoadFinished");
         Intent intent = new Intent(AuthActivity.this, MainActivity.class);

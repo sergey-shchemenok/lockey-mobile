@@ -15,7 +15,7 @@ public class NotificationDbHelper extends SQLiteOpenHelper {
     /**
      * Name of the database file
      */
-    private static final String DATABASE_NAME = "shelter.db";
+    private static final String DATABASE_NAME = "lockeydata.db";
 
     /**
      * Database version. If you change the database schema, you must increment the database version.

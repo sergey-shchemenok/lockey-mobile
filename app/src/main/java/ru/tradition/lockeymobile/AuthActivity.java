@@ -46,6 +46,8 @@ public class AuthActivity extends AppCompatActivity
     private TextView infoMessage;
     private TextView connectionStatusMessage;
 
+    //token of device
+    String fcmToken;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,9 +62,10 @@ public class AuthActivity extends AppCompatActivity
         setContentView(R.layout.activity_auth);
 
         //token for firebase cloud messaging
-        String fcmToken = FirebaseInstanceId.getInstance().getToken();
+        fcmToken = FirebaseInstanceId.getInstance().getToken();
         Log.i(LOG_TAG, "the token is: " + fcmToken);
 
+        //in case we get this activity after clicking the notification from background
         NotificationsData notificationsData = getNotificationData();
         if (notificationsData != null) {
             insertNotification(notificationsData);
@@ -111,6 +114,29 @@ public class AuthActivity extends AppCompatActivity
                 AppData.usr = loginView.getText().toString();
                 //get token. If it is correct start main activity
                 getToken();
+            }
+        });
+
+        //just for test version
+        loginButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                if (fcmToken != null) {
+                    String[] addresses = new String[1];
+                    //addresses[1] = "shemenok@yandex.ru";
+                    addresses[0] = "shemenok@tradition.ru";
+                    Intent intent = new Intent(Intent.ACTION_SENDTO);
+                    intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+                    intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+                    intent.putExtra(Intent.EXTRA_SUBJECT, "Токен тестового устройства");
+                    intent.putExtra(Intent.EXTRA_TEXT, fcmToken);
+                    if (intent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
+                }
+
+                return true;
             }
         });
 

@@ -6,4 +6,7 @@
     <!-- Common margin value used throughout the app -->
     <dimen name="activity_margin">16dp</dimen>
 
+    <!-- Margin around the floating action button in MapFragmentTab -->
+    <dimen name="fab_margin">16dp</dimen>
+
 </resources>

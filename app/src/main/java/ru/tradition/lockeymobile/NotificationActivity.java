@@ -16,7 +16,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
@@ -32,24 +31,29 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     private TextView notificationBody;
     private TextView notificationSendingTime;
 
-    private NotificationsData nd;
+    private NotificationsData ndForeground;
+    private NotificationsData ndBackground;
+
+    //if we open this activity not from the notificatiton tab on item clicking
+    private boolean fromItem = true;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //to get data from background notifications
-        NotificationsData notificationsData = getNotificationData();
-        if (notificationsData != null) {
-            insertNotification(notificationsData);
+        //to get data from background notifications' intent
+        ndBackground = getNotificationData();
+        if (ndBackground != null) {
+            insertNotification(ndBackground);
+            fromItem = false;
         }
 
 
         setContentView(R.layout.activity_notification);
 
-        //go to auth activity
-        if (AppData.usr.equals("")||AppData.pwd.equals("")||AppData.isAuthorized == false) {
+        //go to auth activity. It need to prevent seeing the internal information without authorization
+        if (AppData.usr.equals("") || AppData.pwd.equals("") || AppData.isAuthorized == false) {
             Intent intent = new Intent(this, AuthActivity.class);
             intent.putExtra("hasCredentials", false);
             startActivity(intent);
@@ -70,12 +74,14 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         toolbar.setTitle(R.string.notification_activity_title);
 
 
-        //get data from the incoming intent
+        //get data from the incoming intent. From clicking on item at notification tab
         Intent intent = getIntent();
         mCurrentNotificationUri = intent.getData();
 
+        //this occurs when we get here after clicking the notification banner that coming in foreground
         if (mCurrentNotificationUri == null) {
-            nd = (NotificationsData) getIntent().getSerializableExtra("NotificationData");
+            ndForeground = (NotificationsData) getIntent().getSerializableExtra("NotificationData");
+            fromItem = false;
         } else
             getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
@@ -83,8 +89,9 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         notificationBody = (TextView) findViewById(R.id.notification_activity_body);
         notificationSendingTime = (TextView) findViewById(R.id.notification_activity_sending_time);
 
-        showData(notificationsData);
-        showData(nd);
+        //trying to show data from fore or background
+        showData(ndBackground);
+        showData(ndForeground);
 
     }
 
@@ -115,7 +122,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         // Proceed with moving to the first row of the cursor and reading data from it
         // (This should be the only row in the cursor)
         if (cursor.moveToFirst()) {
-            // Find the columns of pet attributes that we're interested in
+            // Find the columns of notification attributes that we're interested in
             int assetIDColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID);
             int titleColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE);
             int bodyColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY);
@@ -174,17 +181,27 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
     @Override
     public boolean onSupportNavigateUp() {
-        //todo good navigation from previous - back from main - up
-        super.onBackPressed();
-        //return super.onSupportNavigateUp();
+        //todo navigation can be improved
+        if (fromItem)
+            super.onBackPressed();
+        else {
+            fromItem = true;
+            return super.onSupportNavigateUp();
+        }
         return true;
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (fromItem)
+            super.onBackPressed();
+        else {
+            fromItem = true;
+            super.onSupportNavigateUp();
+        }
     }
 
+    //to get notification data from intent
     private NotificationsData getNotificationData() {
         int id = 0;
         String title = null;
@@ -243,6 +260,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         else return null;
     }
 
+    //to insert data inte database
     private void insertNotification(NotificationsData nd) {
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
@@ -255,8 +273,9 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         Uri newUri = getContentResolver().insert(NotificationContract.NotificationEntry.CONTENT_URI, values);
     }
 
+    //to show data in this activity
     private void showData(NotificationsData nd) {
-        if (nd != null){
+        if (nd != null) {
             notificationTitle.setText(nd.getTitle());
             notificationBody.setText(nd.getBody());
             notificationSendingTime.setText(nd.getSending_time());

@@ -30,9 +30,6 @@ public final class NotificationContract {
 
     /**
      * Possible path (appended to base content URI for possible URI's)
-     * For instance, content://com.example.android.pets/pets/ is a valid path for
-     * looking at pet data. content://com.example.android.pets/staff/ will fail,
-     * as the ContentProvider hasn't been given any information on what to do with "staff".
      */
     public static final String PATH_NOTIFICATIONS = "notifications";
 
@@ -55,8 +52,6 @@ public final class NotificationContract {
          */
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_NOTIFICATIONS;
-
-
 
         /**
          * Name of database table for notifications
@@ -91,9 +86,8 @@ public final class NotificationContract {
          */
         public final static String COLUMN_NOTIFICATION_BODY = "body";
 
-
         /**
-         * Departure time.
+         * Sending time.
          * Type: TEXT
          */
         public final static String COLUMN_NOTIFICATION_SENDING_TIME = "sending_time";
@@ -109,8 +103,5 @@ public final class NotificationContract {
          * Type: REAL
          */
         public final static String COLUMN_NOTIFICATION_LONGITUDE = "longitude";
-
-
-
     }
 }

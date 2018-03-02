@@ -14,6 +14,12 @@
     <!-- Text color for the header in assets table list -->
     <color name="assetTableHeaderColor">#B4BAC0</color>
 
+    <!-- Fab ripple color -->
+    <color name="fab_back">#82b4bac0</color>
+
+    <!-- Fab backgorund color -->
+    <color name="fab_ripple">#822d2f31</color>
+
     <!-- Text color for the content in assets table list -->
     <color name="assetTableContentColor">#2B3D4D</color>
 

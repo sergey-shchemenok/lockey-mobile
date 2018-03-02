@@ -36,6 +36,11 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
     private static final String LOG_TAG = FcmInstanceIDService.class.getSimpleName();
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
+    @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
         Log.i(LOG_TAG, "FROM:" + remoteMessage.getFrom());
@@ -76,7 +81,6 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
             Log.i(LOG_TAG, "Message Notification date: " + date);
             Log.i(LOG_TAG, "Message Notification latitude: " + latitude);
             Log.i(LOG_TAG, "Message Notification longitude: " + longitude);
-
 
             sendNotification(id, title, body, click_action, date, latitude, longitude);
         }

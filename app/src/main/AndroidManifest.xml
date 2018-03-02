@@ -64,10 +64,14 @@
             android:authorities="ru.tradition.lockeymobile"
             android:exported="false" />
 
-        <service android:name=".tabs.notifications.fcmservices.FcmMessagingService">
+
+        <service android:name=".tabs.notifications.fcmservices.FcmMessagingService"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
+
         </service>
         <service android:name=".tabs.notifications.fcmservices.FcmInstanceIDService">
             <intent-filter>
@@ -83,10 +87,12 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
     </application>
 
 </manifest>

@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -46,6 +48,10 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
     private static View rootView;
 
     boolean mapReady = false;
+
+    //add fab button
+    private FloatingActionButton fab;
+    private int mapType = GoogleMap.MAP_TYPE_NORMAL;
 
     private static TreeMap<Integer, Marker> markers = new TreeMap<>();
 
@@ -119,9 +125,28 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         rootView = inflater.inflate(R.layout.tab_fragment_map, container, false);
         // Inflate the layout for this fragment
 
-       return rootView;
-    }
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
 
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mapReady && AppData.m_map != null) {
+                    if (mapType == GoogleMap.MAP_TYPE_NORMAL) {
+                        AppData.m_map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                        mapType = GoogleMap.MAP_TYPE_SATELLITE;
+                    } else if (mapType == GoogleMap.MAP_TYPE_SATELLITE){
+                        AppData.m_map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                        mapType = GoogleMap.MAP_TYPE_HYBRID;
+                    } else {
+                        AppData.m_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                        mapType = GoogleMap.MAP_TYPE_NORMAL;
+                    }
+                }
+            }
+        });
+
+        return rootView;
+    }
 
 
     //Handler for map updating here
@@ -143,6 +168,14 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         mapReady = true;
         AppData.m_map = map;
         AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+
+        AppData.m_map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Toast.makeText(getContext(), marker.getTitle(), Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
 
         try {
             markers.clear();

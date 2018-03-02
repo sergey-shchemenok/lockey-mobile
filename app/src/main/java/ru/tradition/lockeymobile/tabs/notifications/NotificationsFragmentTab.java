@@ -147,11 +147,15 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         if (AppData.selectedNotificationUri != null && !AppData.selectedNotificationUri.isEmpty()) {
             int toDelete = AppData.selectedNotificationCounter;
             Log.i(LOG_TAG, "toDelete initial........." + toDelete);
-            for (Uri u: AppData.selectedNotificationUri){
+            for (Uri u : AppData.selectedNotificationUri) {
                 if (u != null) {
                     int rowsAffected = getActivity().getContentResolver().delete(u, null, null);
                     toDelete -= rowsAffected;
                     Log.i(LOG_TAG, "toDelete initial........." + toDelete);
+
+                    if (AppData.selectedNotificationLong.contains(u.toString()))
+                        AppData.selectedNotificationLong.remove(u.toString());
+
                 }
             }
             // Show a toast message depending on whether or not the delete was successful.
@@ -173,6 +177,7 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
     }
 
+    //update listView after changes
     public void updateList() {
         if (loaderSwitch == 0) {
             getLoaderManager().initLoader(CURSOR_UPDATE_LOADER_ID, null, this);

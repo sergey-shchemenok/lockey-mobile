@@ -34,13 +34,13 @@ public final class AppData {
             .zoom(10)
             .build();
 
-    //This set determines which kit is selected
+    //This sets determines which kit is selected
     public static Set<Integer> selectedAsset = new TreeSet<>();
     public static Set<String> selectedNotification = new TreeSet<>();
     public static Set<String> selectedNotificationLong = new TreeSet<>();
     public static Set<Uri> selectedNotificationUri = new TreeSet<>();
 
-    //for selectingMode
+    //for selectingMode touches the notification and asset tabs
     public static boolean isAssetSelectingMode = false;
     public static int selectedAssetCounter = 0;
     public static boolean isNotificationSelectingMode = false;

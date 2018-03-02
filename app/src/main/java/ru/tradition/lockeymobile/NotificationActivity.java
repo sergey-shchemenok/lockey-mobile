@@ -166,7 +166,8 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                 logout();
                 return true;
             case R.id.notification_menu_settings:
-                //todo settings here
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
         }
         return super.onOptionsItemSelected(item);

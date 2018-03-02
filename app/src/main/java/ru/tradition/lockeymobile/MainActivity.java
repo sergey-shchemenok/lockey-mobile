@@ -4,9 +4,11 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -94,6 +96,11 @@ public class MainActivity extends AppCompatActivity implements
         infoMessage = (TextView) findViewById(R.id.main_info_message);
         infoMessage.setVisibility(View.GONE);
         progressCircle.setVisibility(View.VISIBLE);
+
+        //todo when server part be ready
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean allowNotification = sharedPrefs.getBoolean(getString(R.string.allow_notifications), false);
+        Log.i(LOG_TAG, "allowNotification.........." + allowNotification);
 
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -319,7 +326,8 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 return true;
             case R.id.main_menu_settings:
-                //todo settings here
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
             case R.id.main_menu_delete:
                 //Let it be here for a while
@@ -353,6 +361,7 @@ public class MainActivity extends AppCompatActivity implements
         Intent intent = new Intent(this, AuthActivity.class);
         AppData.isFinished = false;
         AppData.isRepeated = false;
+        NotificationsFragmentTab.loaderSwitch = 0;
         if (AppData.isAssetSelectingMode || AppData.isNotificationSelectingMode)
             changeModeToNormal();
         startActivity(intent);

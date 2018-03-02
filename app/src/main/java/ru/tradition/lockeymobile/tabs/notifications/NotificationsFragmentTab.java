@@ -40,7 +40,7 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
     public static final String LOG_TAG = NotificationsFragmentTab.class.getName();
 
     private NotificationCursorAdapter adapter;
-    private static int loaderSwitch = 0;
+    public static int loaderSwitch = 0;
     private static final int CURSOR_LOADER_ID = 3;
     private static final int CURSOR_UPDATE_LOADER_ID = 4;
 

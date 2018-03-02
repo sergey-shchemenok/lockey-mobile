@@ -89,7 +89,8 @@ public class AssetActivity extends AppCompatActivity {
                 logout();
                 return true;
             case R.id.asset_menu_settings:
-                //todo settings here
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
                 return true;
         }
         return super.onOptionsItemSelected(item);

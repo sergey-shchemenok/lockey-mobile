@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/settings_title">
+
+    <CheckBoxPreference
+        android:title="Уведомления"
+        android:defaultValue="false"
+        android:summary="Разрешить отправку уведомлений"
+        android:key="@string/allow_notifications"
+
+        />
+
+
+
+</PreferenceScreen>

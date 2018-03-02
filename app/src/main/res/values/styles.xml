@@ -23,16 +23,11 @@
         <item name="android:textSize">20sp</item>
     </style>
 
-    <!--&lt;!&ndash; Toolbar button style &ndash;&gt;-->
-    <!--<style name="DrawerIcon" parent="Widget.AppCompat.DrawerArrowToggle">-->
-        <!--<item name="color">@color/color_icon</item>-->
-    <!--</style>-->
-
-    <!--&lt;!&ndash; App bar style &ndash;&gt;-->
-    <!--<style name="LockeyMobileBarStyle" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse">-->
-        <!--&lt;!&ndash; Remove the shadow below the app bar &ndash;&gt;-->
-        <!--<item name="elevation">0dp</item>-->
-    <!--</style>-->
+    //style for settings
+    <style name="AppTheme.SettingActivity" parent="AppTheme">
+        <item name="colorControlNormal">@color/checkboxColor</item>
+        <item name="colorControlActivated">@color/checkboxColor</item>
+    </style>
 
 
     <!-- Style for a tab that displays a category name -->

@@ -10,6 +10,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
 public class AssetActivity extends AppCompatActivity {
@@ -22,6 +26,8 @@ public class AssetActivity extends AppCompatActivity {
 
     private Button commandButton1;
     private Button commandButton2;
+
+    private AssetsData assetData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,9 +53,9 @@ public class AssetActivity extends AppCompatActivity {
         name = (TextView)findViewById(R.id.asset_name);
         //lastTime = (TextView)findViewById(R.id.asset_last_time);
         commandButton1 = (Button)findViewById(R.id.activity_asset_command1);
-        commandButton2 = (Button)findViewById(R.id.activity_asset_command2);
+        //commandButton2 = (Button)findViewById(R.id.activity_asset_command2);
 
-        AssetsData assetData = (AssetsData) getIntent().getSerializableExtra("AssetData");
+        assetData = (AssetsData) getIntent().getSerializableExtra("AssetData");
 
         kitNumber.setText(String.valueOf(assetData.getId()));
         regNumber.setText(assetData.getRegNumber());
@@ -60,16 +66,21 @@ public class AssetActivity extends AppCompatActivity {
         commandButton1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                AppData.isRepeated = false;
+                AppData.isFinished = false;
+                Intent intent = new Intent(AssetActivity.this, MainActivity.class);
+                intent.putExtra("latitude", assetData.getLatitude());
+                intent.putExtra("longitude", assetData.getLongitude());
+                startActivity(intent);
             }
         });
 
-        commandButton2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
+//        commandButton2.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
 
 
     }
@@ -90,6 +101,7 @@ public class AssetActivity extends AppCompatActivity {
                 return true;
             case R.id.asset_menu_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                settingsIntent.putExtra("currentPage", AppData.viewPager.getCurrentItem());
                 startActivity(settingsIntent);
                 return true;
         }

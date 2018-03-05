@@ -17,9 +17,12 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.AssetActivity;
+import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
 
 import static ru.tradition.lockeymobile.AppData.mAssetData;
@@ -53,7 +56,13 @@ public class AssetsFragmentTab extends Fragment {
 
         //to prevent crash in some killing process situations
         try {
-            assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
+            if (MainActivity.orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
+                assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
+            } else if (MainActivity.orderBy.equals(getString(R.string.settings_order_by_signal_time_value))) {
+                ArrayList<AssetsData> ads = new ArrayList<>(mAssetData.values());
+                Collections.sort(ads, AssetsData.COMPARE_BY_LAST_SIGNAL_TIME);
+                assetsDataAdapter.addAll(ads);
+            }
         } catch (NullPointerException e) {
             AppData.mainActivity.logout();
             Log.i(LOG_TAG, "onAssetsFragmentCreateView..........NullPointerException");
@@ -117,6 +126,7 @@ public class AssetsFragmentTab extends Fragment {
                 return true;
             }
         });
+
         return rootView;
     }
 

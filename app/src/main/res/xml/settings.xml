@@ -4,13 +4,20 @@
     android:title="@string/settings_title">
 
     <CheckBoxPreference
-        android:title="Уведомления"
+        android:title="@string/settings_allow_notifications_title"
         android:defaultValue="false"
-        android:summary="Разрешить отправку уведомлений"
-        android:key="@string/allow_notifications"
+        android:key="@string/settings_allow_notifications_key"
 
         />
 
-
+    <ListPreference
+        android:defaultValue="@string/settings_order_by_default"
+        android:entries="@array/settings_order_by_labels"
+        android:entryValues="@array/settings_order_by_values"
+        android:key="@string/settings_order_by_key"
+        android:title="@string/settings_order_by_title" />
 
 </PreferenceScreen>
+
+
+    <!--android:summary="Разрешить отправку уведомлений"-->

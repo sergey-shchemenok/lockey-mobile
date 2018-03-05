@@ -26,11 +26,11 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 import ru.tradition.lockeymobile.tabs.AppTabAdapter;
@@ -41,6 +41,7 @@ import ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTab;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 
+import static ru.tradition.lockeymobile.AppData.mAssetData;
 import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUrlResponseCode;
 import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUrlResponseMessage;
 
@@ -60,6 +61,10 @@ public class MainActivity extends AppCompatActivity implements
     private NetworkInfo activeNetwork;
     private LoaderManager loaderManager;
     private TextView infoMessage;
+
+    //preferences
+    public static boolean allowNotification;
+    public static String orderBy;
 
     public static final String LOG_TAG = MainActivity.class.getName();
 
@@ -99,13 +104,20 @@ public class MainActivity extends AppCompatActivity implements
 
         //todo when server part be ready
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean allowNotification = sharedPrefs.getBoolean(getString(R.string.allow_notifications), false);
+        allowNotification = sharedPrefs.getBoolean(getString(R.string.settings_allow_notifications_key), false);
         Log.i(LOG_TAG, "allowNotification.........." + allowNotification);
+        orderBy = sharedPrefs.getString(
+                getString(R.string.settings_order_by_key),
+                getString(R.string.settings_order_by_default)
+        );
+        Log.i(LOG_TAG, "orderBy.........." + orderBy);
+
 
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         //launch loading data from server
         startLoader();
+
     }
 
     //The method adds "up" button to toolbar
@@ -243,6 +255,20 @@ public class MainActivity extends AppCompatActivity implements
 
             AppData.isRepeated = true;
 
+            //if we come here from the asset activity
+            Bundle bundle = getIntent().getExtras();
+            if (bundle != null && !bundle.isEmpty()){
+                AppData.viewPager.setCurrentItem(1);
+                AppData.target = CameraPosition.builder()
+                        .target(new LatLng(bundle.getDouble("latitude"), bundle.getDouble("longitude")))
+                        .zoom(13)
+                        .build();
+                //go to map tab
+                AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+                bundle.clear();
+            }
+
+
         } else {
             Log.i(LOG_TAG, "the second load has finished");
             if (assetData == null || assetData.isEmpty()) {
@@ -257,7 +283,14 @@ public class MainActivity extends AppCompatActivity implements
     //update the list of assets
     public void updateListView() {
         AssetsFragmentTab.assetsDataAdapter.clear();
-        AssetsFragmentTab.assetsDataAdapter.addAll(new ArrayList<>(AppData.mAssetData.values()));
+        Log.i(LOG_TAG, "order by list..........." + getString(R.string.settings_order_by_kit_id_value));
+        if (orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
+            AssetsFragmentTab.assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
+        } else if (orderBy.equals(getString(R.string.settings_order_by_signal_time_value))) {
+            ArrayList<AssetsData> ads = new ArrayList<>(mAssetData.values());
+            Collections.sort(ads, AssetsData.COMPARE_BY_LAST_SIGNAL_TIME);
+            AssetsFragmentTab.assetsDataAdapter.addAll(ads);
+        }
     }
 
     //we need to interrupt the loading thread
@@ -327,6 +360,7 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.main_menu_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                settingsIntent.putExtra("currentPage", AppData.viewPager.getCurrentItem());
                 startActivity(settingsIntent);
                 return true;
             case R.id.main_menu_delete:

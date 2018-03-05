@@ -167,6 +167,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                 return true;
             case R.id.notification_menu_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                settingsIntent.putExtra("currentPage", AppData.viewPager.getCurrentItem());
                 startActivity(settingsIntent);
                 return true;
         }

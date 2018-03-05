@@ -31,8 +31,22 @@
     <string name="cancel">Отмена</string>
     <string name="delete_notifications">Удалить выбранные уведомления?</string>
     <string name="settings_title">Настройки</string>
-    <string name="allow_notifications" translatable="false">allow_notification</string>
+
+    <!--settings-->
+    <string name="settings_allow_notifications_key" translatable="false">allow_notification</string>
     <string name="settings_activity_title">Настройки</string>
+    <string name="settings_allow_notifications_title">Разрешить отправку уведомлений</string>
+    <string name="settings_order_by_title">Сортировка по</string>
+    <string name="settings_order_by_key">order_by</string>
+    <string name="settings_order_by_default" translatable="false">@string/settings_order_by_kit_id_value</string>
+
+    <!-- Label for order-by kit id option [CHAR LIMIT=20] -->
+    <string name="settings_order_by_kit_id_label">Номеру комплекта</string>
+    <string name="settings_order_by_kit_id_value" translatable="false">kit_id</string>
+
+    <!-- Label for order-by most recent option [CHAR LIMIT=20] -->
+    <string name="settings_order_by_signal_time_label">Времени последнего сигнала</string>
+    <string name="settings_order_by_signal_time_value" translatable="false">signal_time</string>
 
 
 </resources>

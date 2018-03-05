@@ -95,7 +95,9 @@
         </activity>
         <activity android:name=".SettingsActivity"
             android:theme="@style/AppTheme.SettingActivity">
-
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
         </activity>
     </application>
 

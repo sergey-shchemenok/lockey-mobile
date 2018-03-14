@@ -1,5 +1,6 @@
 package ru.tradition.lockeymobile;
 
+import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Context;
@@ -125,8 +126,8 @@ public class AuthActivity extends AppCompatActivity
             public boolean onLongClick(View v) {
 
                 if (fcmToken != null) {
-                    String[] addresses = new String[1];
-                    //addresses[1] = "shemenok@yandex.ru";
+                    String[] addresses = new String[2];
+                    addresses[1] = "alex.zador@gmail.com";
                     addresses[0] = "shemenok@tradition.ru";
                     Intent intent = new Intent(Intent.ACTION_SENDTO);
                     intent.setData(Uri.parse("mailto:")); // only email apps should handle this
@@ -324,6 +325,6 @@ public class AuthActivity extends AppCompatActivity
     //we don't need to move to previous activity from here
     @Override
     public void onBackPressed() {
-
+        moveTaskToBack(true);
     }
 }

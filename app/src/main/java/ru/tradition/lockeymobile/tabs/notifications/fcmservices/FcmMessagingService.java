@@ -96,12 +96,14 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
         Log.i(LOG_TAG, body + ".........");
 
         Intent intent;
-        if (click_action.equals("NOTIFICATIONACTIVITY")) {
-            intent = new Intent(this, NotificationActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        } else if (click_action.equals("MAINACTIVITY")) {
-            intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        if (click_action != null && !click_action.isEmpty()) {
+            if (click_action.equals("NOTIFICATIONACTIVITY")) {
+                intent = new Intent(this, NotificationActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            } else {
+                intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            }
         } else {
             intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -156,6 +158,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
                 //.setContentInfo("Info")
                 .setAutoCancel(true)
                 .setSound(notificationSound)
+                .setColor(Color.LTGRAY)
                 .setContentIntent(pendingIntent);
 
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

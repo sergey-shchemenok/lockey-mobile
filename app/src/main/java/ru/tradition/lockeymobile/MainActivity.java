@@ -42,7 +42,6 @@ import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTab;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 
 import static ru.tradition.lockeymobile.AppData.mAssetData;
-import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUrlResponseCode;
 import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUrlResponseMessage;
 
 public class MainActivity extends AppCompatActivity implements
@@ -74,11 +73,11 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
 
         //go to auth activity
-        if (assetsUrlResponseCode == 0) {
-            Intent intent = new Intent(this, AuthActivity.class);
-            startActivity(intent);
-            Log.i(LOG_TAG, ".............assetsUrlResponseCode == 0");
-        }
+//        if (AppData.assetsUrlResponseCode == 0) {
+//            Intent intent = new Intent(this, AuthActivity.class);
+//            startActivity(intent);
+//            Log.i(LOG_TAG, ".............assetsUrlResponseCode == 0");
+//        }
         //go to auth activity
         if (AppData.usr.equals("") || AppData.pwd.equals("")) {
             Intent intent = new Intent(this, AuthActivity.class);
@@ -138,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements
 
     //For initial data loading
     public void startLoader() {
+        Log.i(LOG_TAG, "....startLoader....");
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
             loaderManager = getLoaderManager();
@@ -145,7 +145,9 @@ public class MainActivity extends AppCompatActivity implements
             Log.i(LOG_TAG, "initLoader");
         } else {
             progressCircle.setVisibility(View.GONE);
+            infoMessage.setVisibility(View.VISIBLE);
             infoMessage.setText(R.string.no_connection);
+            logout();
         }
     }
 
@@ -177,13 +179,13 @@ public class MainActivity extends AppCompatActivity implements
         progressCircle.setVisibility(View.GONE);
 
         //whether it can be authorized. The token has not expired
-        if (assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+        if (AppData.assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             AssetsQueryUtils.needToken = true;
         }
 
         //whether it has some problem
-        if (assetsUrlResponseCode != HttpURLConnection.HTTP_OK &&
-                assetsUrlResponseCode != HttpURLConnection.HTTP_UNAUTHORIZED) {
+        if (AppData.assetsUrlResponseCode != HttpURLConnection.HTTP_OK &&
+                AppData.assetsUrlResponseCode != HttpURLConnection.HTTP_UNAUTHORIZED) {
             infoMessage.setVisibility(View.VISIBLE);
             infoMessage.setText(assetsUrlResponseMessage);
             return;
@@ -193,13 +195,19 @@ public class MainActivity extends AppCompatActivity implements
         if (!AppData.isRepeated) {
             AppData.isFinished = true;
             if (assetData == null || assetData.isEmpty()) {
-                mEmptyStateTextView.setText(R.string.no_assets);
-                return;
+                if (AppData.mAssetData == null || AppData.mAssetData.isEmpty()) {
+                    mEmptyStateTextView.setText(R.string.no_assets);
+                    return;
+                }
+                Log.i(LOG_TAG, "the first load has finished with old data");
+
+            } else {
+                AppData.mAssetData = assetData;
+                Log.i(LOG_TAG, "the first load has finished without mistakes");
+
             }
             mEmptyStateTextView.setText("");
             Log.i(LOG_TAG, "the first load has finished");
-
-            AppData.mAssetData = assetData;
 
             // Find the view pager that will allow the user to swipe between fragments
             AppData.viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -257,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements
 
             //if we come here from the asset activity
             Bundle bundle = getIntent().getExtras();
-            if (bundle != null && !bundle.isEmpty()){
+            if (bundle != null && !bundle.isEmpty()) {
                 AppData.viewPager.setCurrentItem(1);
                 AppData.target = CameraPosition.builder()
                         .target(new LatLng(bundle.getDouble("latitude"), bundle.getDouble("longitude")))

@@ -35,7 +35,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     private NotificationsData ndBackground;
 
     //if we open this activity not from the notificatiton tab on item clicking
-    private boolean fromItem = true;
+    private boolean fromItem = false;
 
 
     @Override
@@ -82,8 +82,10 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         if (mCurrentNotificationUri == null) {
             ndForeground = (NotificationsData) getIntent().getSerializableExtra("NotificationData");
             fromItem = false;
-        } else
+        } else {
             getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
+            fromItem = true;
+        }
 
         notificationTitle = (TextView) findViewById(R.id.notification_activity_title);
         notificationBody = (TextView) findViewById(R.id.notification_activity_body);
@@ -258,7 +260,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                 && sending_time != null) {
             return new NotificationsData(id, title, body, sending_time);
         }
-        //todo add other datas (longitude and latitude)
+        //todo add other data (longitude and latitude)
         else return null;
     }
 

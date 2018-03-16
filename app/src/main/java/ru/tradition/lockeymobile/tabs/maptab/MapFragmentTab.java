@@ -1,6 +1,7 @@
 package ru.tradition.lockeymobile.tabs.maptab;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,12 +12,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.Toast;
 
 
@@ -30,6 +32,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -38,9 +42,6 @@ import java.util.TreeMap;
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.R;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsDataAdapter;
-
-import static ru.tradition.lockeymobile.AppData.mAssetData;
 
 
 /**
@@ -51,7 +52,33 @@ import static ru.tradition.lockeymobile.AppData.mAssetData;
  * Use the {@link MapFragmentTab#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
+public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
+        GeofencePolygonAdapter.ListItemClickListener {
+
+    /*
+    to delete
+     */
+
+    /*
+     * References to RecyclerView and Adapter to reset the list to its
+     * "pretty" state when the reset menu item is clicked.
+     */
+    private GeofencePolygonAdapter mAdapter;
+    private RecyclerView mPolygonsList;
+
+    // COMPLETED (9) Create a Toast variable called mToast to store the current Toast
+    /*
+     * If we hold a reference to our Toast, we can cancel it (if it's showing)
+     * to display a new Toast. If we didn't do this, Toasts would be delayed
+     * in showing up if you clicked many list items in quick succession.
+     */
+    private Toast mToast;
+
+
+    /*
+    to delete end
+     */
+
 
     private final String LOG_TAG = MapFragmentTab.class.getSimpleName();
     private static View rootView;
@@ -61,8 +88,11 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
     //add fabLayers button
     private FloatingActionButton fabLayers;
 
-    //add fab bottom drawer button
+    //add fab and other elements for bottom drawer
     private FloatingActionButton fabBottomDrawer;
+    private LinearLayout llBottomSheet;
+    private BottomSheetBehavior bottomSheetBehavior;
+
 
     private int mapType = GoogleMap.MAP_TYPE_NORMAL;
 
@@ -83,16 +113,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         // Required empty public constructor
     }
 
-    //MapFragmentTab fragment;
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MapFragmentTab.
-     */
     // TODO: Rename and change types and number of parameters
     public static MapFragmentTab newInstance(String param1, String param2) {
         MapFragmentTab fragment = new MapFragmentTab();
@@ -144,10 +164,10 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
 
         //for drawer
         // get the bottom sheet view
-        LinearLayout llBottomSheet = (LinearLayout) rootView.findViewById(R.id.bottom_sheet);
+        llBottomSheet = (LinearLayout) rootView.findViewById(R.id.bottom_sheet);
 
         // init the bottom sheet behavior
-        final BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
 
         // change the state of the bottom sheet
 //        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -173,6 +193,22 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
 //                }
                 if (BottomSheetBehavior.STATE_COLLAPSED == newState || BottomSheetBehavior.STATE_HIDDEN == newState) {
                     fabBottomDrawer.animate().scaleX(1).scaleY(1).setDuration(100).start();
+                }
+
+                if (BottomSheetBehavior.STATE_EXPANDED == newState) {
+                    if (AppData.m_map != null) {
+                        for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetData.entrySet()) {
+                            int id = pair.getKey();
+                            Marker savedMarker = markers.get(id);
+                            //need this check in case killing process
+                            if (savedMarker != null) {
+                                savedMarker.setAlpha(0.5f);
+                            }
+                        }
+                        Log.i(LOG_TAG, "The markers changed colors");
+
+                    } else
+                        Log.i(LOG_TAG, "the map................. is null");
                 }
             }
 
@@ -231,15 +267,88 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         });
 
         //fake data. Should be changed
-        ListView assetsListView = (ListView) rootView.findViewById(R.id.assets_list_test);
+//        ListView assetsListView = (ListView) rootView.findViewById(R.id.assets_list_test);
+//
+//        AssetsDataAdapter assetsDataAdapter = new AssetsDataAdapter(getActivity(), new ArrayList<AssetsData>());
+//        assetsListView.setAdapter(assetsDataAdapter);
+//
+//        assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
 
-        AssetsDataAdapter assetsDataAdapter = new AssetsDataAdapter(getActivity(), new ArrayList<AssetsData>());
-        assetsListView.setAdapter(assetsDataAdapter);
+        /*
+        to delete
+         */
+         /*
+         * Using findViewById, we get a reference to our RecyclerView from xml. This allows us to
+         * do things like set the adapter of the RecyclerView and toggle the visibility.
+         */
 
-        assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
+
+        mPolygonsList = (RecyclerView) rootView.findViewById(R.id.geofence_polygons);
+
+        /*
+         * A LinearLayoutManager is responsible for measuring and positioning item views within a
+         * RecyclerView into a linear list. This means that it can produce either a horizontal or
+         * vertical list depending on which parameter you pass in to the LinearLayoutManager
+         * constructor. By default, if you don't specify an orientation, you get a vertical list.
+         * In our case, we want a vertical list, so we don't need to pass in an orientation flag to
+         * the LinearLayoutManager constructor.
+         *
+         * There are other LayoutManagers available to display your data in uniform grids,
+         * staggered grids, and more! See the developer documentation for more details.
+         */
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        mPolygonsList.setLayoutManager(layoutManager);
+
+        /*
+         * Use this setting to improve performance if you know that changes in content do not
+         * change the child layout size in the RecyclerView
+         */
+        mPolygonsList.setHasFixedSize(true);
+
+        // COMPLETED (13) Pass in this as the ListItemClickListener to the GeofencePolygonAdapter constructor
+        /*
+         * The GeofencePolygonAdapter is responsible for displaying each item in the list.
+         */
+        fakeList = new ArrayList<>();
+        fakeList.add(new GeofencePolygon("МКАД1",
+                new LatLng(55.572560364514594, 37.60004794177246),
+                new LatLng(55.59429373522563, 37.50666415270996),
+                new LatLng(55.63539896560563, 37.45997225817871),
+                new LatLng(55.72985487342488, 37.373454924194334),
+                new LatLng(55.8618643459282, 37.400920744506834),
+                new LatLng(55.910386676275145, 37.56983553942871),
+                new LatLng(55.88959881965586, 37.70991122302246),
+                new LatLng(55.819453970015424, 37.83900057849121),
+                new LatLng(55.647024698634446, 37.83625399645996)
+        ));
+        fakeList.add(new GeofencePolygon("МКАД2",
+                new LatLng(55.572560364514594, 37.60004794177246),
+                new LatLng(55.59429373522563, 37.50666415270996),
+                new LatLng(55.72985487342488, 37.373454924194334),
+                new LatLng(55.8618643459282, 37.400920744506834),
+                new LatLng(55.88959881965586, 37.70991122302246),
+                new LatLng(55.819453970015424, 37.83900057849121)
+        ));
+        fakeList.add(new GeofencePolygon("МКАД3",
+                new LatLng(55.59429373522563, 37.50666415270996),
+                new LatLng(55.63539896560563, 37.45997225817871),
+                new LatLng(55.8618643459282, 37.400920744506834),
+                new LatLng(55.910386676275145, 37.56983553942871),
+                new LatLng(55.819453970015424, 37.83900057849121)
+        ));
+
+        mAdapter = new GeofencePolygonAdapter(fakeList, this);
+        mPolygonsList.setAdapter(mAdapter);
+
+        /*
+        to delete end
+         */
+
 
         return rootView;
     }
+
+    private ArrayList<GeofencePolygon> fakeList;
 
 
     //Handler for map updating here
@@ -404,6 +513,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         mListener = null;
     }
 
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -419,5 +529,41 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
         void onFragmentInteraction(Uri uri);
     }
 
+    //just for test
+    // COMPLETED (10) Override ListItemClickListener's onListItemClick method
 
+    /**
+     * This is where we receive our callback from
+     * {@link com.example.android.recyclerview.GreenAdapter.ListItemClickListener}
+     * <p>
+     * This callback is invoked when you click on an item in the list.
+     *
+     * @param clickedItemIndex Index in the list of the item that was clicked.
+     */
+    @Override
+    public void onListItemClick(int clickedItemIndex) {
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        String toastMessage = "Item #" + clickedItemIndex + " clicked.";
+        mToast = Toast.makeText(getActivity(), toastMessage, Toast.LENGTH_LONG);
+
+        mToast.show();
+
+        if (AppData.m_map != null) {
+
+            GeofencePolygon gf = fakeList.get(clickedItemIndex);
+            LatLng[] ll = gf.getPolygon();
+
+            PolygonOptions popt = new PolygonOptions().geodesic(true);
+
+            for (LatLng l : ll) {
+                popt.add(l);
+            }
+            Polygon p = AppData.m_map.addPolygon(popt);
+            p.setFillColor(0xb4ffffff);
+            p.setStrokeColor(Color.BLUE);
+
+        }
+    }
 }

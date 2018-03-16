@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottom_sheet"
     android:layout_width="match_parent"
-    android:layout_height="340dp"
+    android:layout_height="100dp"
     android:background="@android:color/darker_gray"
     android:orientation="vertical"
     app:behavior_hideable="true"
@@ -18,19 +18,18 @@
         android:text="text1"
         android:textColor="@android:color/white" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="text2"
-        android:textColor="@android:color/white" />
-
-    <ListView
-        android:id="@+id/assets_list_test"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/geofence_polygons"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@null"
-        android:dividerHeight="0dp"
-        android:orientation="vertical" />
+        />
+
+    <!--<ListView-->
+        <!--android:id="@+id/assets_list_test"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:divider="@null"-->
+        <!--android:dividerHeight="0dp"-->
+        <!--android:orientation="vertical" />-->
 
 </LinearLayout>

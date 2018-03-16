@@ -23,7 +23,7 @@
         <item name="android:textSize">20sp</item>
     </style>
 
-    //style for settings
+    <!--style for settings-->
     <style name="AppTheme.SettingActivity" parent="AppTheme">
         <item name="colorControlNormal">@color/checkboxColor</item>
         <item name="colorControlActivated">@color/checkboxColor</item>

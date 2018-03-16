@@ -48,5 +48,4 @@
     <string name="settings_order_by_signal_time_label">времени последнего сигнала</string>
     <string name="settings_order_by_signal_time_value" translatable="false">signal_time</string>
 
-
 </resources>

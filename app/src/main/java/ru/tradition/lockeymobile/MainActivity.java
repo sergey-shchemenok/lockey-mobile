@@ -387,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements
                     LatLngBounds bounds = builder.build();
 
                     //Then obtain a movement description object by using the factory: CameraUpdateFactory:
-                    int padding = 0; // offset from edges of the map in pixels
+                    int padding = 5; // offset from edges of the map in pixels
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                     changeModeToNormal();
                     updateListView();

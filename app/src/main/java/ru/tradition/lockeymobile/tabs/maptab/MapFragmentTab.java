@@ -4,7 +4,9 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 
@@ -27,13 +31,16 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.AppData;
-import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsDataAdapter;
+
+import static ru.tradition.lockeymobile.AppData.mAssetData;
 
 
 /**
@@ -51,8 +58,12 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
 
     boolean mapReady = false;
 
-    //add fab button
-    private FloatingActionButton fab;
+    //add fabLayers button
+    private FloatingActionButton fabLayers;
+
+    //add fab bottom drawer button
+    private FloatingActionButton fabBottomDrawer;
+
     private int mapType = GoogleMap.MAP_TYPE_NORMAL;
 
     private static TreeMap<Integer, Marker> markers = new TreeMap<>();
@@ -124,19 +135,73 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        rootView = inflater.inflate(R.layout.tab_fragment_map, container, false);
+        rootView = inflater.inflate(R.layout.tab_fragment_map_drawer, container, false);
         // Inflate the layout for this fragment
 
-        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        fabLayers = (FloatingActionButton) rootView.findViewById(R.id.fab_layers);
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        fabBottomDrawer = (FloatingActionButton) rootView.findViewById(R.id.fab_bottom_drawer);
+
+        //for drawer
+        // get the bottom sheet view
+        LinearLayout llBottomSheet = (LinearLayout) rootView.findViewById(R.id.bottom_sheet);
+
+        // init the bottom sheet behavior
+        final BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
+
+        // change the state of the bottom sheet
+//        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+//        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+
+        // set the peek height
+//        bottomSheetBehavior.setPeekHeight(340);
+
+        // set hideable or not
+        bottomSheetBehavior.setHideable(true);
+
+//        bottomSheetBehavior.setSkipCollapsed(true);
+
+        // set callback for changes
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+//                if (BottomSheetBehavior.STATE_DRAGGING == newState) {
+//                    fabBottomDrawer.animate().scaleX(0).scaleY(0).setDuration(300).start();
+//                } else if (BottomSheetBehavior.STATE_COLLAPSED == newState || BottomSheetBehavior.STATE_HIDDEN == newState) {
+//                    fabBottomDrawer.animate().scaleX(1).scaleY(1).setDuration(300).start();
+//                }
+                if (BottomSheetBehavior.STATE_COLLAPSED == newState || BottomSheetBehavior.STATE_HIDDEN == newState) {
+                    fabBottomDrawer.animate().scaleX(1).scaleY(1).setDuration(100).start();
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                bottomSheetBehavior.getPeekHeight();
+                if (slideOffset >= 0)
+                    fabBottomDrawer.animate().scaleX(1 - slideOffset).scaleY(1 - slideOffset).setDuration(0).start();
+                //fabBottomDrawer.animate().scaleX(1 - Math.abs(slideOffset)).scaleY(1 - Math.abs(slideOffset)).setDuration(0).start();
+
+            }
+        });
+
+        fabBottomDrawer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
+
+
+        fabLayers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mapReady && AppData.m_map != null) {
                     if (mapType == GoogleMap.MAP_TYPE_NORMAL) {
                         AppData.m_map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                         mapType = GoogleMap.MAP_TYPE_SATELLITE;
-                    } else if (mapType == GoogleMap.MAP_TYPE_SATELLITE){
+                    } else if (mapType == GoogleMap.MAP_TYPE_SATELLITE) {
                         AppData.m_map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                         mapType = GoogleMap.MAP_TYPE_HYBRID;
                     } else {
@@ -147,7 +212,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        fab.setOnLongClickListener(new View.OnLongClickListener() {
+        fabLayers.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -157,13 +222,21 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback {
                 }
                 LatLngBounds bounds = builder.build();
 
-                int padding = 0; // offset from edges of the map in pixels
+                int padding = 5; // offset from edges of the map in pixels
                 CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
 
                 AppData.m_map.animateCamera(cu);
                 return true;
             }
         });
+
+        //fake data. Should be changed
+        ListView assetsListView = (ListView) rootView.findViewById(R.id.assets_list_test);
+
+        AssetsDataAdapter assetsDataAdapter = new AssetsDataAdapter(getActivity(), new ArrayList<AssetsData>());
+        assetsListView.setAdapter(assetsDataAdapter);
+
+        assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
 
         return rootView;
     }

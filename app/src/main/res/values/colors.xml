@@ -19,10 +19,10 @@
     <color name="checkboxColor">#6f6f6f</color>
 
     <!-- Fab ripple color -->
-    <color name="fab_back">#82b4bac0</color>
+    <color name="fab_back">#b4ffffff</color>
 
     <!-- Fab backgorund color -->
-    <color name="fab_ripple">#822d2f31</color>
+    <color name="fab_ripple">#f1e0e4e9</color>
 
     <!-- Text color for the content in assets table list -->
     <color name="assetTableContentColor">#2B3D4D</color>

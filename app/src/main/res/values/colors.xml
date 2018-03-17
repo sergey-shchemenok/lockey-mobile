@@ -50,6 +50,12 @@
     <!-- Text color for the notification body -->
     <color name="notificationBodyColor">#797e83</color>
 
+    <!-- Geofence border -->
+    <color name="geofence_border">#21a30d</color>
+
+    <!-- Geofence filling -->
+    <color name="geofence_filling">#6421a30d</color>
+
     <!--to delete after testing-->
     <!--Material Greens-->
     <!--In between colors were created with this tool:-->

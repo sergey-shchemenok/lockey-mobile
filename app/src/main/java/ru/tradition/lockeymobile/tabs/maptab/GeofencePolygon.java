@@ -7,12 +7,18 @@ import com.google.android.gms.maps.model.LatLng;
  */
 
 public class GeofencePolygon {
-    String polygonName;
-    LatLng[] polygon;
+    private int geofence_id;
+    private String polygonName;
+    private LatLng[] polygon;
 
-    public GeofencePolygon(String polygonName, LatLng... polygon) {
+    public GeofencePolygon(int geofence_id, String polygonName, LatLng... polygon) {
+        this.geofence_id = geofence_id;
         this.polygonName = polygonName;
         this.polygon = polygon;
+    }
+
+    public int getGeofence_id() {
+        return geofence_id;
     }
 
     public String getPolygonName() {

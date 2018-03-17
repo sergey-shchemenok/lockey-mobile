@@ -16,12 +16,14 @@
 package ru.tradition.lockeymobile.tabs.maptab;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -31,12 +33,12 @@ import ru.tradition.lockeymobile.R;
 /**
  * We couldn't come up with a good name for this class. Then, we realized
  * that this lesson is about RecyclerView.
- *
+ * <p>
  * RecyclerView... Recycling... Saving the planet? Being green? Anyone?
  * #crickets
- *
+ * <p>
  * Avoid unnecessary garbage collection by using RecyclerView and ViewHolders.
- *
+ * <p>
  * If you don't like our puns, we named this Adapter GeofencePolygonAdapter because its
  * contents are green.
  */
@@ -100,6 +102,7 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
 
     // COMPLETED (1) Add an interface called ListItemClickListener
     // COMPLETED (2) Within that interface, define a void method called onListItemClick that takes an int as a parameter
+
     /**
      * The interface that receives onClick messages.
      */
@@ -108,12 +111,13 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
     }
 
     // COMPLETED (4) Add a ListItemClickListener as a parameter to the constructor and store it in mOnClickListener
+
     /**
      * Constructor for GeofencePolygonAdapter that accepts a number of items to display and the specification
      * for the ListItemClickListener.
      *
      * @param numberOfItems Number of items to display in list
-     * @param listener Listener for list item clicks
+     * @param listener      Listener for list item clicks
      */
     public GeofencePolygonAdapter(ArrayList<GeofencePolygon> geofencePolygons, ListItemClickListener listener) {
         mGeofencePolygons = geofencePolygons;
@@ -122,7 +126,6 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
     }
 
     /**
-     *
      * This gets called when each new ViewHolder is created. This happens when the RecyclerView
      * is laid out. Enough ViewHolders will be created to fill the screen and allow for scrolling.
      *
@@ -143,9 +146,12 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
         View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
         PolygonNameViewHolder viewHolder = new PolygonNameViewHolder(view);
 
-        int backgroundColorForViewHolder = ColorUtils
-                .getViewHolderBackgroundColorFromInstance(context, viewHolderCount);
-        viewHolder.itemView.setBackgroundColor(backgroundColorForViewHolder);
+//        int backgroundColorForViewHolder = ColorUtils
+//                .getViewHolderBackgroundColorFromInstance(context, viewHolderCount);
+//        viewHolder.itemView.setBackgroundColor(backgroundColorForViewHolder);
+
+        viewHolder.polygonViewHolder.setBackgroundColor(Color.WHITE);
+
 
         viewHolderCount++;
         Log.d(LOG_TAG, "onCreateViewHolder: number of ViewHolders created: "
@@ -166,7 +172,13 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
     @Override
     public void onBindViewHolder(PolygonNameViewHolder holder, int position) {
         Log.d(LOG_TAG, "#" + position);
-        holder.bind(position);
+        if (holder != null) {
+            if (position == MapFragmentTab.polygonNamesNumber)
+                holder.setColorGray();
+            else
+                holder.setColorWhite();
+            holder.bind(position);
+        }
     }
 
     /**
@@ -180,12 +192,16 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
         return mGeofencePolygons.size();
     }
 
+
     // COMPLETED (5) Implement OnClickListener in the PolygonNameViewHolder class
+
     /**
      * Cache of the children views for a list item.
      */
     class PolygonNameViewHolder extends RecyclerView.ViewHolder
-        implements OnClickListener {
+            implements OnClickListener {
+
+        LinearLayout polygonViewHolder;
 
         // Will display the position in the list, ie 0 through getItemCount() - 1
         TextView polygonNameView;
@@ -194,35 +210,53 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
          * Constructor for our ViewHolder. Within this constructor, we get a reference to our
          * TextViews and set an onClickListener to listen for clicks. Those will be handled in the
          * onClick method below.
+         *
          * @param itemView The View that you inflated in
          *                 {@link GeofencePolygonAdapter#onCreateViewHolder(ViewGroup, int)}
          */
         public PolygonNameViewHolder(View itemView) {
             super(itemView);
             polygonNameView = (TextView) itemView.findViewById(R.id.polygon_name);
-            // COMPLETED (7) Call setOnClickListener on the View passed into the constructor (use 'this' as the OnClickListener)
-            itemView.setOnClickListener(this);
+            polygonViewHolder = (LinearLayout) itemView.findViewById(R.id.polygon_viewholder);
+            polygonViewHolder.setOnClickListener(this);
         }
 
         /**
          * A method we wrote for convenience. This method will take an integer as input and
          * use that integer to display the appropriate text within a list item.
+         *
          * @param listIndex Position of the item in the list
          */
         void bind(int position) {
             polygonNameView.setText(mGeofencePolygons.get(position).getPolygonName());
         }
 
+        void setColorGray() {
+            polygonViewHolder.setBackgroundColor(Color.LTGRAY);
+        }
+
+        void setColorWhite() {
+            polygonViewHolder.setBackgroundColor(Color.WHITE);
+        }
+
 
         // COMPLETED (6) Override onClick, passing the clicked item's position (getAdapterPosition()) to mOnClickListener via its onListItemClick method
+
         /**
          * Called whenever a user clicks on an item in the list.
+         *
          * @param v The View that was clicked
          */
         @Override
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
             mOnClickListener.onListItemClick(clickedPosition);
+            if (clickedPosition == MapFragmentTab.polygonNamesNumber)
+                setColorGray();
+            else
+                setColorWhite();
+//            MapFragmentTab.mAdapter.onBindViewHolder(this, clickedPosition++);
         }
+
     }
 }

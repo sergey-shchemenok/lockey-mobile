@@ -17,8 +17,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
+    android:id="@+id/polygon_viewholder"
     android:layout_height="60dp"
-    android:padding="16dp">
+    android:padding="8dp">
 
     <TextView
         android:id="@+id/polygon_name"
@@ -26,7 +27,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|start"
         android:fontFamily="sans-serif-medium"
-        android:textAppearance="?android:textAppearanceMedium"
+        android:textColor="@color/notificationTitleColor"
+        android:textAppearance="?android:textAppearanceSmall"
         tools:text="МКАД" />
 
 </LinearLayout>

@@ -243,109 +243,87 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         mPolygonsList.setHasFixedSize(true);
 
         fakeList = new ArrayList<>();
-        fakeList.add(new GeofencePolygon(21, "МКАД1",
-                new LatLng(55.572560364514594, 37.60004794177246),
-                new LatLng(55.59429373522563, 37.50666415270996),
-                new LatLng(55.63539896560563, 37.45997225817871),
-                new LatLng(55.72985487342488, 37.373454924194334),
-                new LatLng(55.8618643459282, 37.400920744506834),
-                new LatLng(55.910386676275145, 37.56983553942871),
-                new LatLng(55.88959881965586, 37.70991122302246),
-                new LatLng(55.819453970015424, 37.83900057849121),
-                new LatLng(55.647024698634446, 37.83625399645996)
+        fakeList.add(new GeofencePolygon(21, "МКАД",
+                new LatLng(55.57562233895321, 37.59931400583514),
+                new LatLng(55.5965780907678, 37.51367056907543),
+                new LatLng(55.63613065941571, 37.460112219466055),
+                new LatLng(55.69190167482748, 37.413420324934805),
+                new LatLng(55.71124802627249, 37.38732779563793),
+                new LatLng(55.75145776796834, 37.36810172141918),
+                new LatLng(55.786993409326605, 37.372221594466055),
+                new LatLng(55.81092307423466, 37.39007437766918),
+                new LatLng(55.841007252919766, 37.396940832747305),
+                new LatLng(55.85950903121015, 37.399687414778555),
+                new LatLng(55.881083308630785, 37.45049918235668),
+                new LatLng(55.88570480889632, 37.48895133079418),
+                new LatLng(55.90572495239638, 37.528776770247305),
+                new LatLng(55.90880405762271, 37.583708410872305),
+                new LatLng(55.89725615242213, 37.64275992454418),
+                new LatLng(55.89186595335763, 37.70593131126293),
+                new LatLng(55.82481097085516, 37.83776724876293),
+                new LatLng(55.71666328863865, 37.841887121809805),
+                new LatLng(55.69654567259541, 37.833647375716055),
+                new LatLng(55.65318023530563, 37.84326041282543),
+                new LatLng(55.572516831562154, 37.69219840110668),
+                new LatLng(55.56941107857544, 37.671599035872305)
         ));
         fakeList.add(new GeofencePolygon(25, "Нижний Новгород",
-                new LatLng(55.572560364514594, 37.60004794177246),
-                new LatLng(55.59429373522563, 37.50666415270996),
-                new LatLng(55.72985487342488, 37.373454924194334),
-                new LatLng(55.8618643459282, 37.400920744506834),
-                new LatLng(55.88959881965586, 37.70991122302246),
-                new LatLng(55.819453970015424, 37.83900057849121)
-        ));
+                new LatLng(56.30411772619058, 43.69103165174192),
+                new LatLng(56.380229864152, 43.82923465052909),
+                new LatLng(56.41139196413391, 44.01600222865409),
+                new LatLng(56.3513251385113, 44.23572879115409),
+                new LatLng(56.158321176743996, 44.23435550013846),
+                new LatLng(56.06413731314753, 44.11762576381034),
+                new LatLng(56.134605503455326, 43.74546389857596)
+
+                ));
         fakeList.add(new GeofencePolygon(28, "Офис",
-                new LatLng(55.59429373522563, 37.50666415270996),
-                new LatLng(55.63539896560563, 37.45997225817871),
-                new LatLng(55.8618643459282, 37.400920744506834),
-                new LatLng(55.910386676275145, 37.56983553942871),
-                new LatLng(55.819453970015424, 37.83900057849121)
+                new LatLng(55.588120214087816, 37.65351380514278),
+                new LatLng(55.588768979013835, 37.65327777074947),
+                new LatLng(55.588835673865624, 37.653889314404864),
+                new LatLng(55.58818691004207, 37.654114619962115)
         ));
-        fakeList.add(new GeofencePolygon(31, "МКАД",
-                new LatLng(55.572560364514594, 37.60004794177246),
-                new LatLng(55.59429373522563, 37.50666415270996),
-                new LatLng(55.63539896560563, 37.45997225817871),
-                new LatLng(55.72985487342488, 37.373454924194334),
-                new LatLng(55.8618643459282, 37.400920744506834),
-                new LatLng(55.910386676275145, 37.56983553942871),
-                new LatLng(55.88959881965586, 37.70991122302246),
-                new LatLng(55.819453970015424, 37.83900057849121),
-                new LatLng(55.647024698634446, 37.83625399645996)
+        fakeList.add(new GeofencePolygon(31, "Центр",
+                new LatLng(55.760591030877904, 31.340907338621832),
+                new LatLng(56.90548719520857, 30.813563588621832),
+                new LatLng(58.17889441594721, 33.67000890112183),
+                new LatLng(58.86725629527061, 36.96590733862183),
+                new LatLng(58.54770155778007, 41.00887608862183),
+                new LatLng(56.22755986468746, 42.76668858862183),
+                new LatLng(53.88759714051711, 42.37118077612183),
+                new LatLng(53.02412807774639, 37.71297765112183),
+                new LatLng(54.19724425694539, 33.58211827612183)
         ));
         fakeList.add(new GeofencePolygon(35, "Стройка 12",
-                new LatLng(55.572560364514594, 37.60004794177246),
-                new LatLng(55.59429373522563, 37.50666415270996),
-                new LatLng(55.72985487342488, 37.373454924194334),
-                new LatLng(55.8618643459282, 37.400920744506834),
-                new LatLng(55.88959881965586, 37.70991122302246),
-                new LatLng(55.819453970015424, 37.83900057849121)
+                new LatLng(55.61587297858232, 37.46164675179648),
+                new LatLng(55.62086526490709, 37.46387834969687),
+                new LatLng(55.62081679916385, 37.47383470956015),
+                new LatLng(55.61514589356092, 37.475980476772065)
         ));
         fakeList.add(new GeofencePolygon(38, "Московская область",
-                new LatLng(55.59429373522563, 37.50666415270996),
-                new LatLng(55.63539896560563, 37.45997225817871),
-                new LatLng(55.8618643459282, 37.400920744506834),
-                new LatLng(55.910386676275145, 37.56983553942871),
-                new LatLng(55.819453970015424, 37.83900057849121)
+                new LatLng(55.27574067614793, 35.36139002637526),
+                new LatLng(56.39846583288372, 35.62506190137526),
+                new LatLng(56.92975473224751, 37.64654627637526),
+                new LatLng(56.71331433143086, 38.30572596387526),
+                new LatLng(55.908952332380316, 38.70123377637526),
+                new LatLng(55.81030003082483, 39.93170252637526),
+                new LatLng(55.26322247267056, 40.28326502637526),
+                new LatLng(54.30024741518173, 38.78912440137526),
+                new LatLng(54.835251662420234, 37.95416346387526),
+                new LatLng(54.75925202850601, 37.38287440137526),
+                new LatLng(55.26322247267056, 36.67974940137526),
+                new LatLng(55.16293474516506, 35.36139002637526)
         ));
-        fakeList.add(new GeofencePolygon(41, "МКАД7",
-                new LatLng(55.572560364514594, 37.60004794177246),
-                new LatLng(55.59429373522563, 37.50666415270996),
-                new LatLng(55.63539896560563, 37.45997225817871),
-                new LatLng(55.72985487342488, 37.373454924194334),
-                new LatLng(55.8618643459282, 37.400920744506834),
-                new LatLng(55.910386676275145, 37.56983553942871),
-                new LatLng(55.88959881965586, 37.70991122302246),
-                new LatLng(55.819453970015424, 37.83900057849121),
-                new LatLng(55.647024698634446, 37.83625399645996)
-        ));
-        fakeList.add(new GeofencePolygon(45, "МКАД8",
-                new LatLng(55.572560364514594, 37.60004794177246),
-                new LatLng(55.59429373522563, 37.50666415270996),
-                new LatLng(55.72985487342488, 37.373454924194334),
-                new LatLng(55.8618643459282, 37.400920744506834),
-                new LatLng(55.88959881965586, 37.70991122302246),
-                new LatLng(55.819453970015424, 37.83900057849121)
-        ));
-        fakeList.add(new GeofencePolygon(48, "МКАД9",
-                new LatLng(55.59429373522563, 37.50666415270996),
-                new LatLng(55.63539896560563, 37.45997225817871),
-                new LatLng(55.8618643459282, 37.400920744506834),
-                new LatLng(55.910386676275145, 37.56983553942871),
-                new LatLng(55.819453970015424, 37.83900057849121)
-        ));
-        fakeList.add(new GeofencePolygon(51, "МКАД10",
-                new LatLng(55.572560364514594, 37.60004794177246),
-                new LatLng(55.59429373522563, 37.50666415270996),
-                new LatLng(55.63539896560563, 37.45997225817871),
-                new LatLng(55.72985487342488, 37.373454924194334),
-                new LatLng(55.8618643459282, 37.400920744506834),
-                new LatLng(55.910386676275145, 37.56983553942871),
-                new LatLng(55.88959881965586, 37.70991122302246),
-                new LatLng(55.819453970015424, 37.83900057849121),
-                new LatLng(55.647024698634446, 37.83625399645996)
-        ));
-        fakeList.add(new GeofencePolygon(55, "МКАД11",
-                new LatLng(55.572560364514594, 37.60004794177246),
-                new LatLng(55.59429373522563, 37.50666415270996),
-                new LatLng(55.72985487342488, 37.373454924194334),
-                new LatLng(55.8618643459282, 37.400920744506834),
-                new LatLng(55.88959881965586, 37.70991122302246),
-                new LatLng(55.819453970015424, 37.83900057849121)
-        ));
-        fakeList.add(new GeofencePolygon(58, "МКАД12",
-                new LatLng(55.59429373522563, 37.50666415270996),
-                new LatLng(55.63539896560563, 37.45997225817871),
-                new LatLng(55.8618643459282, 37.400920744506834),
-                new LatLng(55.910386676275145, 37.56983553942871),
-                new LatLng(55.819453970015424, 37.83900057849121)
+        fakeList.add(new GeofencePolygon(41, "Национальный парк",
+                new LatLng(63.043406922092856, 36.23426996166063),
+                new LatLng(63.29629615315988, 36.24525628978563),
+                new LatLng(63.54698574915778, 36.51991449291063),
+                new LatLng(63.537196046466725, 36.80555902416063),
+                new LatLng(63.22709522026023, 36.99232660228563),
+                new LatLng(63.02846227771947, 37.49769769603563),
+                new LatLng(62.67252899731627, 37.31093011791063),
+                new LatLng(62.26117310623878, 37.17909418041063),
+                new LatLng(62.11765459299115, 36.75062738353563)
         ));
 
         mAdapter = new GeofencePolygonAdapter(fakeList, this);
@@ -360,7 +338,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 
 
     //helper method to clear polygon set
-    private void clearPolygonSet(){
+    private void clearPolygonSet() {
         if (!polygons.isEmpty()) {
             for (Map.Entry<Integer, Polygon> pair : polygons.entrySet())
                 pair.getValue().remove();
@@ -380,17 +358,17 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
             }
             if (polygonNamesNumber != clickedItemIndex) {
                 GeofencePolygon geof = fakeList.get(clickedItemIndex);
-                LatLng[] latLng = geof.getPolygon();
+                LatLng[] latLngArray = geof.getPolygon();
 
                 PolygonOptions popt = new PolygonOptions().geodesic(true);
 
-                for (LatLng ll : latLng) {
-                    popt.add(ll);
+                for (LatLng point : latLngArray) {
+                    popt.add(point);
                 }
-                Polygon p = AppData.m_map.addPolygon(popt);
-                polygons.put(geof.getGeofence_id(), p);
-                p.setFillColor(Color.parseColor("#6421a30d"));
-                p.setStrokeColor(Color.parseColor("#FF21A30D"));
+                Polygon geozone = AppData.m_map.addPolygon(popt);
+                polygons.put(geof.getGeofence_id(), geozone);
+                geozone.setFillColor(Color.parseColor("#6421a30d"));
+                geozone.setStrokeColor(Color.parseColor("#FF21A30D"));
                 int lastPosition = polygonNamesNumber;
                 polygonNamesNumber = clickedItemIndex;
                 if (lastPosition >= 0) {
@@ -402,13 +380,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
             } else {
                 polygonNamesNumber = -1;
             }
-
-//            mAdapter = new GeofencePolygonAdapter(fakeList, this);
-//            mPolygonsList.setAdapter(mAdapter);
-//            GeofencePolygonAdapter.PolygonNameViewHolder vh = (GeofencePolygonAdapter.PolygonNameViewHolder) mPolygonsList.findViewHolderForAdapterPosition(clickedItemIndex);
-//            mAdapter.onBindViewHolder(vh, clickedItemIndex);
-
-
         }
     }
 

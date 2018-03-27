@@ -159,12 +159,8 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 //                }
                 if (BottomSheetBehavior.STATE_COLLAPSED == newState || BottomSheetBehavior.STATE_HIDDEN == newState) {
                     fabBottomDrawer.animate().scaleX(1).scaleY(1).setDuration(100).start();
-                    if (!polygons.isEmpty()) {
-                        for (Map.Entry<Integer, Polygon> pair : polygons.entrySet())
-                            pair.getValue().remove();
-                        polygons.clear();
-                    }
-                    polygonNamesNumber = -1;
+                    clearPolygonSet();
+                    mAdapter.notifyDataSetChanged();
                 }
 
 
@@ -356,29 +352,26 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         mPolygonsList.setAdapter(mAdapter);
 
         //to remove zones after rotation
-        if (!polygons.isEmpty()) {
-            for (Map.Entry<Integer, Polygon> pair : polygons.entrySet())
-                pair.getValue().remove();
-            polygons.clear();
-        }
-        polygonNamesNumber = -1;
-
+        clearPolygonSet();
         return rootView;
     }
 
     private ArrayList<GeofencePolygon> fakeList;
 
 
+    //helper method to clear polygon set
+    private void clearPolygonSet(){
+        if (!polygons.isEmpty()) {
+            for (Map.Entry<Integer, Polygon> pair : polygons.entrySet())
+                pair.getValue().remove();
+            polygons.clear();
+        }
+        polygonNamesNumber = -1;
+    }
+
+
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-        String toastMessage = "Item #" + clickedItemIndex + " clicked.";
-        mToast = Toast.makeText(getActivity(), toastMessage, Toast.LENGTH_LONG);
-
-        mToast.show();
-
         if (AppData.m_map != null) {
             if (!polygons.isEmpty()) {
                 for (Map.Entry<Integer, Polygon> pair : polygons.entrySet())
@@ -401,8 +394,9 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 int lastPosition = polygonNamesNumber;
                 polygonNamesNumber = clickedItemIndex;
                 if (lastPosition >= 0) {
-                    GeofencePolygonAdapter.PolygonNameViewHolder vh = (GeofencePolygonAdapter.PolygonNameViewHolder) mPolygonsList.findViewHolderForAdapterPosition(lastPosition);
-                    mAdapter.onBindViewHolder(vh, lastPosition);
+//                    GeofencePolygonAdapter.PolygonNameViewHolder vh = (GeofencePolygonAdapter.PolygonNameViewHolder) mPolygonsList.findViewHolderForAdapterPosition(lastPosition);
+//                    mAdapter.onBindViewHolder(vh, lastPosition);
+                    mAdapter.notifyDataSetChanged();
                 }
 
             } else {

@@ -291,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements
     //update the list of assets
     public void updateListView() {
         AssetsFragmentTab.assetsDataAdapter.clear();
+        //AssetsFragmentTab.assetsDataAdapter.notifyDataSetChanged();
         Log.i(LOG_TAG, "order by list..........." + getString(R.string.settings_order_by_kit_id_value));
         if (orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
             AssetsFragmentTab.assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));

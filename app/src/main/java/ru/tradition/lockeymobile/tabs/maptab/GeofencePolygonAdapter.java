@@ -30,78 +30,20 @@ import java.util.ArrayList;
 
 import ru.tradition.lockeymobile.R;
 
-/**
- * We couldn't come up with a good name for this class. Then, we realized
- * that this lesson is about RecyclerView.
- * <p>
- * RecyclerView... Recycling... Saving the planet? Being green? Anyone?
- * #crickets
- * <p>
- * Avoid unnecessary garbage collection by using RecyclerView and ViewHolders.
- * <p>
- * If you don't like our puns, we named this Adapter GeofencePolygonAdapter because its
- * contents are green.
- */
 public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygonAdapter.PolygonNameViewHolder> {
 
     private static final String LOG_TAG = GeofencePolygonAdapter.class.getSimpleName();
 
-    // COMPLETED (3) Create a final private ListItemClickListener called mOnClickListener
     /*
      * An on-click handler that we've defined to make it easy for an Activity to interface with
      * our RecyclerView
      */
     final private ListItemClickListener mOnClickListener;
 
-    /*
-     * The number of ViewHolders that have been created. Typically, you can figure out how many
-     * there should be by determining how many list items fit on your screen at once and add 2 to 4
-     * to that number. That isn't the exact formula, but will give you an idea of how many
-     * ViewHolders have been created to display any given RecyclerView.
-     *
-     * Here's some ASCII art to hopefully help you understand:
-     *
-     *    ViewHolders on screen:
-     *
-     *        *-----------------------------*
-     *        |         ViewHolder index: 0 |
-     *        *-----------------------------*
-     *        |         ViewHolder index: 1 |
-     *        *-----------------------------*
-     *        |         ViewHolder index: 2 |
-     *        *-----------------------------*
-     *        |         ViewHolder index: 3 |
-     *        *-----------------------------*
-     *        |         ViewHolder index: 4 |
-     *        *-----------------------------*
-     *        |         ViewHolder index: 5 |
-     *        *-----------------------------*
-     *        |         ViewHolder index: 6 |
-     *        *-----------------------------*
-     *        |         ViewHolder index: 7 |
-     *        *-----------------------------*
-     *
-     *    Extra ViewHolders (off screen)
-     *
-     *        *-----------------------------*
-     *        |         ViewHolder index: 8 |
-     *        *-----------------------------*
-     *        |         ViewHolder index: 9 |
-     *        *-----------------------------*
-     *        |         ViewHolder index: 10|
-     *        *-----------------------------*
-     *        |         ViewHolder index: 11|
-     *        *-----------------------------*
-     *
-     *    Total number of ViewHolders = 11
-     */
     private static int viewHolderCount;
 
     //list of polygons for geofencing
     private ArrayList<GeofencePolygon> mGeofencePolygons;
-
-    // COMPLETED (1) Add an interface called ListItemClickListener
-    // COMPLETED (2) Within that interface, define a void method called onListItemClick that takes an int as a parameter
 
     /**
      * The interface that receives onClick messages.
@@ -110,7 +52,6 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
         void onListItemClick(int clickedItemIndex);
     }
 
-    // COMPLETED (4) Add a ListItemClickListener as a parameter to the constructor and store it in mOnClickListener
 
     /**
      * Constructor for GeofencePolygonAdapter that accepts a number of items to display and the specification
@@ -146,7 +87,6 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
         View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
         PolygonNameViewHolder viewHolder = new PolygonNameViewHolder(view);
 
-//        int backgroundColorForViewHolder = ColorUtils
 //                .getViewHolderBackgroundColorFromInstance(context, viewHolderCount);
 //        viewHolder.itemView.setBackgroundColor(backgroundColorForViewHolder);
 

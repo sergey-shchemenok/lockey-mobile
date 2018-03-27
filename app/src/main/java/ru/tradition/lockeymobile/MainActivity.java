@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -232,15 +233,9 @@ public class MainActivity extends AppCompatActivity implements
                     if (AppData.isAssetSelectingMode && position != 0) {
                         changeModeToNormal();
                         updateListView();
-//                        if (position == 1) {
-//                            AppData.mMenu.getItem(1).setVisible(false);
-//                        }
                     } else if (AppData.isNotificationSelectingMode && position != 2) {
                         changeModeToNormal();
                         NotificationsFragmentTab.nft.updateList();
-//                        if (position == 1) {
-//                            AppData.mMenu.getItem(1).setVisible(false);
-//                        }
                     }
 
                     if (!AppData.isAssetSelectingMode && position == 0) {
@@ -251,6 +246,10 @@ public class MainActivity extends AppCompatActivity implements
                     }
                     if (position == 1) {
                         AppData.mMenu.getItem(1).setVisible(false);
+                    }
+
+                    if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                        MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                     }
 
                 }
@@ -453,6 +452,8 @@ public class MainActivity extends AppCompatActivity implements
         } else if (AppData.isNotificationSelectingMode) {
             changeModeToNormal();
             NotificationsFragmentTab.nft.updateList();
+        } else if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         } else
             logout();
     }

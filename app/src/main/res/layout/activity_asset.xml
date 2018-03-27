@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -10,14 +10,13 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
-            xmlns:android="http://schemas.android.com/apk/res/android"
+        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:background="@color/colorPrimary"
             app:titleTextAppearance="@style/Toolbar.TitleText"
-            app:titleTextColor="@android:color/white"
-            android:background="@color/colorPrimary" />
+            app:titleTextColor="@android:color/white" />
 
 
         <LinearLayout
@@ -33,8 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:paddingBottom="16dp"
-                >
+                android:paddingBottom="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -50,9 +48,9 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:gravity="end"
-                    android:textAlignment="viewEnd"
                     android:maxLines="1"
                     android:paddingLeft="16dp"
+                    android:textAlignment="viewEnd"
                     android:textColor="@color/assetTableContentColor"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -153,69 +151,39 @@
             </LinearLayout>
 
 
-            <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:orientation="horizontal"-->
-            <!--android:paddingBottom="16dp">-->
-
-            <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="ВПС: "-->
-            <!--android:textAllCaps="true"-->
-            <!--android:textColor="@color/assetTableHeaderColor"-->
-            <!--android:textSize="12sp"-->
-            <!--android:textStyle="bold"-->
-
-            <!--/>-->
-
-            <!--<TextView-->
-            <!--android:id="@+id/asset_last_time"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:ellipsize="end"-->
-            <!--android:gravity="end"-->
-            <!--android:maxLines="1"-->
-            <!--android:paddingLeft="16dp"-->
-            <!--android:textAlignment="viewEnd"-->
-            <!--android:textColor="@color/assetTableContentColor"-->
-            <!--android:textSize="24sp"-->
-            <!--android:textStyle="bold"-->
-            <!--tools:text="0" />-->
-
-            <!--</LinearLayout>-->
-
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
 
                 android:orientation="horizontal">
 
                 <Button
-                    android:id="@+id/activity_asset_command1"
+                    android:id="@+id/activity_asset_to_map"
                     android:layout_width="wrap_content"
                     android:layout_height="32dp"
-                    android:layout_marginTop="8dp"
                     android:layout_marginRight="16dp"
+                    android:layout_marginTop="8dp"
                     android:background="@color/colorAccent"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:text="На карте"
                     android:textColor="@android:color/white" />
 
-                <!--<Button-->
-                    <!--android:id="@+id/activity_asset_command2"-->
-                    <!--android:layout_width="0dp"-->
-                    <!--android:layout_height="32dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:background="@color/colorAccent"-->
-                    <!--android:ellipsize="end"-->
-                    <!--android:maxLines="1"-->
-                    <!--android:text="Команда 2"-->
-                    <!--android:textColor="@android:color/white" />-->
+                <Button
+                    android:id="@+id/activity_asset_block_engine"
+                    android:layout_width="136dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAccent"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="Заблокировать"
+                    android:textColor="@android:color/white" />
 
-            </LinearLayout>
+
+            </RelativeLayout>
 
         </LinearLayout>
 

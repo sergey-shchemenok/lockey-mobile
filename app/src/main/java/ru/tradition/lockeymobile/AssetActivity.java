@@ -10,10 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
 public class AssetActivity extends AppCompatActivity {
@@ -24,8 +20,8 @@ public class AssetActivity extends AppCompatActivity {
     //just for debugging
     private TextView lastTime;
 
-    private Button commandButton1;
-    private Button commandButton2;
+    private Button toMapButton;
+    private Button blockEngineButton;
 
     private AssetsData assetData;
 
@@ -52,8 +48,8 @@ public class AssetActivity extends AppCompatActivity {
         carModel = (TextView)findViewById(R.id.asset_car_model);
         name = (TextView)findViewById(R.id.asset_name);
         //lastTime = (TextView)findViewById(R.id.asset_last_time);
-        commandButton1 = (Button)findViewById(R.id.activity_asset_command1);
-        //commandButton2 = (Button)findViewById(R.id.activity_asset_command2);
+        toMapButton = (Button)findViewById(R.id.activity_asset_to_map);
+        blockEngineButton = (Button)findViewById(R.id.activity_asset_block_engine);
 
         assetData = (AssetsData) getIntent().getSerializableExtra("AssetData");
 
@@ -63,7 +59,7 @@ public class AssetActivity extends AppCompatActivity {
         name.setText(assetData.getName());
         //lastTime.setText(String.valueOf(assetData.getLastSignalTime()));
 
-        commandButton1.setOnClickListener(new View.OnClickListener() {
+        toMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AppData.isRepeated = false;
@@ -75,12 +71,12 @@ public class AssetActivity extends AppCompatActivity {
             }
         });
 
-//        commandButton2.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//            }
-//        });
+        blockEngineButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
 
     }

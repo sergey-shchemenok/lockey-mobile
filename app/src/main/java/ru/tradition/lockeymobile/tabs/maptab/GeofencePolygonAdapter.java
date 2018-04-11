@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import ru.tradition.lockeymobile.R;
 
@@ -43,7 +44,7 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
     private static int viewHolderCount;
 
     //list of polygons for geofencing
-    private ArrayList<GeofencePolygon> mGeofencePolygons;
+    private List<GeofencePolygon> mGeofencePolygons;
 
     /**
      * The interface that receives onClick messages.
@@ -60,7 +61,7 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
      * @param numberOfItems Number of items to display in list
      * @param listener      Listener for list item clicks
      */
-    public GeofencePolygonAdapter(ArrayList<GeofencePolygon> geofencePolygons, ListItemClickListener listener) {
+    public GeofencePolygonAdapter(List<GeofencePolygon> geofencePolygons, ListItemClickListener listener) {
         mGeofencePolygons = geofencePolygons;
         mOnClickListener = listener;
         viewHolderCount = 0;
@@ -129,7 +130,9 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
      */
     @Override
     public int getItemCount() {
-        return mGeofencePolygons.size();
+        if (mGeofencePolygons != null && !mGeofencePolygons.isEmpty())
+            return mGeofencePolygons.size();
+        else return 0;
     }
 
 

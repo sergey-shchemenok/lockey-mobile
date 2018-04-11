@@ -312,7 +312,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 new LatLng(62.11765459299115, 36.75062738353563)
         ));
 
-        mAdapter = new GeofencePolygonAdapter(fakeList, this);
+        mAdapter = new GeofencePolygonAdapter(AppData.polygonsList, this);
         mPolygonsList.setAdapter(mAdapter);
 
         //to remove zones after rotation
@@ -341,7 +341,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 polygons.clear();
             }
             if (polygonNamesNumber != clickedItemIndex) {
-                GeofencePolygon geof = fakeList.get(clickedItemIndex);
+                GeofencePolygon geof = AppData.polygonsList.get(clickedItemIndex);
                 LatLng[] latLngArray = geof.getPolygon();
 
                 PolygonOptions popt = new PolygonOptions().geodesic(true);

@@ -8,6 +8,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +16,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
+import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
 
 /**
  * Created by Caelestis on 28.01.2018.
@@ -28,6 +30,7 @@ public final class AppData {
 
     //Stores the response code for the request
     public static int assetsUrlResponseCode;
+    public static int zonesUrlResponseCode;
 
     //Here is the data from Loader about cars and other assets
     public static Map<Integer, AssetsData> mAssetData;
@@ -36,6 +39,9 @@ public final class AppData {
             .target(new LatLng(55.7522200, 37.6155600))
             .zoom(10)
             .build();
+
+    //Here is the data from Loader about geozones
+    public static List<GeofencePolygon> polygonsList;
 
     //This sets determines which kit is selected
     public static Set<Integer> selectedAsset = new TreeSet<>();
@@ -79,8 +85,4 @@ public final class AppData {
     public static final String ASSETS_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/Cars";
     public static final String AUTH_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/Auth";
     public static final String ZONES_LIST_URL = "http://my.lockey.ru/LockeyREST/api/Zone";
-
-
-
-
 }

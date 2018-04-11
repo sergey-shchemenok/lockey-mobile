@@ -32,13 +32,12 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
 
 import ru.tradition.lockeymobile.tabs.AppTabAdapter;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragmentTab;
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsLoader;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils;
+import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTab;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 
@@ -48,7 +47,7 @@ import static ru.tradition.lockeymobile.AppData.mAssetData;
 import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUrlResponseMessage;
 
 public class MainActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Map<Integer, AssetsData>>,
+        LoaderManager.LoaderCallbacks<LoadedData>,
         MapFragmentTab.OnFragmentInteractionListener,
         NotificationsFragmentTab.OnFragmentInteractionListener,
         AssetsFragmentTab.OnFragmentInteractionListener {
@@ -119,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements
 
         //launch loading data from server
         startLoader();
-
+        getZones();
     }
 
     //The method adds "up" button to toolbar
@@ -147,15 +146,22 @@ public class MainActivity extends AppCompatActivity implements
             loaderManager.initLoader(AppData.ASSETS_LOADER_ID, null, this);
             Log.i(LOG_TAG, "initLoader");
         } else {
-            progressCircle.setVisibility(View.GONE);
-            infoMessage.setVisibility(View.VISIBLE);
-            infoMessage.setText(R.string.no_connection);
             logout();
         }
     }
 
-    public void getZones() {
-
+    public void getZones(){
+        Log.i(LOG_TAG, "....getZones....");
+        activeNetwork = connectivityManager.getActiveNetworkInfo();
+        if (activeNetwork != null && activeNetwork.isConnected()) {
+            loaderManager = getLoaderManager();
+            loaderManager.initLoader(AppData.ZONES_LOADER_ID, null, this);
+            Log.i(LOG_TAG, "initLoader");
+        } else {
+            progressCircle.setVisibility(View.GONE);
+            infoMessage.setVisibility(View.VISIBLE);
+            infoMessage.setText(R.string.no_connection);
+        }
     }
 
     //For periodic data loading
@@ -174,28 +180,40 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public Loader<Map<Integer, AssetsData>> onCreateLoader(int loaderId, Bundle bundle) {
+    public Loader<LoadedData> onCreateLoader(int loaderId, Bundle bundle) {
         switch (loaderId) {
             case ASSETS_LOADER_ID:
                 // Create a new loader for the given URL
                 Log.i(LOG_TAG, "onCreateLoader");
-                return new AssetsLoader(this, AppData.ASSETS_REQUEST_URL);
+                return new DataLoader(this, AppData.ASSETS_REQUEST_URL, ASSETS_LOADER_ID);
             case ZONES_LOADER_ID:
-                return null;
+                return new DataLoader(this, AppData.ZONES_LIST_URL, ZONES_LOADER_ID);
             default:
                 return null;
         }
     }
 
     @Override
-    public void onLoadFinished(Loader<Map<Integer, AssetsData>> loader, Map<Integer, AssetsData> assetData) {
+    public void onLoadFinished(Loader<LoadedData> loader, LoadedData loadedData) {
+        if (loadedData.getPolygonsList() != null && !loadedData.getPolygonsList().isEmpty()) {
+            AppData.polygonsList = loadedData.getPolygonsList();
+            loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
+            return;
+        }
+        if (AppData.zonesUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED){
+            getZones();
+            return;
+        }
+
         // Set empty state text to display "No assets found."
-        progressCircle.setVisibility(View.GONE);
+        if (progressCircle.getVisibility() != View.GONE)
+            progressCircle.setVisibility(View.GONE);
 
         //whether it can be authorized. The token has not expired
         if (AppData.assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             AssetsQueryUtils.needToken = true;
         }
+
 
         //whether it has some problem
         if (AppData.assetsUrlResponseCode != HttpURLConnection.HTTP_OK &&
@@ -208,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements
 
         if (!AppData.isRepeated) {
             AppData.isFinished = true;
-            if (assetData == null || assetData.isEmpty()) {
+            if (loadedData.getAssetData() == null || loadedData.getAssetData().isEmpty()) {
                 if (AppData.mAssetData == null || AppData.mAssetData.isEmpty()) {
                     mEmptyStateTextView.setText(R.string.no_assets);
                     return;
@@ -216,25 +234,19 @@ public class MainActivity extends AppCompatActivity implements
                 Log.i(LOG_TAG, "the first load has finished with old data");
 
             } else {
-                AppData.mAssetData = assetData;
+                AppData.mAssetData = loadedData.getAssetData();
                 Log.i(LOG_TAG, "the first load has finished without mistakes");
 
             }
             mEmptyStateTextView.setText("");
             Log.i(LOG_TAG, "the first load has finished");
 
-            // Find the view pager that will allow the user to swipe between fragments
             AppData.viewPager = (ViewPager) findViewById(R.id.viewpager);
-            // Create an adapter that knows which fragment should be shown on each page
             adapter = new AppTabAdapter(this, getSupportFragmentManager());
-            // Set the adapter onto the view pager
             AppData.viewPager.setAdapter(adapter);
-            //assetsListView.setEmptyView(mEmptyStateTextView);
             TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-            // Connect the tab layout with the view pager.
             tabLayout.setupWithViewPager(AppData.viewPager);
 
-            //listen to tab changes
             AppData.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -291,11 +303,10 @@ public class MainActivity extends AppCompatActivity implements
 
         } else {
             Log.i(LOG_TAG, "the second load has finished");
-            if (assetData == null || assetData.isEmpty()) {
+            if (loadedData.getAssetData() == null || loadedData.getAssetData().isEmpty()) {
                 return;
             }
-            AppData.mAssetData = assetData;
-            //here is not good for speed
+            AppData.mAssetData = loadedData.getAssetData();
             updateListView();
         }
     }
@@ -323,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLoaderReset(Loader<Map<Integer, AssetsData>> loader) {
+    public void onLoaderReset(Loader<LoadedData> loader) {
         //AppData.mAssetData.clear();
         Log.i(LOG_TAG, "onLoadReset");
     }

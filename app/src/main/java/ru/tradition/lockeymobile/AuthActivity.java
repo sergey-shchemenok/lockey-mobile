@@ -1,6 +1,5 @@
 package ru.tradition.lockeymobile;
 
-import android.app.Activity;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Context;
@@ -293,7 +292,7 @@ public class AuthActivity extends AppCompatActivity
     private int mInterval = 1000 * 1; // 1 seconds by default, can be changed later
     private Handler mHandler;
 
-    Runnable mStatusChecker = new Runnable() {
+    Runnable mStatusOfNetworkChecker = new Runnable() {
         @Override
         public void run() {
             try {
@@ -308,17 +307,17 @@ public class AuthActivity extends AppCompatActivity
                     connectionStatusMessage.setText(R.string.no_connection);
                 }
             } finally {
-                mHandler.postDelayed(mStatusChecker, mInterval);
+                mHandler.postDelayed(mStatusOfNetworkChecker, mInterval);
             }
         }
     };
 
     void startRepeatingTask() {
-        mStatusChecker.run();
+        mStatusOfNetworkChecker.run();
     }
 
     void stopRepeatingTask() {
-        mHandler.removeCallbacks(mStatusChecker);
+        mHandler.removeCallbacks(mStatusOfNetworkChecker);
     }
     //end here
 

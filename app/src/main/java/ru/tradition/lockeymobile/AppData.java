@@ -71,12 +71,14 @@ public final class AppData {
      */
     public static final int ASSETS_LOADER_ID = 1;
     public static final int AUTH_LOADER_ID = 2;
+    public static final int ZONES_LOADER_ID = 3;
 
     /**
      * URL for assets data from server
      */
     public static final String ASSETS_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/Cars";
     public static final String AUTH_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/Auth";
+    public static final String ZONES_LIST_URL = "http://my.lockey.ru/LockeyREST/api/Zone";
 
 
 

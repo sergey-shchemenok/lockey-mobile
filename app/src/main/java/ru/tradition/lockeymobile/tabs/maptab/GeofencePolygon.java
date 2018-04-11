@@ -9,11 +9,13 @@ import com.google.android.gms.maps.model.LatLng;
 public class GeofencePolygon {
     private int geofence_id;
     private String polygonName;
+    private boolean isPrivate;
     private LatLng[] polygon;
 
-    public GeofencePolygon(int geofence_id, String polygonName, LatLng... polygon) {
+    public GeofencePolygon(int geofence_id, String polygonName, boolean isPrivate, LatLng... polygon) {
         this.geofence_id = geofence_id;
         this.polygonName = polygonName;
+        this.isPrivate = isPrivate;
         this.polygon = polygon;
     }
 
@@ -23,6 +25,10 @@ public class GeofencePolygon {
 
     public String getPolygonName() {
         return polygonName;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
     }
 
     public LatLng[] getPolygon() {

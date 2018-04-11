@@ -42,6 +42,8 @@ import ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTab;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 
+import static ru.tradition.lockeymobile.AppData.ASSETS_LOADER_ID;
+import static ru.tradition.lockeymobile.AppData.ZONES_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.mAssetData;
 import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUrlResponseMessage;
 
@@ -152,6 +154,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    public void getZones() {
+
+    }
+
     //For periodic data loading
     public synchronized void repeatLoader() {
         activeNetwork = connectivityManager.getActiveNetworkInfo();
@@ -168,10 +174,17 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public Loader<Map<Integer, AssetsData>> onCreateLoader(int i, Bundle bundle) {
-        // Create a new loader for the given URL
-        Log.i(LOG_TAG, "onCreateLoader");
-        return new AssetsLoader(this, AppData.ASSETS_REQUEST_URL);
+    public Loader<Map<Integer, AssetsData>> onCreateLoader(int loaderId, Bundle bundle) {
+        switch (loaderId) {
+            case ASSETS_LOADER_ID:
+                // Create a new loader for the given URL
+                Log.i(LOG_TAG, "onCreateLoader");
+                return new AssetsLoader(this, AppData.ASSETS_REQUEST_URL);
+            case ZONES_LOADER_ID:
+                return null;
+            default:
+                return null;
+        }
     }
 
     @Override
@@ -235,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements
                         updateListView();
                     } else if (AppData.isNotificationSelectingMode && position != 2) {
                         changeModeToNormal();
-                        NotificationsFragmentTab.nft.updateList();
+                        NotificationsFragmentTab.notificationsFragmentTab.updateList();
                     }
 
                     if (!AppData.isAssetSelectingMode && position == 0) {
@@ -362,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements
                         AppData.mMenu.getItem(4).setVisible(true);
                         AppData.mMenu.getItem(1).setVisible(false);
                         AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(AppData.selectedNotificationCounter));
-                        NotificationsFragmentTab.nft.updateList();
+                        NotificationsFragmentTab.notificationsFragmentTab.updateList();
                     }
                 }
                 return true;
@@ -373,8 +386,8 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.main_menu_delete:
                 //Let it be here for a while
-                NotificationsFragmentTab.nft.showDeleteConfirmationDialog();
-                NotificationsFragmentTab.nft.updateList();
+                NotificationsFragmentTab.notificationsFragmentTab.showDeleteConfirmationDialog();
+                NotificationsFragmentTab.notificationsFragmentTab.updateList();
                 return true;
             case R.id.main_menu_zoom_out:
                 if (!AppData.selectedAsset.isEmpty() && AppData.selectedAsset != null) {
@@ -434,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements
             updateListView();
         } else if (AppData.isNotificationSelectingMode) {
             changeModeToNormal();
-            NotificationsFragmentTab.nft.updateList();
+            NotificationsFragmentTab.notificationsFragmentTab.updateList();
         }
         return true;
     }
@@ -451,7 +464,7 @@ public class MainActivity extends AppCompatActivity implements
             updateListView();
         } else if (AppData.isNotificationSelectingMode) {
             changeModeToNormal();
-            NotificationsFragmentTab.nft.updateList();
+            NotificationsFragmentTab.notificationsFragmentTab.updateList();
         } else if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
             MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         } else

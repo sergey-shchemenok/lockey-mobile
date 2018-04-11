@@ -20,8 +20,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import java.util.Set;
-
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.NotificationActivity;
 import ru.tradition.lockeymobile.R;
@@ -46,7 +44,7 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
 
 
     //to access methods from other tabs
-    public static NotificationsFragmentTab nft;
+    public static NotificationsFragmentTab notificationsFragmentTab;
 
     public NotificationsFragmentTab() {
     }
@@ -118,7 +116,7 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         });
         //kick off loader
 
-        nft = this;
+        notificationsFragmentTab = this;
         getList();
 
         return rootView;

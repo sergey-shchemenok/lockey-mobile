@@ -82,6 +82,7 @@
 
         <activity
             android:name=".NotificationActivity"
+            android:launchMode="singleTop"
             android:parentActivityName=".MainActivity">
             <intent-filter>
                 <action android:name="NOTIFICATIONACTIVITY" />
@@ -93,7 +94,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".SettingsActivity"
+        <activity
+            android:name=".SettingsActivity"
             android:theme="@style/AppTheme.SettingActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

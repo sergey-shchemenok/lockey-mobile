@@ -35,6 +35,10 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
 
     private static final String LOG_TAG = FcmInstanceIDService.class.getSimpleName();
 
+    private static final int FCM_NOTIFICATION_ID = 1000;
+    private static final int FCM_PENDING_INTENT_ID = 2000;
+    private static final String FCM_NOTIFICATION_CHANNEL_ID = "fcm_notification_channel";
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -127,17 +131,18 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
             insertNotification(notificationsData);
             intent.putExtra("NotificationData", notificationsData);
         }
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0/*Request code*/, intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, FCM_PENDING_INTENT_ID/*Request code*/, intent, PendingIntent.FLAG_ONE_SHOT);
         //Set sound of notification
         Log.i(LOG_TAG, click_action + ".........pending intent");
 
         Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        String NOTIFICATION_CHANNEL_ID = "my_channel_id_01";
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            @SuppressLint("WrongConstant") NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "My Notifications", NotificationManager.IMPORTANCE_MAX);
+            @SuppressLint("WrongConstant")
+            NotificationChannel notificationChannel = new NotificationChannel(FCM_NOTIFICATION_CHANNEL_ID,
+                    "Primary", NotificationManager.IMPORTANCE_MAX);
 
             // Configure the notification channel.
             notificationChannel.setDescription("Channel description");
@@ -148,7 +153,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        NotificationCompat.Builder notifiBuilder = new NotificationCompat.Builder(this, "M_CH_ID")
+        NotificationCompat.Builder notifiBuilder = new NotificationCompat.Builder(this, FCM_NOTIFICATION_CHANNEL_ID)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -162,7 +167,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
                 .setContentIntent(pendingIntent);
 
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(0 /*ID of notification*/, notifiBuilder.build());
+        notificationManager.notify(FCM_NOTIFICATION_ID /*ID of notification*/, notifiBuilder.build());
 
 
     }

@@ -38,7 +38,6 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.R;
@@ -71,7 +70,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 
     //add fab and other elements for bottom drawer
     private FloatingActionButton fabBottomDrawer;
-    private LinearLayout llBottomSheet;
+    private LinearLayout geoFenceBottomSheet;
     public static BottomSheetBehavior bottomSheetBehavior;
 
 
@@ -126,28 +125,18 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         rootView = inflater.inflate(R.layout.tab_fragment_map_drawer, container, false);
         // Inflate the layout for this fragment
-
         fabLayers = (FloatingActionButton) rootView.findViewById(R.id.fab_layers);
-
         fabBottomDrawer = (FloatingActionButton) rootView.findViewById(R.id.fab_bottom_drawer);
-
-
-        llBottomSheet = (LinearLayout) rootView.findViewById(R.id.bottom_sheet);
-
+        geoFenceBottomSheet = (LinearLayout) rootView.findViewById(R.id.bottom_sheet);
         // init the bottom sheet behavior
-        bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
-
+        bottomSheetBehavior = BottomSheetBehavior.from(geoFenceBottomSheet);
         // set the peek height
 //        bottomSheetBehavior.setPeekHeight(340);
-
         // set hideable or not
         bottomSheetBehavior.setHideable(true);
-
 //        bottomSheetBehavior.setSkipCollapsed(true);
-
         // set callback for changes
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -162,8 +151,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     clearPolygonSet();
                     mAdapter.notifyDataSetChanged();
                 }
-
-
 //                if (BottomSheetBehavior.STATE_EXPANDED == newState) {
 //                    if (AppData.m_map != null) {
 //                        for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetData.entrySet()) {
@@ -197,7 +184,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
             }
         });
-
 
         fabLayers.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -243,7 +229,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         mPolygonsList.setHasFixedSize(true);
 
         fakeList = new ArrayList<>();
-        fakeList.add(new GeofencePolygon(21, "МКАД",
+        fakeList.add(new GeofencePolygon(21, "МКАД",true,
                 new LatLng(55.57562233895321, 37.59931400583514),
                 new LatLng(55.5965780907678, 37.51367056907543),
                 new LatLng(55.63613065941571, 37.460112219466055),
@@ -267,7 +253,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 new LatLng(55.572516831562154, 37.69219840110668),
                 new LatLng(55.56941107857544, 37.671599035872305)
         ));
-        fakeList.add(new GeofencePolygon(25, "Нижний Новгород",
+        fakeList.add(new GeofencePolygon(25, "Нижний Новгород",true,
                 new LatLng(56.30411772619058, 43.69103165174192),
                 new LatLng(56.380229864152, 43.82923465052909),
                 new LatLng(56.41139196413391, 44.01600222865409),
@@ -277,13 +263,13 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 new LatLng(56.134605503455326, 43.74546389857596)
 
                 ));
-        fakeList.add(new GeofencePolygon(28, "Офис",
+        fakeList.add(new GeofencePolygon(28, "Офис",true,
                 new LatLng(55.588120214087816, 37.65351380514278),
                 new LatLng(55.588768979013835, 37.65327777074947),
                 new LatLng(55.588835673865624, 37.653889314404864),
                 new LatLng(55.58818691004207, 37.654114619962115)
         ));
-        fakeList.add(new GeofencePolygon(31, "Центр",
+        fakeList.add(new GeofencePolygon(31, "Центр",true,
                 new LatLng(55.760591030877904, 31.340907338621832),
                 new LatLng(56.90548719520857, 30.813563588621832),
                 new LatLng(58.17889441594721, 33.67000890112183),
@@ -294,13 +280,13 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 new LatLng(53.02412807774639, 37.71297765112183),
                 new LatLng(54.19724425694539, 33.58211827612183)
         ));
-        fakeList.add(new GeofencePolygon(35, "Стройка 12",
+        fakeList.add(new GeofencePolygon(35, "Стройка 12",true,
                 new LatLng(55.61587297858232, 37.46164675179648),
                 new LatLng(55.62086526490709, 37.46387834969687),
                 new LatLng(55.62081679916385, 37.47383470956015),
                 new LatLng(55.61514589356092, 37.475980476772065)
         ));
-        fakeList.add(new GeofencePolygon(38, "Московская область",
+        fakeList.add(new GeofencePolygon(38, "Московская область",true,
                 new LatLng(55.27574067614793, 35.36139002637526),
                 new LatLng(56.39846583288372, 35.62506190137526),
                 new LatLng(56.92975473224751, 37.64654627637526),
@@ -314,7 +300,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 new LatLng(55.26322247267056, 36.67974940137526),
                 new LatLng(55.16293474516506, 35.36139002637526)
         ));
-        fakeList.add(new GeofencePolygon(41, "Национальный парк",
+        fakeList.add(new GeofencePolygon(41, "Национальный парк", true,
                 new LatLng(63.043406922092856, 36.23426996166063),
                 new LatLng(63.29629615315988, 36.24525628978563),
                 new LatLng(63.54698574915778, 36.51991449291063),
@@ -336,7 +322,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 
     private ArrayList<GeofencePolygon> fakeList;
 
-
     //helper method to clear polygon set
     private void clearPolygonSet() {
         if (!polygons.isEmpty()) {
@@ -346,7 +331,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         }
         polygonNamesNumber = -1;
     }
-
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
@@ -383,7 +367,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         }
     }
 
-
     //Handler for map updating here
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -394,7 +377,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     @Override
     public void onStart() {
         super.onStart();
-        startRepeatingTask();
+        startMarkerUpdating();
     }
 
     //Get data from mAssetData list and make marker from it
@@ -440,7 +423,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
             AppData.mainActivity.logout();
             Log.i(LOG_TAG, "onMapStop..........NullPointerException");
         }
-        stopRepeatingTask();
+        stopMarkerUpdating();
         super.onStop();
 
     }
@@ -456,7 +439,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     private int mInterval = 1000 * 5; // 5 seconds by default, can be changed later
     private Handler mHandler;
 
-    Runnable mStatusChecker = new Runnable() {
+    Runnable mMarkerPositionUpdater = new Runnable() {
         @Override
         public void run() {
             try {
@@ -508,17 +491,17 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     Log.i(LOG_TAG, "the map................. is null");
 
             } finally {
-                mHandler.postDelayed(mStatusChecker, mInterval);
+                mHandler.postDelayed(mMarkerPositionUpdater, mInterval);
             }
         }
     };
 
-    void startRepeatingTask() {
-        mStatusChecker.run();
+    void startMarkerUpdating() {
+        mMarkerPositionUpdater.run();
     }
 
-    void stopRepeatingTask() {
-        mHandler.removeCallbacks(mStatusChecker);
+    void stopMarkerUpdating() {
+        mHandler.removeCallbacks(mMarkerPositionUpdater);
     }
 
 

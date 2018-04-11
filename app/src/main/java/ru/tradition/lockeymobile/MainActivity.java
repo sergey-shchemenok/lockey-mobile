@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
             Log.i(LOG_TAG, ".............no credentials");
+            return;
         }
 
         AppData.mainActivity = this;
@@ -112,8 +113,6 @@ public class MainActivity extends AppCompatActivity implements
                 getString(R.string.settings_order_by_default)
         );
         Log.i(LOG_TAG, "orderBy.........." + orderBy);
-
-
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         //launch loading data from server
@@ -156,9 +155,9 @@ public class MainActivity extends AppCompatActivity implements
         if (activeNetwork != null && activeNetwork.isConnected()) {
             loaderManager = getLoaderManager();
             loaderManager.initLoader(AppData.ZONES_LOADER_ID, null, this);
+
             Log.i(LOG_TAG, "initLoader");
         } else {
-            progressCircle.setVisibility(View.GONE);
             infoMessage.setVisibility(View.VISIBLE);
             infoMessage.setText(R.string.no_connection);
         }
@@ -198,20 +197,15 @@ public class MainActivity extends AppCompatActivity implements
         if (loadedData.getPolygonsList() != null && !loadedData.getPolygonsList().isEmpty()) {
             AppData.polygonsList = loadedData.getPolygonsList();
             loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
+            Log.i(LOG_TAG, "Polygons loaded" + "\n" + AppData.polygonsList.toString());
             return;
         }
-        if (AppData.zonesUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED){
-            getZones();
-            return;
-        }
-
-        // Set empty state text to display "No assets found."
-        if (progressCircle.getVisibility() != View.GONE)
-            progressCircle.setVisibility(View.GONE);
 
         //whether it can be authorized. The token has not expired
         if (AppData.assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
             AssetsQueryUtils.needToken = true;
+            getZones();
         }
 
 
@@ -300,6 +294,9 @@ public class MainActivity extends AppCompatActivity implements
                 bundle.clear();
             }
 
+            if (progressCircle.getVisibility() != View.GONE)
+                progressCircle.setVisibility(View.GONE);
+
 
         } else {
             Log.i(LOG_TAG, "the second load has finished");
@@ -308,6 +305,9 @@ public class MainActivity extends AppCompatActivity implements
             }
             AppData.mAssetData = loadedData.getAssetData();
             updateListView();
+
+            if (progressCircle.getVisibility() != View.GONE)
+                progressCircle.setVisibility(View.GONE);
         }
     }
 

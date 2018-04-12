@@ -1,6 +1,7 @@
 package ru.tradition.lockeymobile.tabs.maptab;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,6 +41,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.AppData;
+import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.R;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
@@ -361,7 +363,8 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 markers.put(pair.getKey(), AppData.m_map.addMarker(marker));
             }
         } catch (NullPointerException e) {
-            AppData.mainActivity.logout();
+            //AppData.mainActivity.logout();
+            startActivity(new Intent(getActivity(), AuthActivity.class));
             Log.i(LOG_TAG, "onMapReady..........NullPointerException");
         }
     }

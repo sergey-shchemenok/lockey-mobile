@@ -22,6 +22,7 @@ import java.util.Comparator;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.AssetActivity;
+import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
 
@@ -64,7 +65,8 @@ public class AssetsFragmentTab extends Fragment {
                 assetsDataAdapter.addAll(ads);
             }
         } catch (NullPointerException e) {
-            AppData.mainActivity.logout();
+            startActivity(new Intent(getActivity(), AuthActivity.class));
+            //AppData.mainActivity.logout();
             Log.i(LOG_TAG, "onAssetsFragmentCreateView..........NullPointerException");
 
         }

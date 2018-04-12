@@ -13,6 +13,7 @@ import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
 import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
 
 import static ru.tradition.lockeymobile.AppData.ASSETS_LOADER_ID;
+import static ru.tradition.lockeymobile.AppData.SUBSCRIPTIONS_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.ZONES_LOADER_ID;
 
 /**
@@ -63,14 +64,17 @@ public class DataLoader extends AsyncTaskLoader<LoadedData> {
         switch (loaderID) {
             case ASSETS_LOADER_ID:
                 Log.v(LOG_TAG, "loadInBackground");
-
                 // Perform the network request, parse the response, and extract a list of assets.
                 Map<Integer, AssetsData> assetsList = AssetsQueryUtils.fetchAssetsData(mUrl);
-
                 return new LoadedData(assetsList);
+
             case ZONES_LOADER_ID:
                 List<GeofencePolygon> polygonsList = GeofenceQueryUtils.fetchZonesData(mUrl);
-                return new LoadedData(polygonsList);
+                return new LoadedData(polygonsList, null);
+
+            case SUBSCRIPTIONS_LOADER_ID:
+                List<SubscriptionData> subscriptionsList = SubscriptionQueryUtils.fetchSubscriptionsData(mUrl);
+                return new LoadedData(null, subscriptionsList);
 
             default:
                 return null;

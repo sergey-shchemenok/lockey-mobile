@@ -80,7 +80,6 @@
 
         <activity
             android:name=".NotificationActivity"
-            android:launchMode="singleTop"
             android:parentActivityName=".MainActivity">
             <intent-filter>
                 <action android:name="NOTIFICATIONACTIVITY" />
@@ -103,3 +102,4 @@
     </application>
 
 </manifest>
+    <!--android:launchMode="singleTop"-->

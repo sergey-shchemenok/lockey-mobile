@@ -47,5 +47,10 @@
     <!-- Label for order-by most recent option [CHAR LIMIT=20] -->
     <string name="settings_order_by_signal_time_label">времени последнего сигнала</string>
     <string name="settings_order_by_signal_time_value" translatable="false">signal_time</string>
+    <string name="subscription_name">Название:</string>
+    <string name="zone_name">Зона:</string>
+    <string name="subscription_status">Статус:</string>
+    <string name="kits_numbers">Комплекты:</string>
+    <string name="subscriptions_activity_title">Подписки</string>
 
 </resources>

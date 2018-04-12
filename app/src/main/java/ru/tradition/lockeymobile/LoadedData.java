@@ -13,14 +13,19 @@ import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
 public class LoadedData {
     private Map<Integer, AssetsData> assetData;
     private List<GeofencePolygon> polygonsList;
+    private List<SubscriptionData> subscriptionData;
+
 
     public LoadedData(Map<Integer, AssetsData> assetData) {
         this.assetData = assetData;
     }
 
-    public LoadedData(List<GeofencePolygon> polygonsList) {
+    public LoadedData(List<GeofencePolygon> polygonsList, List<SubscriptionData> subscriptionData) {
         this.polygonsList = polygonsList;
+        this.subscriptionData = subscriptionData;
     }
+
+
 
     public Map<Integer, AssetsData> getAssetData() {
         return assetData;
@@ -28,5 +33,9 @@ public class LoadedData {
 
     public List<GeofencePolygon> getPolygonsList() {
         return polygonsList;
+    }
+
+    public List<SubscriptionData> getSubscriptionData() {
+        return subscriptionData;
     }
 }

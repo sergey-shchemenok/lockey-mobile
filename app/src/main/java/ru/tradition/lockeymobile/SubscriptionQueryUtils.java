@@ -1,9 +1,11 @@
-package ru.tradition.lockeymobile.tabs.maptab;
+package ru.tradition.lockeymobile;
 
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,36 +19,31 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.TreeMap;
 
-import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils;
+import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
+import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
 
 import static ru.tradition.lockeymobile.auth.AuthQueryUtils.authCookieManager;
 
 /**
- * Created by Caelestis on 11.04.2018.
+ * Created by Caelestis on 12.04.2018.
  */
 
-public final class GeofenceQueryUtils {
-    public static final String LOG_TAG = GeofenceQueryUtils.class.getName();
+public final class SubscriptionQueryUtils {
+    public static final String LOG_TAG = SubscriptionQueryUtils.class.getName();
 
     //Stores the response message for the request
-    public static String zonesUrlResponseMessage;
+    public static String subscriptionsUrlResponseMessage;
 
     //whether it need new token to download data
     public static boolean needToken = false;
 
     /**
-     * Create a private constructor because no one should ever create a {@link GeofenceQueryUtils} object.
+     * Create a private constructor because no one should ever create a {@link SubscriptionQueryUtils} object.
      */
-    private GeofenceQueryUtils() {
+    private SubscriptionQueryUtils() {
     }
 
     public static ArrayList<GeofencePolygon> extractPolygons(String jsonResponse) {
@@ -87,17 +84,21 @@ public final class GeofenceQueryUtils {
     private static URL createUrl(String stringUrl) {
         URL url = null;
         try {
-            url = new URL(stringUrl);
+            Uri builtUri = Uri.parse(stringUrl)
+                    .buildUpon()
+                    .appendQueryParameter("key", FirebaseInstanceId.getInstance().getToken())
+                    .build();
+            url = new URL(builtUri.toString());
         } catch (MalformedURLException e) {
             Log.e(LOG_TAG, "Problem building the URL ", e);
         }
         return url;
     }
 
-    public static ArrayList<GeofencePolygon> fetchZonesData(String requestUrl) {
+    public static ArrayList<SubscriptionData> fetchSubscriptionsData(String requestUrl) {
         // Create URL object
         URL url = createUrl(requestUrl);
-        Log.v(LOG_TAG, "fetchZones");
+        Log.v(LOG_TAG, "fetchSubscriptions");
 
         // Perform HTTP request to the URL and receive a JSON response back
         String jsonResponse = null;
@@ -193,4 +194,5 @@ public final class GeofenceQueryUtils {
         }
         return output.toString();
     }
+
 }

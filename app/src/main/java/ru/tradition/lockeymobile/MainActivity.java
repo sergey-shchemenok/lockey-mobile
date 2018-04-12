@@ -58,10 +58,11 @@ public class MainActivity extends AppCompatActivity implements
 
     private TextView mEmptyStateTextView;
     private ProgressBar progressCircle;
+    private TextView infoMessage;
     private ConnectivityManager connectivityManager;
     private NetworkInfo activeNetwork;
     private LoaderManager loaderManager;
-    private TextView infoMessage;
+
 
     //preferences
     public static boolean allowNotification;
@@ -481,7 +482,9 @@ public class MainActivity extends AppCompatActivity implements
         } else if (AppData.isNotificationSelectingMode) {
             changeModeToNormal();
             NotificationsFragmentTab.adapter.notifyDataSetChanged();
-        } else if (MapFragmentTab.bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
+        } else if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        } else if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
             MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         } else
             logout();

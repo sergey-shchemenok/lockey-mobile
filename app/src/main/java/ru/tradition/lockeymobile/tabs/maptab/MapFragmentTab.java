@@ -376,7 +376,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         try {
             AppData.target = AppData.m_map.getCameraPosition();
         } catch (NullPointerException e) {
-            AppData.mainActivity.logout();
+            startActivity(new Intent(getActivity(), AuthActivity.class));
             Log.i(LOG_TAG, "onMapStop..........NullPointerException");
         }
         stopMarkerUpdating();

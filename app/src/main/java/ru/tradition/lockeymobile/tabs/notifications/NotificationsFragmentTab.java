@@ -37,10 +37,9 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
 
     public static final String LOG_TAG = NotificationsFragmentTab.class.getName();
 
-    private NotificationCursorAdapter adapter;
+    public static NotificationCursorAdapter adapter;
     public static int loaderSwitch = 0;
     private static final int CURSOR_LOADER_ID = 3;
-    private static final int CURSOR_UPDATE_LOADER_ID = 4;
 
 
     //to access methods from other tabs
@@ -88,13 +87,15 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
                         AppData.selectedNotification.add(currentNotificationUri.toString());
                         AppData.selectedNotificationUri.add(currentNotificationUri);
                         AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(++AppData.selectedNotificationCounter));
-                        updateList();
+                        adapter.notifyDataSetChanged();
+                        //updateList();
                         Log.i(LOG_TAG, "currentNotificationUri.........." + currentNotificationUri.toString());
                     } else {
                         AppData.selectedNotification.remove(currentNotificationUri.toString());
                         AppData.selectedNotificationUri.remove(currentNotificationUri);
                         AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(--AppData.selectedNotificationCounter));
-                        updateList();
+                        adapter.notifyDataSetChanged();
+                        //updateList();
                     }
                 }
             }
@@ -106,10 +107,12 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
                 Uri currentNotificationUri = ContentUris.withAppendedId(NotificationContract.NotificationEntry.CONTENT_URI, itemId);
                 if (!AppData.selectedNotificationLong.contains(currentNotificationUri.toString())) {
                     AppData.selectedNotificationLong.add(currentNotificationUri.toString());
-                    updateList();
+                    adapter.notifyDataSetChanged();
+                    //updateList();
                 } else {
                     AppData.selectedNotificationLong.remove(currentNotificationUri.toString());
-                    updateList();
+                    adapter.notifyDataSetChanged();
+                    //updateList();
                 }
                 return true;
             }
@@ -196,27 +199,26 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
     }
 
-    //update listView after changes
-    public void updateList() {
-        if (loaderSwitch == 0) {
-            getLoaderManager().initLoader(CURSOR_UPDATE_LOADER_ID, null, this);
-            getLoaderManager().getLoader(CURSOR_LOADER_ID).reset();
-            loaderSwitch = 1;
-        } else if (loaderSwitch == 1) {
-            getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
-            getLoaderManager().getLoader(CURSOR_UPDATE_LOADER_ID).reset();
-            loaderSwitch = 2;
-        } else if (loaderSwitch == 2) {
-            getLoaderManager().restartLoader(CURSOR_UPDATE_LOADER_ID, null, this);
-            getLoaderManager().getLoader(CURSOR_LOADER_ID).reset();
-            loaderSwitch = 1;
-        }
-    }
+//    //update listView after changes
+//    public void updateList() {
+//        if (loaderSwitch == 0) {
+//            getLoaderManager().initLoader(CURSOR_UPDATE_LOADER_ID, null, this);
+//            getLoaderManager().getLoader(CURSOR_LOADER_ID).reset();
+//            loaderSwitch = 1;
+//        } else if (loaderSwitch == 1) {
+//            getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
+//            getLoaderManager().getLoader(CURSOR_UPDATE_LOADER_ID).reset();
+//            loaderSwitch = 2;
+//        } else if (loaderSwitch == 2) {
+//            getLoaderManager().restartLoader(CURSOR_UPDATE_LOADER_ID, null, this);
+//            getLoaderManager().getLoader(CURSOR_LOADER_ID).reset();
+//            loaderSwitch = 1;
+//        }
+//    }
 
     @Override
     public void onDestroyView() {
         getLoaderManager().destroyLoader(CURSOR_LOADER_ID);
-        getLoaderManager().destroyLoader(CURSOR_UPDATE_LOADER_ID);
         loaderSwitch = 0;
         super.onDestroyView();
     }

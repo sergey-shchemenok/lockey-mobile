@@ -259,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements
                         updateListView();
                     } else if (AppData.isNotificationSelectingMode && position != 2) {
                         changeModeToNormal();
-                        NotificationsFragmentTab.notificationsFragmentTab.updateList();
+                        NotificationsFragmentTab.adapter.notifyDataSetChanged();
                     }
 
                     if (!AppData.isAssetSelectingMode && position == 0) {
@@ -391,7 +391,7 @@ public class MainActivity extends AppCompatActivity implements
                         AppData.mMenu.getItem(4).setVisible(true);
                         AppData.mMenu.getItem(1).setVisible(false);
                         AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(AppData.selectedNotificationCounter));
-                        NotificationsFragmentTab.notificationsFragmentTab.updateList();
+                        NotificationsFragmentTab.adapter.notifyDataSetChanged();
                     }
                 }
                 return true;
@@ -403,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.main_menu_delete:
                 //Let it be here for a while
                 NotificationsFragmentTab.notificationsFragmentTab.showDeleteConfirmationDialog();
-                NotificationsFragmentTab.notificationsFragmentTab.updateList();
+                NotificationsFragmentTab.adapter.notifyDataSetChanged();
                 return true;
             case R.id.main_menu_zoom_out:
                 if (!AppData.selectedAsset.isEmpty() && AppData.selectedAsset != null) {
@@ -463,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements
             updateListView();
         } else if (AppData.isNotificationSelectingMode) {
             changeModeToNormal();
-            NotificationsFragmentTab.notificationsFragmentTab.updateList();
+            NotificationsFragmentTab.adapter.notifyDataSetChanged();
         }
         return true;
     }
@@ -480,7 +480,7 @@ public class MainActivity extends AppCompatActivity implements
             updateListView();
         } else if (AppData.isNotificationSelectingMode) {
             changeModeToNormal();
-            NotificationsFragmentTab.notificationsFragmentTab.updateList();
+            NotificationsFragmentTab.adapter.notifyDataSetChanged();
         } else if (MapFragmentTab.bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
             MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         } else

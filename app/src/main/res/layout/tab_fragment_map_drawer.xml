@@ -37,9 +37,11 @@
         app:elevation="1dp"
         app:fabCustomSize="44dp"
         app:fabSize="normal"
-        app:layout_anchor="@+id/bottom_sheet"
-        app:layout_anchorGravity="top|end"
+        android:layout_gravity="bottom|end"
         app:pressedTranslationZ="12dp"
         app:rippleColor="@color/fab_ripple" />
 
 </android.support.design.widget.CoordinatorLayout>
+
+    <!--app:layout_anchor="@+id/bottom_sheet"-->
+    <!--app:layout_anchorGravity="top|end"-->

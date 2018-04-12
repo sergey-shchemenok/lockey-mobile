@@ -18,17 +18,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:id="@+id/polygon_viewholder"
-    android:layout_height="60dp"
+    android:background="@color/transparence"
+    android:layout_height="wrap_content"
     android:padding="8dp">
 
     <TextView
         android:id="@+id/polygon_name"
+        android:paddingTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@color/transparence"
         android:layout_gravity="center_vertical|start"
-        android:fontFamily="sans-serif-medium"
         android:textColor="@color/notificationTitleColor"
-        android:textAppearance="?android:textAppearanceSmall"
+        android:textSize="16sp"
         tools:text="МКАД" />
 
 </LinearLayout>

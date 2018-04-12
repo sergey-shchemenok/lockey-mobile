@@ -202,10 +202,15 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         //whether it can be authorized. The token has not expired
-        if (AppData.assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+        if (AppData.zonesUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
-            AssetsQueryUtils.needToken = true;
+            GeofenceQueryUtils.needToken = true;
             getZones();
+        }
+
+        //whether it can be authorized. The token has not expired
+        if (AppData.assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            AssetsQueryUtils.needToken = true;
         }
 
 
@@ -476,7 +481,7 @@ public class MainActivity extends AppCompatActivity implements
         } else if (AppData.isNotificationSelectingMode) {
             changeModeToNormal();
             NotificationsFragmentTab.notificationsFragmentTab.updateList();
-        } else if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+        } else if (MapFragmentTab.bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_HIDDEN) {
             MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         } else
             logout();

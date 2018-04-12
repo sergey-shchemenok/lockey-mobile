@@ -53,7 +53,8 @@ import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
  * create an instance of this fragment.
  */
 public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
-        GeofencePolygonAdapter.ListItemClickListener {
+        GeofencePolygonAdapter.ListItemClickListener,
+        GeofencePolygonAdapter.ListItemLongClickListener{
 
     public static GeofencePolygonAdapter mAdapter;
     private RecyclerView mPolygonsList;
@@ -74,6 +75,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     public static BottomSheetBehavior bottomSheetBehavior;
 
     private LinearLayoutManager layoutManager;
+    private int recyclerViewScrollState = 0;
 
 
     private int mapType = GoogleMap.MAP_TYPE_NORMAL;
@@ -150,30 +152,32 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 //                    fabBottomDrawer.animate().scaleX(1).scaleY(1).setDuration(300).start();
 //                }
                 if (BottomSheetBehavior.STATE_HIDDEN == newState) {
-                    fabBottomDrawer.animate().scaleX(1).scaleY(1).setDuration(100).start();
+//                    fabBottomDrawer.animate().scaleX(1).scaleY(1).setDuration(100).start();
+                    fabLayers.show();
+                    fabBottomDrawer.show();
                     clearPolygonSet();
                     mAdapter.notifyDataSetChanged();
                 }
 
                 if (BottomSheetBehavior.STATE_EXPANDED == newState) {
-                    LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-                    mPolygonsList.setLayoutManager(layoutManager);
-                    mPolygonsList.setHasFixedSize(true);
-                    mAdapter = new GeofencePolygonAdapter(AppData.polygonsList, MapFragmentTab.this);
+                    //recyclerViewScrollState = mPolygonsList.getScrollState();
+                    recyclerViewScrollState = layoutManager.findFirstCompletelyVisibleItemPosition();
+                    layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                    mAdapter = new GeofencePolygonAdapter(AppData.polygonsList, MapFragmentTab.this, MapFragmentTab.this);
                     mPolygonsList.setAdapter(mAdapter);
+                    mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.hide();
+                    fabBottomDrawer.hide();
                 }
                 if (BottomSheetBehavior.STATE_COLLAPSED == newState) {
-                    LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-                    mPolygonsList.setLayoutManager(layoutManager);
-                    mPolygonsList.setHasFixedSize(true);
-                    mAdapter = new GeofencePolygonAdapter(AppData.polygonsList, MapFragmentTab.this);
+                    //recyclerViewScrollState = mPolygonsList.getScrollState();
+                    recyclerViewScrollState = layoutManager.findFirstCompletelyVisibleItemPosition();
+                    layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                    mAdapter = new GeofencePolygonAdapter(AppData.polygonsList, MapFragmentTab.this, MapFragmentTab.this);
                     mPolygonsList.setAdapter(mAdapter);
+                    mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.show();
-                }
-
-                if (BottomSheetBehavior.STATE_HIDDEN == newState) {
-                    fabLayers.show();
+                    fabBottomDrawer.hide();
                 }
 
 
@@ -235,15 +239,12 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 
 
         mPolygonsList = (RecyclerView) rootView.findViewById(R.id.geofence_polygons);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mPolygonsList.setLayoutManager(layoutManager);
-
         mPolygonsList.setHasFixedSize(true);
-
-        mAdapter = new GeofencePolygonAdapter(AppData.polygonsList, this);
+        mAdapter = new GeofencePolygonAdapter(AppData.polygonsList, this, this);
         //Log.i(LOG_TAG, "Polygons set" + AppData.polygonsList.toString());
         mPolygonsList.setAdapter(mAdapter);
-
         //to remove zones after rotation
         clearPolygonSet();
         return rootView;
@@ -283,8 +284,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 int lastPosition = polygonNamesNumber;
                 polygonNamesNumber = clickedItemIndex;
                 if (lastPosition >= 0) {
-//                    GeofencePolygonAdapter.PolygonNameViewHolder vh = (GeofencePolygonAdapter.PolygonNameViewHolder) mPolygonsList.findViewHolderForAdapterPosition(lastPosition);
-//                    mAdapter.onBindViewHolder(vh, lastPosition);
                     mAdapter.notifyDataSetChanged();
                 }
 
@@ -292,6 +291,33 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 polygonNamesNumber = -1;
             }
         }
+    }
+
+    @Override
+    public void onListItemLongClick(int clickedItemIndex) {
+        if (AppData.m_map != null) {
+            if (polygonNamesNumber != clickedItemIndex) {
+                this.onListItemClick(clickedItemIndex);
+
+            }
+        }
+
+        GeofencePolygon geof = AppData.polygonsList.get(clickedItemIndex);
+        LatLng[] latLng = geof.getPolygon();
+        Log.i(LOG_TAG, "long click.....");
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (LatLng ll : latLng) {
+            builder.include(ll);
+        }
+        LatLngBounds bounds = builder.build();
+
+        int padding = 5; // offset from edges of the map in pixels
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+        AppData.m_map.animateCamera(cu);
+
+
     }
 
     //Handler for map updating here

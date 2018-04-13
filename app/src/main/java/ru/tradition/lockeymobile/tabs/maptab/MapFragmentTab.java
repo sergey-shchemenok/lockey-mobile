@@ -56,7 +56,7 @@ import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
  */
 public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         GeofencePolygonAdapter.ListItemClickListener,
-        GeofencePolygonAdapter.ListItemLongClickListener{
+        GeofencePolygonAdapter.ListItemLongClickListener {
 
     public static GeofencePolygonAdapter mAdapter;
     private RecyclerView mPolygonsList;
@@ -165,7 +165,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     //recyclerViewScrollState = mPolygonsList.getScrollState();
                     recyclerViewScrollState = layoutManager.findFirstCompletelyVisibleItemPosition();
                     layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                    mAdapter = new GeofencePolygonAdapter(AppData.polygonsList, MapFragmentTab.this, MapFragmentTab.this);
+                    mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), MapFragmentTab.this, MapFragmentTab.this);
                     mPolygonsList.setAdapter(mAdapter);
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.hide();
@@ -175,7 +175,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     //recyclerViewScrollState = mPolygonsList.getScrollState();
                     recyclerViewScrollState = layoutManager.findFirstCompletelyVisibleItemPosition();
                     layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-                    mAdapter = new GeofencePolygonAdapter(AppData.polygonsList, MapFragmentTab.this, MapFragmentTab.this);
+                    mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), MapFragmentTab.this, MapFragmentTab.this);
                     mPolygonsList.setAdapter(mAdapter);
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.show();
@@ -244,9 +244,10 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mPolygonsList.setLayoutManager(layoutManager);
         mPolygonsList.setHasFixedSize(true);
-        mAdapter = new GeofencePolygonAdapter(AppData.polygonsList, this, this);
-        //Log.i(LOG_TAG, "Polygons set" + AppData.polygonsList.toString());
-        mPolygonsList.setAdapter(mAdapter);
+        if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty()) {
+            mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), this, this);
+            mPolygonsList.setAdapter(mAdapter);
+        }
         //to remove zones after rotation
         clearPolygonSet();
         return rootView;
@@ -271,7 +272,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 polygons.clear();
             }
             if (polygonNamesNumber != clickedItemIndex) {
-                GeofencePolygon geof = AppData.polygonsList.get(clickedItemIndex);
+                GeofencePolygon geof = AppData.mPolygonsMap.get(clickedItemIndex);
                 LatLng[] latLngArray = geof.getPolygon();
 
                 PolygonOptions popt = new PolygonOptions().geodesic(true);
@@ -304,7 +305,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
             }
         }
 
-        GeofencePolygon geof = AppData.polygonsList.get(clickedItemIndex);
+        GeofencePolygon geof = AppData.mPolygonsMap.get(clickedItemIndex);
         LatLng[] latLng = geof.getPolygon();
         Log.i(LOG_TAG, "long click.....");
 
@@ -335,7 +336,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         startMarkerUpdating();
     }
 
-    //Get data from mAssetData list and make marker from it
+    //Get data from mAssetMap list and make marker from it
     @Override
     public void onMapReady(GoogleMap map) {
         mapReady = true;
@@ -353,7 +354,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 
         try {
             markers.clear();
-            for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetData.entrySet()) {
+            for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
                 MarkerOptions marker = new MarkerOptions()
                         .position(new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude()))
                         .title(String.valueOf(pair.getValue().getId()));
@@ -411,7 +412,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
 
                     //updating marker position
-                    for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetData.entrySet()) {
+                    for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
                         int id = pair.getKey();
                         Marker savedMarker = markers.get(id);
                         LatLng savedPosition;

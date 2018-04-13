@@ -65,16 +65,16 @@ public class DataLoader extends AsyncTaskLoader<LoadedData> {
             case ASSETS_LOADER_ID:
                 Log.v(LOG_TAG, "loadInBackground");
                 // Perform the network request, parse the response, and extract a list of assets.
-                Map<Integer, AssetsData> assetsList = AssetsQueryUtils.fetchAssetsData(mUrl);
-                return new LoadedData(assetsList);
+                Map<Integer, AssetsData> assetsMap = AssetsQueryUtils.fetchAssetsData(mUrl);
+                return new LoadedData(assetsMap, null, null);
 
             case ZONES_LOADER_ID:
-                List<GeofencePolygon> polygonsList = GeofenceQueryUtils.fetchZonesData(mUrl);
-                return new LoadedData(polygonsList, null);
+                Map<Integer, GeofencePolygon> polygonsMap = GeofenceQueryUtils.fetchZonesData(mUrl);
+                return new LoadedData(null, polygonsMap, null);
 
             case SUBSCRIPTIONS_LOADER_ID:
-                List<SubscriptionData> subscriptionsList = SubscriptionQueryUtils.fetchSubscriptionsData(mUrl);
-                return new LoadedData(null, subscriptionsList);
+                Map<Integer, SubscriptionData> subscriptionsMap = SubscriptionQueryUtils.fetchSubscriptionsData(mUrl);
+                return new LoadedData(null, null, subscriptionsMap);
 
             default:
                 return null;

@@ -17,7 +17,6 @@ package ru.tradition.lockeymobile.tabs.maptab;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,7 +26,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import ru.tradition.lockeymobile.R;
@@ -122,9 +120,9 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
         Log.d(LOG_TAG, "#" + position);
         if (holder != null) {
             if (position == MapFragmentTab.polygonNamesNumber)
-                holder.setColorGray();
+                holder.setColorRed();
             else
-                holder.setColorWhite();
+                holder.setColorDarkGray();
             holder.bind(position);
         }
     }
@@ -182,12 +180,12 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
             polygonNameView.setText(mGeofencePolygons.get(position).getPolygonName());
         }
 
-        void setColorGray() {
+        void setColorRed() {
             //polygonViewHolder.setBackgroundColor(Color.LTGRAY);
             polygonNameView.setTextColor(Color.RED);
         }
 
-        void setColorWhite() {
+        void setColorDarkGray() {
             //polygonViewHolder.setBackgroundColor(Color.WHITE);
             polygonNameView.setTextColor(Color.parseColor("#2B3D4D"));
         }
@@ -205,9 +203,9 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
             int clickedPosition = getAdapterPosition();
             mOnClickListener.onListItemClick(clickedPosition);
             if (clickedPosition == MapFragmentTab.polygonNamesNumber)
-                setColorGray();
+                setColorRed();
             else
-                setColorWhite();
+                setColorDarkGray();
 //            MapFragmentTab.mAdapter.onBindViewHolder(this, clickedPosition++);
         }
 
@@ -217,6 +215,7 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
             // Return true to indicate the click was handled
             int clickedPosition = getAdapterPosition();
             mOnLongClickListener.onListItemLongClick(clickedPosition);
+            setColorRed();
             return true;
         }
 

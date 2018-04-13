@@ -6,36 +6,50 @@ import java.util.Map;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
 
+import static ru.tradition.lockeymobile.AppData.ASSETS_LOADER_ID;
+import static ru.tradition.lockeymobile.AppData.SUBSCRIPTIONS_LOADER_ID;
+import static ru.tradition.lockeymobile.AppData.ZONES_LOADER_ID;
+
 /**
  * Created by Caelestis on 11.04.2018.
  */
 
 public class LoadedData {
-    private Map<Integer, AssetsData> assetData;
-    private List<GeofencePolygon> polygonsList;
-    private List<SubscriptionData> subscriptionData;
+    private Map<Integer, AssetsData> assetMap;
+    private Map<Integer, GeofencePolygon> polygonsMap;
+    private Map<Integer, SubscriptionData> subscriptionMap;
+
+//    public LoadedData(Map<Integer, AssetsData> assetMap, Map<Integer,
+//            GeofencePolygon> polygonsMap, Map<Integer, SubscriptionData> subscriptionMap) {
+////        switch (loaderID){
+////            case ASSETS_LOADER_ID:
+////                assetMap = (Map<Integer, AssetsData>)map;
+////            case ZONES_LOADER_ID:
+////                polygonsMap = (Map<Integer, GeofencePolygon>)map;
+////            case SUBSCRIPTIONS_LOADER_ID:
+////                subscriptionMap =(Map<Integer, SubscriptionData>)map;
+//
+//
+//
+//        }
+//    }
 
 
-    public LoadedData(Map<Integer, AssetsData> assetData) {
-        this.assetData = assetData;
+    public LoadedData(Map<Integer, AssetsData> assetMap, Map<Integer, GeofencePolygon> polygonsMap, Map<Integer, SubscriptionData> subscriptionMap) {
+        this.assetMap = assetMap;
+        this.polygonsMap = polygonsMap;
+        this.subscriptionMap = subscriptionMap;
     }
 
-    public LoadedData(List<GeofencePolygon> polygonsList, List<SubscriptionData> subscriptionData) {
-        this.polygonsList = polygonsList;
-        this.subscriptionData = subscriptionData;
+    public Map<Integer, AssetsData> getAssetMap() {
+        return assetMap;
     }
 
-
-
-    public Map<Integer, AssetsData> getAssetData() {
-        return assetData;
+    public Map<Integer, GeofencePolygon> getPolygonsMap() {
+        return polygonsMap;
     }
 
-    public List<GeofencePolygon> getPolygonsList() {
-        return polygonsList;
-    }
-
-    public List<SubscriptionData> getSubscriptionData() {
-        return subscriptionData;
+    public Map<Integer, SubscriptionData> getSubscriptionMap() {
+        return subscriptionMap;
     }
 }

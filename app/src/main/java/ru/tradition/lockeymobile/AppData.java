@@ -34,7 +34,7 @@ public final class AppData {
     public static int subscriptionsUrlResponseCode;
 
     //Here is the data from Loader about cars and other assets
-    public static Map<Integer, AssetsData> mAssetData;
+    public static Map<Integer, AssetsData> mAssetMap;
     //To save camera position in case of restarting app
     public static CameraPosition target = CameraPosition.builder()
             .target(new LatLng(55.7522200, 37.6155600))
@@ -42,10 +42,10 @@ public final class AppData {
             .build();
 
     //Here is the data from Loader about geozones
-    public static List<GeofencePolygon> polygonsList;
+    public static Map<Integer, GeofencePolygon> mPolygonsMap;
 
     //Here is the data from Loader about subscriptions
-    public static List<GeofencePolygon> subscriptionsList;
+    public static Map<Integer, SubscriptionData> mSubscriptionsMap;
 
     //This sets determines which kit is selected
     public static Set<Integer> selectedAsset = new TreeSet<>();
@@ -79,8 +79,8 @@ public final class AppData {
      * Constant value for the assets loader ID. We can choose any integer.
      * This comes into play if you're using multiple loaders.
      */
-    public static final int ASSETS_LOADER_ID = 1;
-    public static final int AUTH_LOADER_ID = 2;
+    public static final int AUTH_LOADER_ID = 1;
+    public static final int ASSETS_LOADER_ID = 2;
     public static final int ZONES_LOADER_ID = 3;
     public static final int SUBSCRIPTIONS_LOADER_ID = 4;
 

@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
@@ -95,7 +96,7 @@ public final class SubscriptionQueryUtils {
         return url;
     }
 
-    public static ArrayList<SubscriptionData> fetchSubscriptionsData(String requestUrl) {
+    public static TreeMap<Integer, SubscriptionData> fetchSubscriptionsData(String requestUrl) {
         // Create URL object
         URL url = createUrl(requestUrl);
         Log.v(LOG_TAG, "fetchSubscriptions");
@@ -115,7 +116,8 @@ public final class SubscriptionQueryUtils {
         ArrayList<GeofencePolygon> polygonsList = extractPolygons(jsonResponse);
 
         // Return the {@link Event}
-        return polygonsList;
+        //return mPolygonsMap;
+        return null;
     }
 
 
@@ -157,7 +159,7 @@ public final class SubscriptionQueryUtils {
             // then read the input stream and parse the response.
 
             AppData.zonesUrlResponseCode = urlConnection.getResponseCode();
-            zonesUrlResponseMessage = urlConnection.getResponseMessage();
+            //zonesUrlResponseMessage = urlConnection.getResponseMessage();
             if (AppData.zonesUrlResponseCode == HttpURLConnection.HTTP_OK) {
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);

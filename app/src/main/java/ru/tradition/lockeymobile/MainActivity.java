@@ -43,7 +43,7 @@ import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 
 import static ru.tradition.lockeymobile.AppData.ASSETS_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.ZONES_LOADER_ID;
-import static ru.tradition.lockeymobile.AppData.mAssetData;
+import static ru.tradition.lockeymobile.AppData.mAssetMap;
 import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUrlResponseMessage;
 
 public class MainActivity extends AppCompatActivity implements
@@ -195,10 +195,10 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onLoadFinished(Loader<LoadedData> loader, LoadedData loadedData) {
-        if (loadedData.getPolygonsList() != null && !loadedData.getPolygonsList().isEmpty()) {
-            AppData.polygonsList = loadedData.getPolygonsList();
+        if (loadedData.getPolygonsMap() != null && !loadedData.getPolygonsMap().isEmpty()) {
+            AppData.mPolygonsMap = loadedData.getPolygonsMap();
             loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
-            Log.i(LOG_TAG, "Polygons loaded" + "\n" + AppData.polygonsList.toString());
+            Log.i(LOG_TAG, "Polygons loaded" + "\n" + AppData.mPolygonsMap.toString());
             return;
         }
 
@@ -206,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements
         if (AppData.zonesUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
             GeofenceQueryUtils.needToken = true;
+            //todo something later
             getZones();
         }
 
@@ -226,15 +227,15 @@ public class MainActivity extends AppCompatActivity implements
 
         if (!AppData.isRepeated) {
             AppData.isFinished = true;
-            if (loadedData.getAssetData() == null || loadedData.getAssetData().isEmpty()) {
-                if (AppData.mAssetData == null || AppData.mAssetData.isEmpty()) {
+            if (loadedData.getAssetMap() == null || loadedData.getAssetMap().isEmpty()) {
+                if (AppData.mAssetMap == null || AppData.mAssetMap.isEmpty()) {
                     mEmptyStateTextView.setText(R.string.no_assets);
                     return;
                 }
                 Log.i(LOG_TAG, "the first load has finished with old data");
 
             } else {
-                AppData.mAssetData = loadedData.getAssetData();
+                AppData.mAssetMap = loadedData.getAssetMap();
                 Log.i(LOG_TAG, "the first load has finished without mistakes");
 
             }
@@ -306,10 +307,10 @@ public class MainActivity extends AppCompatActivity implements
 
         } else {
             Log.i(LOG_TAG, "the second load has finished");
-            if (loadedData.getAssetData() == null || loadedData.getAssetData().isEmpty()) {
+            if (loadedData.getAssetMap() == null || loadedData.getAssetMap().isEmpty()) {
                 return;
             }
-            AppData.mAssetData = loadedData.getAssetData();
+            AppData.mAssetMap = loadedData.getAssetMap();
             updateListView();
 
             if (progressCircle.getVisibility() != View.GONE)
@@ -323,9 +324,9 @@ public class MainActivity extends AppCompatActivity implements
         //AssetsFragmentTab.assetsDataAdapter.notifyDataSetChanged();
         Log.i(LOG_TAG, "order by list..........." + getString(R.string.settings_order_by_kit_id_value));
         if (orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
-            AssetsFragmentTab.assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
+            AssetsFragmentTab.assetsDataAdapter.addAll(new ArrayList<>(mAssetMap.values()));
         } else if (orderBy.equals(getString(R.string.settings_order_by_signal_time_value))) {
-            ArrayList<AssetsData> ads = new ArrayList<>(mAssetData.values());
+            ArrayList<AssetsData> ads = new ArrayList<>(mAssetMap.values());
             Collections.sort(ads, AssetsData.COMPARE_BY_LAST_SIGNAL_TIME);
             AssetsFragmentTab.assetsDataAdapter.addAll(ads);
         }
@@ -341,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onLoaderReset(Loader<LoadedData> loader) {
-        //AppData.mAssetData.clear();
+        //AppData.mAssetMap.clear();
         Log.i(LOG_TAG, "onLoadReset");
     }
 
@@ -411,7 +412,7 @@ public class MainActivity extends AppCompatActivity implements
                     //first calculate the bounds of all the markers like so:
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
                     for (Integer id : AppData.selectedAsset) {
-                        AssetsData as = AppData.mAssetData.get(id);
+                        AssetsData as = AppData.mAssetMap.get(id);
                         builder.include(new LatLng(as.getLatitude(), as.getLongitude()));
                     }
                     LatLngBounds bounds = builder.build();

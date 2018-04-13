@@ -18,7 +18,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.AssetActivity;
@@ -26,7 +25,7 @@ import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
 
-import static ru.tradition.lockeymobile.AppData.mAssetData;
+import static ru.tradition.lockeymobile.AppData.mAssetMap;
 
 /**
  * Created by Caelestis on 25.01.2018.
@@ -58,9 +57,9 @@ public class AssetsFragmentTab extends Fragment {
         //to prevent crash in some killing process situations
         try {
             if (MainActivity.orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
-                assetsDataAdapter.addAll(new ArrayList<>(mAssetData.values()));
+                assetsDataAdapter.addAll(new ArrayList<>(mAssetMap.values()));
             } else if (MainActivity.orderBy.equals(getString(R.string.settings_order_by_signal_time_value))) {
-                ArrayList<AssetsData> ads = new ArrayList<>(mAssetData.values());
+                ArrayList<AssetsData> ads = new ArrayList<>(mAssetMap.values());
                 Collections.sort(ads, AssetsData.COMPARE_BY_LAST_SIGNAL_TIME);
                 assetsDataAdapter.addAll(ads);
             }

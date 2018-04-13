@@ -49,9 +49,9 @@ public final class GeofenceQueryUtils {
     private GeofenceQueryUtils() {
     }
 
-    public static ArrayList<GeofencePolygon> extractPolygons(String jsonResponse) {
+    public static TreeMap<Integer, GeofencePolygon> extractPolygons(String jsonResponse) {
         // Create an empty ArrayList that we can start adding polygons to
-        ArrayList<GeofencePolygon> polygons = new ArrayList<>();
+        TreeMap<Integer, GeofencePolygon> polygons = new TreeMap<>();
 
         // Try to parse the SAMPLE_JSON_RESPONSE. If there's a problem with the way the JSON
         // is formatted, a JSONException exception object will be thrown.
@@ -70,7 +70,7 @@ public final class GeofenceQueryUtils {
                     JSONArray pointsLatLng = pointsArray.getJSONArray(j);
                     polygon[j] = new LatLng(pointsLatLng.getDouble(0), pointsLatLng.getDouble(1));
                 }
-                polygons.add(new GeofencePolygon(id, name, isPrivate, polygon));
+                polygons.put(id, new GeofencePolygon(id, name, isPrivate, polygon));
             }
 
         } catch (JSONException e) {
@@ -94,7 +94,7 @@ public final class GeofenceQueryUtils {
         return url;
     }
 
-    public static ArrayList<GeofencePolygon> fetchZonesData(String requestUrl) {
+    public static TreeMap<Integer, GeofencePolygon> fetchZonesData(String requestUrl) {
         // Create URL object
         URL url = createUrl(requestUrl);
         Log.v(LOG_TAG, "fetchZones");
@@ -111,10 +111,10 @@ public final class GeofenceQueryUtils {
         // Extract relevant fields from the JSON response and create an {@link Event} object
         //jsonResponse = "[{\"ID\":2670,\"Name\":\"х808рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х808рт77\"},{\"ID\":5800,\"Name\":\"х108мо77\",\"Model\":\"fh; Volvo\",\"RegNumber\":\"х108мо77\"},{\"ID\":5801,\"Name\":\"с580км777\",\"Model\":\"FH; Вольво\",\"RegNumber\":\"с580км777\"},{\"ID\":6317,\"Name\":\"с416км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с416км777\"},{\"ID\":5807,\"Name\":\"с415км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с415км777\"},{\"ID\":116208,\"Name\":\"о901хк77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"о901хк77\"},{\"ID\":116237,\"Name\":\"х807рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х807рт77\"},{\"ID\":120387,\"Name\":\"х109мо77\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"х109мо77\"}]";
 
-        ArrayList<GeofencePolygon> polygonsList = extractPolygons(jsonResponse);
+        TreeMap<Integer, GeofencePolygon> polygonsMap = extractPolygons(jsonResponse);
 
         // Return the {@link Event}
-        return polygonsList;
+        return polygonsMap;
     }
 
 

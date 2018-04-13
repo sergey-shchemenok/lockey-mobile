@@ -402,6 +402,11 @@ public class MainActivity extends AppCompatActivity implements
                 settingsIntent.putExtra("currentPage", AppData.viewPager.getCurrentItem());
                 startActivity(settingsIntent);
                 return true;
+            case R.id.main_menu_subscriptions:
+                Intent subscriptionsIntent = new Intent(this, SubscriptionsActivity.class);
+                subscriptionsIntent.putExtra("currentPage", AppData.viewPager.getCurrentItem());
+                startActivity(subscriptionsIntent);
+                return true;
             case R.id.main_menu_delete:
                 //Let it be here for a while
                 NotificationsFragmentTab.notificationsFragmentTab.showDeleteConfirmationDialog();

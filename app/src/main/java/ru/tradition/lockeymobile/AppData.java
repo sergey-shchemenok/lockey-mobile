@@ -52,6 +52,8 @@ public final class AppData {
     public static Set<String> selectedNotification = new TreeSet<>();
     public static Set<String> selectedNotificationLong = new TreeSet<>();
     public static Set<Uri> selectedNotificationUri = new TreeSet<>();
+    public static Set<Integer> selectedSubscription = new TreeSet<>();
+
 
     //for selectingMode touches the notification and asset tabs
     public static boolean isAssetSelectingMode = false;

@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
-import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
-import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
 
 import static ru.tradition.lockeymobile.auth.AuthQueryUtils.authCookieManager;
 
@@ -47,9 +45,9 @@ public final class SubscriptionQueryUtils {
     private SubscriptionQueryUtils() {
     }
 
-    public static ArrayList<GeofencePolygon> extractPolygons(String jsonResponse) {
+    public static TreeMap<Integer, SubscriptionData> extractSubscriptions(String jsonResponse) {
         // Create an empty ArrayList that we can start adding polygons to
-        ArrayList<GeofencePolygon> polygons = new ArrayList<>();
+        TreeMap<Integer, SubscriptionData> subscriptions = new TreeMap<>();
 
         // Try to parse the SAMPLE_JSON_RESPONSE. If there's a problem with the way the JSON
         // is formatted, a JSONException exception object will be thrown.
@@ -58,17 +56,20 @@ public final class SubscriptionQueryUtils {
             // build up a list of objects with the corresponding data.
             JSONArray rootArray = new JSONArray(jsonResponse);
             for (int i = 0; i < rootArray.length(); i++) {
-                JSONObject zone = rootArray.getJSONObject(i);
-                int id = zone.getInt("ID");
-                String name = zone.getString("Name");
-                boolean isPrivate = zone.getBoolean("Private");
-                JSONArray pointsArray = zone.getJSONArray("Points");
-                LatLng[] polygon = new LatLng[pointsArray.length()];
-                for (int j = 0; j < pointsArray.length(); j++) {
-                    JSONArray pointsLatLng = pointsArray.getJSONArray(j);
-                    polygon[j] = new LatLng(pointsLatLng.getDouble(0), pointsLatLng.getDouble(1));
+                JSONObject subscription = rootArray.getJSONObject(i);
+                int sid = subscription.getInt("SID");
+                String title = subscription.getString("Title");
+                int zid = subscription.getInt("ZID");
+                String zoneTitle = "Empty";
+                if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty())
+                    zoneTitle = AppData.mPolygonsMap.get(zid).getPolygonName();
+                boolean isSubscribed = subscription.getBoolean("Subscribed");
+                JSONArray carsArray = subscription.getJSONArray("Cars");
+                int[] cars = new int[carsArray.length()];
+                for (int j = 0; j < carsArray.length(); j++) {
+                    cars[j] = carsArray.getInt(j);
                 }
-                polygons.add(new GeofencePolygon(id, name, isPrivate, polygon));
+                subscriptions.put(sid, new SubscriptionData(sid, title, zid, zoneTitle, isSubscribed, cars));
             }
 
         } catch (JSONException e) {
@@ -76,7 +77,7 @@ public final class SubscriptionQueryUtils {
         }
 
         // Return the list of polygons
-        return polygons;
+        return subscriptions;
     }
 
     /**
@@ -110,14 +111,9 @@ public final class SubscriptionQueryUtils {
         }
         Log.e(LOG_TAG, "here jsonResponse     " + jsonResponse + " ");
 
-        // Extract relevant fields from the JSON response and create an {@link Event} object
-        //jsonResponse = "[{\"ID\":2670,\"Name\":\"х808рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х808рт77\"},{\"ID\":5800,\"Name\":\"х108мо77\",\"Model\":\"fh; Volvo\",\"RegNumber\":\"х108мо77\"},{\"ID\":5801,\"Name\":\"с580км777\",\"Model\":\"FH; Вольво\",\"RegNumber\":\"с580км777\"},{\"ID\":6317,\"Name\":\"с416км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с416км777\"},{\"ID\":5807,\"Name\":\"с415км777\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"с415км777\"},{\"ID\":116208,\"Name\":\"о901хк77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"о901хк77\"},{\"ID\":116237,\"Name\":\"х807рт77\",\"Model\":\"седельный   тягач; MAN\",\"RegNumber\":\"х807рт77\"},{\"ID\":120387,\"Name\":\"х109мо77\",\"Model\":\"FH; Volvo\",\"RegNumber\":\"х109мо77\"}]";
+        TreeMap<Integer, SubscriptionData> subscriptions = extractSubscriptions(jsonResponse);
 
-        ArrayList<GeofencePolygon> polygonsList = extractPolygons(jsonResponse);
-
-        // Return the {@link Event}
-        //return mPolygonsMap;
-        return null;
+        return subscriptions;
     }
 
 

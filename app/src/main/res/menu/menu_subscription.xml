@@ -5,18 +5,23 @@
     tools:context=".NotificationActivity">
 
     <item
-        android:id="@+id/notification_menu_logout"
+        android:id="@+id/subscription_menu_logout"
         android:title="@string/menu_logout"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/notification_menu_settings"
+        android:id="@+id/subscription_menu_settings"
         android:title="@string/menu_settings"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/notification_menu_subscriptions"
-        android:title="@string/menu_subscriptions"
-        app:showAsAction="never" />
+        android:id="@+id/subscription_menu_subscribe"
+        android:title="@string/menu_subscribe"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/subscription_menu_unsubscribe"
+        android:title="@string/menu_unsubscribe"
+        app:showAsAction="ifRoom" />
 
 </menu>

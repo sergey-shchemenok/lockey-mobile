@@ -52,5 +52,9 @@
     <string name="subscription_status">Статус:</string>
     <string name="kits_numbers">Комплекты:</string>
     <string name="subscriptions_activity_title">Подписки</string>
+    <string name="menu_subscriptions">Подписки</string>
+    <string name="no_subscriptions">Нет подписок</string>
+    <string name="menu_subscribe">Активировать</string>
+    <string name="menu_unsubscribe">Деактивировать</string>
 
 </resources>

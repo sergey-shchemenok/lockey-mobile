@@ -14,5 +14,10 @@
         android:title="@string/menu_settings"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/asset_menu_subscriptions"
+        android:title="@string/menu_subscriptions"
+        app:showAsAction="never" />
+
 </menu>
     <!--android:visible="false"-->

@@ -33,5 +33,10 @@
         app:showAsAction="always"
         />
 
+    <item
+        android:id="@+id/main_menu_subscriptions"
+        android:title="@string/menu_subscriptions"
+        app:showAsAction="never" />
+
 </menu>
     <!--android:visible="false"-->

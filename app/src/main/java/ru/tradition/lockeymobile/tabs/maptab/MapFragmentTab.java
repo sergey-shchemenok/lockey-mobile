@@ -272,7 +272,8 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 polygons.clear();
             }
             if (polygonNamesNumber != clickedItemIndex) {
-                GeofencePolygon geof = AppData.mPolygonsMap.get(clickedItemIndex);
+                ArrayList<GeofencePolygon> polygonList = new ArrayList<>(AppData.mPolygonsMap.values());
+                GeofencePolygon geof = polygonList.get(clickedItemIndex);
                 LatLng[] latLngArray = geof.getPolygon();
 
                 PolygonOptions popt = new PolygonOptions().geodesic(true);
@@ -305,7 +306,8 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
             }
         }
 
-        GeofencePolygon geof = AppData.mPolygonsMap.get(clickedItemIndex);
+        ArrayList<GeofencePolygon> polygonList = new ArrayList<>(AppData.mPolygonsMap.values());
+        GeofencePolygon geof = polygonList.get(clickedItemIndex);
         LatLng[] latLng = geof.getPolygon();
         Log.i(LOG_TAG, "long click.....");
 

@@ -19,21 +19,6 @@ public class LoadedData {
     private Map<Integer, GeofencePolygon> polygonsMap;
     private Map<Integer, SubscriptionData> subscriptionMap;
 
-//    public LoadedData(Map<Integer, AssetsData> assetMap, Map<Integer,
-//            GeofencePolygon> polygonsMap, Map<Integer, SubscriptionData> subscriptionMap) {
-////        switch (loaderID){
-////            case ASSETS_LOADER_ID:
-////                assetMap = (Map<Integer, AssetsData>)map;
-////            case ZONES_LOADER_ID:
-////                polygonsMap = (Map<Integer, GeofencePolygon>)map;
-////            case SUBSCRIPTIONS_LOADER_ID:
-////                subscriptionMap =(Map<Integer, SubscriptionData>)map;
-//
-//
-//
-//        }
-//    }
-
 
     public LoadedData(Map<Integer, AssetsData> assetMap, Map<Integer, GeofencePolygon> polygonsMap, Map<Integer, SubscriptionData> subscriptionMap) {
         this.assetMap = assetMap;

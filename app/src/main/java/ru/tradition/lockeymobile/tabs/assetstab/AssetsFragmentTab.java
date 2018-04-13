@@ -95,11 +95,11 @@ public class AssetsFragmentTab extends Fragment {
                     if (!AppData.selectedAsset.contains(id)) {
                         AppData.selectedAsset.add(id);
                         AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(++AppData.selectedAssetCounter));
-                        AppData.mainActivity.updateListView();
+                        assetsDataAdapter.notifyDataSetChanged();
                     } else {
                         AppData.selectedAsset.remove(id);
                         AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(--AppData.selectedAssetCounter));
-                        AppData.mainActivity.updateListView();
+                        assetsDataAdapter.notifyDataSetChanged();
                     }
                 }
             }
@@ -114,7 +114,7 @@ public class AssetsFragmentTab extends Fragment {
                 if (AppData.isAssetSelectingMode) {
                     AppData.mainActivity.changeModeToNormal();
                 }
-                AppData.mainActivity.updateListView();
+                assetsDataAdapter.notifyDataSetChanged();
                 AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
                 AppData.target = CameraPosition.builder()
                         .target(new LatLng(as.getLatitude(), as.getLongitude()))

@@ -18,12 +18,17 @@ public class LoadedData {
     private Map<Integer, AssetsData> assetMap;
     private Map<Integer, GeofencePolygon> polygonsMap;
     private Map<Integer, SubscriptionData> subscriptionMap;
+    private String responseMessage;
 
 
     public LoadedData(Map<Integer, AssetsData> assetMap, Map<Integer, GeofencePolygon> polygonsMap, Map<Integer, SubscriptionData> subscriptionMap) {
         this.assetMap = assetMap;
         this.polygonsMap = polygonsMap;
         this.subscriptionMap = subscriptionMap;
+    }
+
+    public LoadedData(String responseMessage) {
+        this.responseMessage = responseMessage;
     }
 
     public Map<Integer, AssetsData> getAssetMap() {
@@ -36,5 +41,9 @@ public class LoadedData {
 
     public Map<Integer, SubscriptionData> getSubscriptionMap() {
         return subscriptionMap;
+    }
+
+    public String getResponseMessage() {
+        return responseMessage;
     }
 }

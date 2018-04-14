@@ -4,7 +4,6 @@ import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.util.Log;
 
-import java.util.List;
 import java.util.Map;
 
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
@@ -12,7 +11,9 @@ import ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
 import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
 
+import static ru.tradition.lockeymobile.AppData.ACTIVATE_SUBSCRIPTION_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.ASSETS_LOADER_ID;
+import static ru.tradition.lockeymobile.AppData.DEACTIVATE_SUBSCRIPTION_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.SUBSCRIPTIONS_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.ZONES_LIST_URL;
 import static ru.tradition.lockeymobile.AppData.ZONES_LOADER_ID;
@@ -35,6 +36,9 @@ public class DataLoader extends AsyncTaskLoader<LoadedData> {
      */
     private String mUrl;
 
+    //for subscribing
+    private int sid;
+
     /**
      * Constructs a new {@link DataLoader}.
      *
@@ -45,6 +49,13 @@ public class DataLoader extends AsyncTaskLoader<LoadedData> {
         super(context);
         mUrl = url;
         this.loaderID = loaderID;
+    }
+
+    public DataLoader(Context context, String url, int loaderID, int sid) {
+        super(context);
+        mUrl = url;
+        this.loaderID = loaderID;
+        this.sid = sid;
     }
 
     @Override
@@ -77,6 +88,13 @@ public class DataLoader extends AsyncTaskLoader<LoadedData> {
                 AppData.mPolygonsMap = GeofenceQueryUtils.fetchZonesData(ZONES_LIST_URL);
                 Map<Integer, SubscriptionData> subscriptionsMap = SubscriptionQueryUtils.fetchSubscriptionsData(mUrl);
                 return new LoadedData(null, null, subscriptionsMap);
+
+            case ACTIVATE_SUBSCRIPTION_LOADER_ID:
+                String responseMessage = ActivatingSubscriptionQueryUtils.fetchResponseMessage(mUrl, sid);
+                return new LoadedData(responseMessage);
+
+
+            case DEACTIVATE_SUBSCRIPTION_LOADER_ID:
 
             default:
                 return null;

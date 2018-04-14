@@ -1,6 +1,9 @@
-package ru.tradition.lockeymobile.auth;
+package ru.tradition.lockeymobile;
 
+import android.text.TextUtils;
 import android.util.Log;
+
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,23 +20,24 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import ru.tradition.lockeymobile.auth.AuthQueryUtils;
+
+import static ru.tradition.lockeymobile.auth.AuthQueryUtils.authCookieManager;
+
 /**
- * Created by Caelestis on 23.01.2018.
+ * Created by Caelestis on 14.04.2018.
  */
 
-public final class AuthQueryUtils {
-    public static final String LOG_TAG = AuthQueryUtils.class.getName();
+public final class ActivatingSubscriptionQueryUtils {
+    public static final String LOG_TAG = ActivatingSubscriptionQueryUtils.class.getName();
 
     //Stores the response code for the request
-    public static int authUrlResponseCode;
+    public static int activatingSubscriptionUrlResponseCode;
 
     //Stores the response message for the request
-    public static String authUrlResponseMessage;
+    public static String activatingSubscriptionUrlResponseMessage;
 
-    //For getting cookies
-    public static java.net.CookieManager authCookieManager = new java.net.CookieManager();
-
-    private AuthQueryUtils() {}
+    private ActivatingSubscriptionQueryUtils() {}
 
     public static String extractData(String jsonResponse) {
 
@@ -63,15 +67,15 @@ public final class AuthQueryUtils {
         return url;
     }
 
-    public static String fetchAuthData(String requestUrl, String pwd, String usr) {
+    public static String fetchResponseMessage(String requestUrl, int sid) {
         // Create URL object
         URL url = createUrl(requestUrl);
-        Log.v(LOG_TAG, "fetchAuthData");
+        Log.v(LOG_TAG, "fetch response Message");
 
         // Perform HTTP request to the URL and receive a JSON response back
         String jsonResponse = null;
         try {
-            jsonResponse = makeHttpRequest(url, pwd, usr);
+            jsonResponse = makeHttpRequest(url, sid);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error closing input stream", e);
         }
@@ -88,42 +92,49 @@ public final class AuthQueryUtils {
     /**
      * Make an HTTP request to the given URL and return a String as the response.
      */
-    public synchronized static String makeHttpRequest(URL url, String pwd, String usr) throws IOException {
+    public synchronized static String makeHttpRequest(URL url, int sid) throws IOException {
+        String jsonResponse = "";
+        // If the URL is null, then return early.
+        if (url == null) {
+            return jsonResponse;
+        }
+
+        if (AppData.needToken) {
+            AuthQueryUtils.makeHttpRequest(new URL(AppData.AUTH_REQUEST_URL), AppData.pwd, AppData.usr);
+            AppData.needToken = false;
+        }
+
         StringBuilder sb = new StringBuilder();
         HttpURLConnection urlConnection = null;
 
         try {
             JSONObject jsonParam = new JSONObject();
-            jsonParam.put("Usr", usr);
-            jsonParam.put("Pwd", pwd);
+            jsonParam.put("sid", sid);
+            jsonParam.put("key",  FirebaseInstanceId.getInstance().getToken());
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("POST");
+
+            if (authCookieManager.getCookieStore().getCookies().size() > 0) {
+                urlConnection.setRequestProperty("Cookie",
+                        TextUtils.join(";", authCookieManager.getCookieStore().getCookies()));
+            }
+
             urlConnection.setConnectTimeout(10000);
             urlConnection.setReadTimeout(15000);
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
             urlConnection.setFixedLengthStreamingMode(jsonParam.toString().getBytes().length);
             urlConnection.setRequestProperty("Content-Type", "application/json;charset=utf-8"); //;charset=utf-8
-            //urlConnection.setRequestProperty("Host", "my.lockey.ru");
             urlConnection.connect();
 
             OutputStream os = new BufferedOutputStream(urlConnection.getOutputStream());
             os.write(jsonParam.toString().getBytes());
             os.flush();
 
-            Map<String, List<String>> headerFields = urlConnection.getHeaderFields();
-            List<String> cookiesHeader = headerFields.get("Set-Cookie");
-
-            if (cookiesHeader != null) {
-                for (String cookie : cookiesHeader) {
-                    authCookieManager.getCookieStore().add(null, HttpCookie.parse(cookie).get(0));
-                }
-            }
-
-            authUrlResponseCode = urlConnection.getResponseCode();
-            authUrlResponseMessage = urlConnection.getResponseMessage();
-            if (authUrlResponseCode == HttpURLConnection.HTTP_OK) {
+            activatingSubscriptionUrlResponseCode = urlConnection.getResponseCode();
+            activatingSubscriptionUrlResponseMessage = urlConnection.getResponseMessage();
+            if (activatingSubscriptionUrlResponseCode == HttpURLConnection.HTTP_OK) {
                 BufferedReader br = new BufferedReader(new InputStreamReader(
                         urlConnection.getInputStream(), "utf-8"));
                 String line = null;
@@ -135,7 +146,7 @@ public final class AuthQueryUtils {
                 return sb.toString();
 
             } else {
-                return String.valueOf(authUrlResponseCode);
+                return String.valueOf(activatingSubscriptionUrlResponseCode);
                 //return urlConnection.getResponseMessage();
             }
         } catch (MalformedURLException e) {
@@ -155,5 +166,4 @@ public final class AuthQueryUtils {
                 urlConnection.disconnect();
         }
     }
-
-    }
+}

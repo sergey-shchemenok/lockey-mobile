@@ -245,7 +245,7 @@ public class AuthActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<String> loader, String message) {
-        loaderManager.destroyLoader(2);
+        loaderManager.destroyLoader(AppData.AUTH_LOADER_ID);
         if (!message.equals("OK") && AuthQueryUtils.authUrlResponseCode != HttpURLConnection.HTTP_OK) {
             infoMessage.setVisibility(View.VISIBLE);
             infoMessage.setText(AuthQueryUtils.authUrlResponseMessage);

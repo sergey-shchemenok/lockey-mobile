@@ -102,6 +102,8 @@ public class AssetsFragmentTab extends Fragment {
                         assetsDataAdapter.notifyDataSetChanged();
                     }
                 }
+//                AppData.mainActivity.getZones();
+
             }
         });
 

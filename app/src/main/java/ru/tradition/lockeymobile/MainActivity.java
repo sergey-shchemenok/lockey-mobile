@@ -205,14 +205,15 @@ public class MainActivity extends AppCompatActivity implements
         //whether it can be authorized. The token has not expired
         if (AppData.zonesUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
-            GeofenceQueryUtils.needToken = true;
+            AppData.needToken = true;
             //todo something later
             getZones();
         }
 
         //whether it can be authorized. The token has not expired
         if (AppData.assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
-            AssetsQueryUtils.needToken = true;
+            AppData.needToken = true;
+            getZones();
         }
 
 

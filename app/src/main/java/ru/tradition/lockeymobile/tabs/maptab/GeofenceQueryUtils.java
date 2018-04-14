@@ -40,9 +40,6 @@ public final class GeofenceQueryUtils {
     //Stores the response message for the request
     public static String zonesUrlResponseMessage;
 
-    //whether it need new token to download data
-    public static boolean needToken = false;
-
     /**
      * Create a private constructor because no one should ever create a {@link GeofenceQueryUtils} object.
      */
@@ -128,9 +125,9 @@ public final class GeofenceQueryUtils {
             return jsonResponse;
         }
 
-        if (needToken) {
+        if (AppData.needToken) {
             AuthQueryUtils.makeHttpRequest(new URL(AppData.AUTH_REQUEST_URL), AppData.pwd, AppData.usr);
-            needToken = false;
+            AppData.needToken = false;
         }
 
         Log.e(LOG_TAG, "url..........." + url + "...");

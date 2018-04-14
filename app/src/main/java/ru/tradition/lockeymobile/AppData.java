@@ -33,6 +33,9 @@ public final class AppData {
     public static int zonesUrlResponseCode;
     public static int subscriptionsUrlResponseCode;
 
+    //whether it need new token to download data
+    public static volatile boolean needToken = false;
+
     //Here is the data from Loader about cars and other assets
     public static Map<Integer, AssetsData> mAssetMap;
     //To save camera position in case of restarting app
@@ -78,21 +81,24 @@ public final class AppData {
 
 
     /**
-     * Constant value for the assets loader ID. We can choose any integer.
-     * This comes into play if you're using multiple loaders.
+     * Constant value for the loader ID.
      */
     public static final int AUTH_LOADER_ID = 1;
     public static final int ASSETS_LOADER_ID = 2;
     public static final int ZONES_LOADER_ID = 3;
     public static final int SUBSCRIPTIONS_LOADER_ID = 4;
+    public static final int ACTIVATE_SUBSCRIPTION_LOADER_ID = 5;
+    public static final int DEACTIVATE_SUBSCRIPTION_LOADER_ID = 6;
 
 
     /**
-     * URL for assets data from server
+     * URL for data from server
      */
     public static final String ASSETS_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/Cars";
     public static final String AUTH_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/Auth";
     public static final String ZONES_LIST_URL = "http://my.lockey.ru/LockeyREST/api/Zone";
     public static final String SUBSCRIPTIONS_LIST_URL = "http://my.lockey.ru/LockeyREST/api/ZoneSubscription?";
+    public static final String ACTIVATE_SUBSCRIPTION_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/ZoneSubscription";
+    public static final String DEACTIVATE_SUBSCRIPTION_REQUEST_URL = "http://my.lockey.ru/LockeyREST/api/ZoneSubscription?";
 
 }

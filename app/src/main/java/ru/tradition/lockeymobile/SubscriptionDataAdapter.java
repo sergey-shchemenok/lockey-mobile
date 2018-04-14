@@ -56,17 +56,22 @@ public class SubscriptionDataAdapter extends ArrayAdapter<SubscriptionData> {
 
         TextView subscriptionStatus = (TextView) listItemView.findViewById(R.id.subscription_status);
         boolean isSubscribed = currentSubscriptionsData.isSubscribed();
-        if (isSubscribed)
+
+        if (AppData.activatingSubscription.contains(currentSubscriptionsData.getSid())) {
+            subscriptionStatus.setText("Активация");
+        } else if (AppData.deactivatingSubscription.contains(currentSubscriptionsData.getSid())) {
+            subscriptionStatus.setText("Деактивация");
+        } else if (isSubscribed)
             subscriptionStatus.setText("Активна");
         else
-            subscriptionStatus.setText("");
+            subscriptionStatus.setText("Неактивна");
 
         TextView kitsNumbers = (TextView) listItemView.findViewById(R.id.kits_numbers);
         int[] cars = currentSubscriptionsData.getCars();
         String carString = "";
-        for (int x: cars)
+        for (int x : cars)
             carString += x + ", ";
-        kitsNumbers.setText(carString.substring(0,(carString.length()-2)));
+        kitsNumbers.setText(carString.substring(0, (carString.length() - 2)));
 
         return listItemView;
     }

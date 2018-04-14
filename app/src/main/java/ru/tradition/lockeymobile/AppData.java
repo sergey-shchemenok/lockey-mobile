@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
@@ -52,11 +53,14 @@ public final class AppData {
 
     //This sets determines which kit is selected
     public static Set<Integer> selectedAsset = new TreeSet<>();
+
     public static Set<String> selectedNotification = new TreeSet<>();
     public static Set<String> selectedNotificationLong = new TreeSet<>();
     public static Set<Uri> selectedNotificationUri = new TreeSet<>();
-    public static Set<Integer> selectedSubscription = new TreeSet<>();
 
+    public static volatile Set<Integer> selectedSubscription = new CopyOnWriteArraySet<>();
+    public static volatile Set<Integer> activatingSubscription = new CopyOnWriteArraySet<>();
+    public static volatile Set<Integer> deactivatingSubscription = new CopyOnWriteArraySet<>();
 
     //for selectingMode touches the notification and asset tabs
     public static boolean isAssetSelectingMode = false;

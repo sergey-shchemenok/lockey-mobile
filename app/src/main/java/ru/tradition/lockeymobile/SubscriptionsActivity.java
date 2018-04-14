@@ -1,18 +1,15 @@
 package ru.tradition.lockeymobile;
 
 import android.app.LoaderManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.content.Loader;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,15 +20,12 @@ import android.widget.TextView;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsDataAdapter;
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragmentTab;
-import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static ru.tradition.lockeymobile.AppData.ACTIVATE_SUBSCRIPTION_LOADER_ID;
+import static ru.tradition.lockeymobile.AppData.DEACTIVATE_SUBSCRIPTION_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.SUBSCRIPTIONS_LOADER_ID;
-import static ru.tradition.lockeymobile.AppData.mAssetMap;
 
 
 public class SubscriptionsActivity extends AppCompatActivity implements
@@ -56,12 +50,20 @@ public class SubscriptionsActivity extends AppCompatActivity implements
     private static boolean subscribedItemSelected = false;
 
     //Contains subscription SID
-    private int mSID = -1;
+    private static int mSID = -1;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //go to auth activity. It need to prevent seeing the internal information without authorization
+        if (AppData.usr.equals("") || AppData.pwd.equals("") || AppData.isAuthorized == false) {
+            Intent intent = new Intent(this, AuthActivity.class);
+            startActivity(intent);
+        }
+        
+
         setContentView(R.layout.activity_subscriptions);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -101,12 +103,21 @@ public class SubscriptionsActivity extends AppCompatActivity implements
                     AppData.selectedSubscription.add(sid);
                     mSID = sid;
                     subscriptionDataAdapter.notifyDataSetChanged();
+                    if (AppData.activatingSubscription.contains(mSID) ||
+                            AppData.deactivatingSubscription.contains(mSID)) {
+                        mMenu.getItem(2).setVisible(false);
+                        mMenu.getItem(3).setVisible(false);
+                        return;
+                    }
+
                     if (sd.isSubscribed()) {
                         subscribedItemSelected = true;
+                        itemSelected = false;
                         mMenu.getItem(2).setVisible(false);
                         mMenu.getItem(3).setVisible(true);
                     } else {
                         itemSelected = true;
+                        subscribedItemSelected = false;
                         mMenu.getItem(2).setVisible(true);
                         mMenu.getItem(3).setVisible(false);
                     }
@@ -127,6 +138,12 @@ public class SubscriptionsActivity extends AppCompatActivity implements
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startUpdater();
+    }
+
     public void getSubscriptions() {
         Log.i(LOG_TAG, "....startSubscriptionLoader....");
         activeNetwork = connectivityManager.getActiveNetworkInfo();
@@ -140,13 +157,28 @@ public class SubscriptionsActivity extends AppCompatActivity implements
         }
     }
 
-    public void activateSubscription() {
+    public synchronized void activateSubscription() {
         Log.i(LOG_TAG, "....start activating subscription....");
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
+            AppData.activatingSubscription.add(mSID);
             loaderManager = getLoaderManager();
             loaderManager.initLoader(AppData.ACTIVATE_SUBSCRIPTION_LOADER_ID, null, this);
             Log.i(LOG_TAG, "init activating subscription");
+        } else {
+            infoMessage.setVisibility(View.VISIBLE);
+            infoMessage.setText(R.string.no_connection);
+        }
+    }
+
+    public synchronized void deactivateSubscription() {
+        Log.i(LOG_TAG, "....start deactivating subscription....");
+        activeNetwork = connectivityManager.getActiveNetworkInfo();
+        if (activeNetwork != null && activeNetwork.isConnected()) {
+            AppData.deactivatingSubscription.add(mSID);
+            loaderManager = getLoaderManager();
+            loaderManager.initLoader(DEACTIVATE_SUBSCRIPTION_LOADER_ID, null, this);
+            Log.i(LOG_TAG, "init deactivating subscription");
         } else {
             infoMessage.setVisibility(View.VISIBLE);
             infoMessage.setText(R.string.no_connection);
@@ -161,7 +193,8 @@ public class SubscriptionsActivity extends AppCompatActivity implements
                 return new DataLoader(this, AppData.SUBSCRIPTIONS_LIST_URL, SUBSCRIPTIONS_LOADER_ID);
             case ACTIVATE_SUBSCRIPTION_LOADER_ID:
                 return new DataLoader(this, AppData.ACTIVATE_SUBSCRIPTION_REQUEST_URL, ACTIVATE_SUBSCRIPTION_LOADER_ID, mSID);
-
+            case DEACTIVATE_SUBSCRIPTION_LOADER_ID:
+                return new DataLoader(this, AppData.DEACTIVATE_SUBSCRIPTION_REQUEST_URL, DEACTIVATE_SUBSCRIPTION_LOADER_ID, mSID);
             default:
                 return null;
         }
@@ -171,34 +204,42 @@ public class SubscriptionsActivity extends AppCompatActivity implements
     public void onLoadFinished(android.content.Loader<LoadedData> loader, LoadedData loadedData) {
         mEmptyStateTextView.setText(R.string.no_subscriptions);
         progressCircle.setVisibility(View.GONE);
+        loaderManager.destroyLoader(AppData.SUBSCRIPTIONS_LOADER_ID);
+        loaderManager.destroyLoader(AppData.ACTIVATE_SUBSCRIPTION_LOADER_ID);
+        loaderManager.destroyLoader(AppData.DEACTIVATE_SUBSCRIPTION_LOADER_ID);
 
-        //whether it can be authorized. The token has not expired
         if (ActivatingSubscriptionQueryUtils.activatingSubscriptionUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             AppData.needToken = true;
             activateSubscription();
             return;
+        }
+        //whether it can be authorized. The token has not expired
+        if (DeactivatingSubscriptionQueryUtils.deactivatingSubscriptionUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            AppData.needToken = true;
+            deactivateSubscription();
+            return;
+        }
+        if (SubscriptionQueryUtils.subscriptionsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            AppData.needToken = true;
+//            getSubscriptions();
+//            return;
         }
 
         if (loadedData.getResponseMessage() != null && !loadedData.getResponseMessage().isEmpty()) {
             if (loadedData.getResponseMessage().equals("OK"))
                 return;
         }
-        //whether it can be authorized. The token has not expired
-        if (AppData.subscriptionsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
-            AppData.needToken = true;
-            getSubscriptions();
-            return;
-        }
 
-        subscriptionDataAdapter.clear();
+
         if (loadedData.getSubscriptionMap() == null || loadedData.getSubscriptionMap().isEmpty()) {
             return;
         }
+        subscriptionDataAdapter.clear();
+        AppData.mSubscriptionsMap = loadedData.getSubscriptionMap();
         infoMessage.setVisibility(View.GONE);
         Log.v(LOG_TAG, "onLoadFinished");
-        subscriptionDataAdapter.addAll(new ArrayList<>(loadedData.getSubscriptionMap().values()));
+        subscriptionDataAdapter.addAll(new ArrayList<>(AppData.mSubscriptionsMap.values()));
 
-        loaderManager.destroyLoader(AppData.SUBSCRIPTIONS_LOADER_ID);
     }
 
     @Override
@@ -215,6 +256,12 @@ public class SubscriptionsActivity extends AppCompatActivity implements
             mMenu.getItem(3).setVisible(false);
         if (!itemSelected)
             mMenu.getItem(2).setVisible(false);
+        if (AppData.activatingSubscription.contains(mSID) ||
+                AppData.deactivatingSubscription.contains(mSID)) {
+            mMenu.getItem(2).setVisible(false);
+            mMenu.getItem(3).setVisible(false);
+        }
+
         return true;
     }
 
@@ -230,19 +277,29 @@ public class SubscriptionsActivity extends AppCompatActivity implements
                 startActivity(settingsIntent);
                 return true;
             case R.id.subscription_menu_subscribe:
-                if (mSID != -1){
-                    activateSubscription();
-                    AppData.selectedSubscription.clear();
-                    mSID = -1;
-                    subscriptionDataAdapter.notifyDataSetChanged();
+                if (!AppData.activatingSubscription.contains(mSID)) {
+                    if (mSID != -1) {
+                        activateSubscription();
+                        AppData.selectedSubscription.clear();
+                        mSID = -1;
+                        mMenu.getItem(2).setVisible(false);
+                        itemSelected = false;
+                        subscribedItemSelected = false;
+                        subscriptionDataAdapter.notifyDataSetChanged();
+                    }
                 }
                 return true;
             case R.id.subscription_menu_unsubscribe:
-                if (mSID != -1){
-                    //deactivateSubscription();
-                    AppData.selectedSubscription.clear();
-                    mSID = -1;
-                    subscriptionDataAdapter.notifyDataSetChanged();
+                if (!AppData.deactivatingSubscription.contains(mSID)) {
+                    if (mSID != -1) {
+                        deactivateSubscription();
+                        AppData.selectedSubscription.clear();
+                        mSID = -1;
+                        mMenu.getItem(3).setVisible(false);
+                        itemSelected = false;
+                        subscribedItemSelected = false;
+                        subscriptionDataAdapter.notifyDataSetChanged();
+                    }
                 }
                 return true;
         }
@@ -273,6 +330,66 @@ public class SubscriptionsActivity extends AppCompatActivity implements
         subscriptionDataAdapter.notifyDataSetChanged();
         subscribedItemSelected = false;
         itemSelected = false;
+    }
+
+
+    //let's check up the Timer
+    private Timer updaterTimer;
+    private SubscriptionListUpdater mUpdater;
+
+    private void startUpdater() {
+        if (updaterTimer != null) {
+            updaterTimer.cancel();
+        }
+        // re-schedule timer here otherwise, IllegalStateException of "TimerTask is scheduled already" will be thrown
+        updaterTimer = new Timer();
+        mUpdater = new SubscriptionListUpdater();
+        updaterTimer.scheduleAtFixedRate(mUpdater, 5000, 5000);
+    }
+
+    class SubscriptionListUpdater extends TimerTask {
+
+        private synchronized void processMenu() {
+            for (int x : AppData.activatingSubscription) {
+                if (AppData.mSubscriptionsMap.get(x).isSubscribed()) {
+                    AppData.activatingSubscription.remove(x);
+                    if (mSID == x && mMenu != null) {
+                        mMenu.getItem(3).setVisible(true);
+                        subscribedItemSelected = true;
+                    }
+                }
+            }
+            for (int x : AppData.deactivatingSubscription) {
+                if (!AppData.mSubscriptionsMap.get(x).isSubscribed()) {
+                    AppData.deactivatingSubscription.remove(x);
+                    if (mSID == x && mMenu != null) {
+                        mMenu.getItem(2).setVisible(true);
+                        itemSelected = true;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    getSubscriptions();
+                    processMenu();
+                    subscriptionDataAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (updaterTimer != null) {
+            updaterTimer.cancel();
+        }
     }
 
 }

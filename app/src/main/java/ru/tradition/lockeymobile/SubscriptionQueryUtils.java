@@ -34,6 +34,7 @@ public final class SubscriptionQueryUtils {
     public static final String LOG_TAG = SubscriptionQueryUtils.class.getName();
 
     //Stores the response message for the request
+    public static int subscriptionsUrlResponseCode;
     public static String subscriptionsUrlResponseMessage;
 
     /**
@@ -151,9 +152,9 @@ public final class SubscriptionQueryUtils {
             // If the request was successful (response code 200),
             // then read the input stream and parse the response.
 
-            AppData.zonesUrlResponseCode = urlConnection.getResponseCode();
-            //zonesUrlResponseMessage = urlConnection.getResponseMessage();
-            if (AppData.zonesUrlResponseCode == HttpURLConnection.HTTP_OK) {
+            subscriptionsUrlResponseCode = urlConnection.getResponseCode();
+            subscriptionsUrlResponseMessage = urlConnection.getResponseMessage();
+            if (subscriptionsUrlResponseCode == HttpURLConnection.HTTP_OK) {
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);
             } else {

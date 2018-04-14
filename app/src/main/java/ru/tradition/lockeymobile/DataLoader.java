@@ -95,7 +95,8 @@ public class DataLoader extends AsyncTaskLoader<LoadedData> {
 
 
             case DEACTIVATE_SUBSCRIPTION_LOADER_ID:
-
+                String responseMessageD = DeactivatingSubscriptionQueryUtils.fetchResponseMessage(mUrl, sid);
+                return new LoadedData(responseMessageD);
             default:
                 return null;
 

@@ -91,12 +91,12 @@ public class DataLoader extends AsyncTaskLoader<LoadedData> {
 
             case ACTIVATE_SUBSCRIPTION_LOADER_ID:
                 String responseMessage = ActivatingSubscriptionQueryUtils.fetchResponseMessage(mUrl, sid);
-                return new LoadedData(responseMessage);
+                return new LoadedData(responseMessage, sid);
 
 
             case DEACTIVATE_SUBSCRIPTION_LOADER_ID:
                 String responseMessageD = DeactivatingSubscriptionQueryUtils.fetchResponseMessage(mUrl, sid);
-                return new LoadedData(responseMessageD);
+                return new LoadedData(responseMessageD, sid);
             default:
                 return null;
 

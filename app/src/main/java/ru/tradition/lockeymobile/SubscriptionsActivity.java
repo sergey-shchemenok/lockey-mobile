@@ -62,7 +62,7 @@ public class SubscriptionsActivity extends AppCompatActivity implements
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
         }
-        
+
 
         setContentView(R.layout.activity_subscriptions);
 
@@ -208,15 +208,25 @@ public class SubscriptionsActivity extends AppCompatActivity implements
         loaderManager.destroyLoader(AppData.ACTIVATE_SUBSCRIPTION_LOADER_ID);
         loaderManager.destroyLoader(AppData.DEACTIVATE_SUBSCRIPTION_LOADER_ID);
 
+        Log.i(LOG_TAG, "activatingSubscriptionUrlResponseCode" + ActivatingSubscriptionQueryUtils.activatingSubscriptionUrlResponseCode);
+        Log.i(LOG_TAG, "deactivatingSubscriptionUrlResponseCode" + DeactivatingSubscriptionQueryUtils.deactivatingSubscriptionUrlResponseCode);
+
+
         if (ActivatingSubscriptionQueryUtils.activatingSubscriptionUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             AppData.needToken = true;
+            Log.i(LOG_TAG, "reactivating...");
+            mSID = loadedData.getSid();
             activateSubscription();
+            mSID = -1;
             return;
         }
         //whether it can be authorized. The token has not expired
         if (DeactivatingSubscriptionQueryUtils.deactivatingSubscriptionUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             AppData.needToken = true;
+            Log.i(LOG_TAG, "redeactivating...");
+            mSID = loadedData.getSid();
             deactivateSubscription();
+            mSID = -1;
             return;
         }
         if (SubscriptionQueryUtils.subscriptionsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
@@ -294,6 +304,7 @@ public class SubscriptionsActivity extends AppCompatActivity implements
                     if (mSID != -1) {
                         deactivateSubscription();
                         AppData.selectedSubscription.clear();
+
                         mSID = -1;
                         mMenu.getItem(3).setVisible(false);
                         itemSelected = false;
@@ -351,6 +362,11 @@ public class SubscriptionsActivity extends AppCompatActivity implements
 
         private synchronized void processMenu() {
             for (int x : AppData.activatingSubscription) {
+                Log.i(LOG_TAG, "activation value of " + x);
+                if (AppData.mSubscriptionsMap.get(x) == null) {
+                    Log.i(LOG_TAG, "activation broken " + x);
+                    break;
+                }
                 if (AppData.mSubscriptionsMap.get(x).isSubscribed()) {
                     AppData.activatingSubscription.remove(x);
                     if (mSID == x && mMenu != null) {
@@ -360,6 +376,11 @@ public class SubscriptionsActivity extends AppCompatActivity implements
                 }
             }
             for (int x : AppData.deactivatingSubscription) {
+                Log.i(LOG_TAG, "deactivation value of " + x);
+                if (AppData.mSubscriptionsMap.get(x) == null) {
+                    Log.i(LOG_TAG, "deactivation broken " + x);
+                    break;
+                }
                 if (!AppData.mSubscriptionsMap.get(x).isSubscribed()) {
                     AppData.deactivatingSubscription.remove(x);
                     if (mSID == x && mMenu != null) {

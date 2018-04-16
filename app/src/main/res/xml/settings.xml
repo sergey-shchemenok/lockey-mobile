@@ -3,12 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="@string/settings_title">
 
-    <CheckBoxPreference
-        android:title="@string/settings_allow_notifications_title"
-        android:defaultValue="false"
-        android:key="@string/settings_allow_notifications_key"
+    <!--<CheckBoxPreference-->
+        <!--android:title="@string/settings_allow_notifications_title"-->
+        <!--android:defaultValue="false"-->
+        <!--android:key="@string/settings_allow_notifications_key"-->
 
-        />
+        <!--/>-->
 
     <ListPreference
         android:defaultValue="@string/settings_order_by_default"

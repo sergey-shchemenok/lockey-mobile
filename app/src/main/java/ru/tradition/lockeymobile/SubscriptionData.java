@@ -4,7 +4,7 @@ package ru.tradition.lockeymobile;
  * Created by Caelestis on 12.04.2018.
  */
 
-class SubscriptionData {
+public class SubscriptionData {
     private int sid;
     private String title;
     private int zid;

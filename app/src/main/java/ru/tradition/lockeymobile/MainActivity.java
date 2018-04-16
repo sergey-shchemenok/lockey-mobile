@@ -76,12 +76,6 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
 
         //go to auth activity
-//        if (AppData.assetsUrlResponseCode == 0) {
-//            Intent intent = new Intent(this, AuthActivity.class);
-//            startActivity(intent);
-//            Log.i(LOG_TAG, ".............assetsUrlResponseCode == 0");
-//        }
-        //go to auth activity
         if (AppData.usr.equals("") || AppData.pwd.equals("")) {
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
@@ -107,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements
 
         //todo when server part be ready
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        allowNotification = sharedPrefs.getBoolean(getString(R.string.settings_allow_notifications_key), false);
-        Log.i(LOG_TAG, "allowNotification.........." + allowNotification);
+//        allowNotification = sharedPrefs.getBoolean(getString(R.string.settings_allow_notifications_key), false);
+//        Log.i(LOG_TAG, "allowNotification.........." + allowNotification);
         orderBy = sharedPrefs.getString(
                 getString(R.string.settings_order_by_key),
                 getString(R.string.settings_order_by_default)

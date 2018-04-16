@@ -212,14 +212,6 @@ public class AuthActivity extends AppCompatActivity
         values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE, nd.getLatitude());
         values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE, nd.getLongitude());
 
-        // Insert a new row for Toto in the database, returning the ID of that new row.
-        // The first argument for db.insert() is the pets table name.
-        // The second argument provides the name of a column in which the framework
-        // can insert NULL in the event that the ContentValues is empty (if
-        // this is set to "null", then the framework will not insert a row when
-        // there are no values).
-        // The third argument is the ContentValues object containing the info for Toto.
-        //long newRowId = db.insert(PetContract.PetEntry.TABLE_NAME, null, values);
         Uri newUri = getContentResolver().insert(NotificationContract.NotificationEntry.CONTENT_URI, values);
     }
 

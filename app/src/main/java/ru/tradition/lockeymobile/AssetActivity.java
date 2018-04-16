@@ -17,8 +17,6 @@ public class AssetActivity extends AppCompatActivity {
     private TextView regNumber;
     private TextView carModel;
     private TextView name;
-    //just for debugging
-    private TextView lastTime;
 
     private Button toMapButton;
     private Button blockEngineButton;

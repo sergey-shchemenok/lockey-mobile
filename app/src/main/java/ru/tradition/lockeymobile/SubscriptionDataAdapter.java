@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
@@ -25,6 +26,37 @@ public class SubscriptionDataAdapter extends ArrayAdapter<SubscriptionData> {
 
     public SubscriptionDataAdapter(Activity context, List<SubscriptionData> data) {
         super(context, 0, data);
+    }
+
+    public void swapItems(List<SubscriptionData> newList) {
+        List<SubscriptionData> oldList = this.getAllAdapterList();
+        List<SubscriptionData> swapList;
+        if (newList.size() >= oldList.size()) {
+            swapList = newList;
+        } else {
+            swapList = oldList;
+        }
+        for (int i = 0; i<swapList.size();i++) {
+            if (i < newList.size()) {
+                this.insert(newList.get(i), i);
+            }
+            if(i < oldList.size()) {
+                this.remove(oldList.get(i));
+            }
+
+        }
+
+        this.notifyDataSetChanged();
+    }
+
+    public List<SubscriptionData> getAllAdapterList(){
+        int count = this.getCount();
+        List<SubscriptionData> objVal = new ArrayList<SubscriptionData>();
+
+        for (int i = 0; i < count; i++) {
+            objVal.add(this.getItem(i));
+        }
+        return objVal;
     }
 
 
@@ -59,12 +91,17 @@ public class SubscriptionDataAdapter extends ArrayAdapter<SubscriptionData> {
 
         if (AppData.activatingSubscription.contains(currentSubscriptionsData.getSid())) {
             subscriptionStatus.setText("Активация");
+            subscriptionStatus.setTextColor(ContextCompat.getColor(getContext(), R.color.assetTableHeaderColor));
         } else if (AppData.deactivatingSubscription.contains(currentSubscriptionsData.getSid())) {
             subscriptionStatus.setText("Деактивация");
-        } else if (isSubscribed)
+            subscriptionStatus.setTextColor(ContextCompat.getColor(getContext(), R.color.assetTableHeaderColor));
+        } else if (isSubscribed) {
             subscriptionStatus.setText("Активна");
-        else
+            subscriptionStatus.setTextColor(ContextCompat.getColor(getContext(), R.color.assetTableContentColor));
+        } else {
             subscriptionStatus.setText("Неактивна");
+            subscriptionStatus.setTextColor(ContextCompat.getColor(getContext(), R.color.assetTableContentColor));
+        }
 
         TextView kitsNumbers = (TextView) listItemView.findViewById(R.id.kits_numbers);
         int[] cars = currentSubscriptionsData.getCars();

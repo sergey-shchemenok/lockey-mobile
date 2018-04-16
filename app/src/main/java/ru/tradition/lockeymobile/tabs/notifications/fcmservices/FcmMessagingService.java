@@ -153,6 +153,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
+        @SuppressWarnings("deprecation")
         NotificationCompat.Builder notifiBuilder = new NotificationCompat.Builder(this, FCM_NOTIFICATION_CHANNEL_ID)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())

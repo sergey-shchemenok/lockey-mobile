@@ -1,13 +1,12 @@
 package ru.tradition.lockeymobile;
 
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -47,8 +46,8 @@ public class SettingsActivity extends AppCompatActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.settings);
 
-            Preference allowNotification = findPreference(getString(R.string.settings_allow_notifications_key));
-            bindPreferenceSummaryToValue(allowNotification);
+//            Preference allowNotification = findPreference(getString(R.string.settings_allow_notifications_key));
+//            bindPreferenceSummaryToValue(allowNotification);
 
             Preference orderBy = findPreference(getString(R.string.settings_order_by_key));
             bindPreferenceSummaryToValue(orderBy);
@@ -73,10 +72,11 @@ public class SettingsActivity extends AppCompatActivity {
         private void bindPreferenceSummaryToValue(Preference preference) {
             preference.setOnPreferenceChangeListener(this);
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
-            if (preference instanceof CheckBoxPreference) {
-                boolean preferenceBoolean = preferences.getBoolean(preference.getKey(), false);
-                onPreferenceChange(preference, preferenceBoolean);
-            }  else if (preference instanceof ListPreference) {
+//            if (preference instanceof CheckBoxPreference) {
+//                boolean preferenceBoolean = preferences.getBoolean(preference.getKey(), false);
+//                onPreferenceChange(preference, preferenceBoolean);
+//            }  else
+            if (preference instanceof ListPreference) {
                 String preferenceString = preferences.getString(preference.getKey(), "");
                 onPreferenceChange(preference, preferenceString);
             }

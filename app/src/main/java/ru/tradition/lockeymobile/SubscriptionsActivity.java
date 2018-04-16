@@ -17,6 +17,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -208,8 +209,8 @@ public class SubscriptionsActivity extends AppCompatActivity implements
         loaderManager.destroyLoader(AppData.ACTIVATE_SUBSCRIPTION_LOADER_ID);
         loaderManager.destroyLoader(AppData.DEACTIVATE_SUBSCRIPTION_LOADER_ID);
 
-        Log.i(LOG_TAG, "activatingSubscriptionUrlResponseCode" + ActivatingSubscriptionQueryUtils.activatingSubscriptionUrlResponseCode);
-        Log.i(LOG_TAG, "deactivatingSubscriptionUrlResponseCode" + DeactivatingSubscriptionQueryUtils.deactivatingSubscriptionUrlResponseCode);
+        Log.i(LOG_TAG, "activatingSubscriptionUrlResponseCode " + ActivatingSubscriptionQueryUtils.activatingSubscriptionUrlResponseCode);
+        Log.i(LOG_TAG, "deactivatingSubscriptionUrlResponseCode " + DeactivatingSubscriptionQueryUtils.deactivatingSubscriptionUrlResponseCode);
 
 
         if (ActivatingSubscriptionQueryUtils.activatingSubscriptionUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
@@ -236,19 +237,45 @@ public class SubscriptionsActivity extends AppCompatActivity implements
         }
 
         if (loadedData.getResponseMessage() != null && !loadedData.getResponseMessage().isEmpty()) {
+            Log.i(LOG_TAG, "Response Message:   " + loadedData.getResponseMessage() + " sid: " + loadedData.getSid());
             if (loadedData.getResponseMessage().equals("OK"))
                 return;
+            else {
+                Toast.makeText(this, "Ошибка: " + loadedData.getResponseMessage(), Toast.LENGTH_LONG).show();
+                if (AppData.deactivatingSubscription.contains(loadedData.getSid())) {
+                    AppData.deactivatingSubscription.remove(loadedData.getSid());
+                } else if (AppData.activatingSubscription.contains(loadedData.getSid())) {
+                    AppData.activatingSubscription.remove(loadedData.getSid());
+                }
+
+            }
+            return;
+//                if (AppData.deactivatingSubscription.contains(loadedData.getSid())){
+//                    mSID = loadedData.getSid();
+//                    deactivateSubscription();
+//                    mSID = -1;
+//                } else if (AppData.activatingSubscription.contains(loadedData.getSid())){
+//                    mSID = loadedData.getSid();
+//                    activateSubscription();
+//                    mSID = -1;
+//                }
+//                return;
+//            }
         }
 
 
         if (loadedData.getSubscriptionMap() == null || loadedData.getSubscriptionMap().isEmpty()) {
             return;
         }
-        subscriptionDataAdapter.clear();
+//        int f = subscriptionsListView.getFirstVisiblePosition();
+//        subscriptionsListView.setSelectionFromTop(f,0);
+
         AppData.mSubscriptionsMap = loadedData.getSubscriptionMap();
         infoMessage.setVisibility(View.GONE);
         Log.v(LOG_TAG, "onLoadFinished");
-        subscriptionDataAdapter.addAll(new ArrayList<>(AppData.mSubscriptionsMap.values()));
+        subscriptionDataAdapter.swapItems(new ArrayList<>(AppData.mSubscriptionsMap.values()));
+        //subscriptionDataAdapter.notifyDataSetChanged();
+        //subscriptionDataAdapter.addAll(new ArrayList<>(AppData.mSubscriptionsMap.values()));
 
     }
 

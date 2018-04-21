@@ -8,6 +8,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,11 @@ public final class AppData {
             .target(new LatLng(55.7522200, 37.6155600))
             .zoom(10)
             .build();
+
+    //to save osm map camera position
+    public static GeoPoint osmStartPoint = new GeoPoint(55.7522200, 37.6155600);
+    public static double osmCameraZoom = 12.0;
+
 
     //Here is the data from Loader about geozones
     public static Map<Integer, GeofencePolygon> mPolygonsMap;

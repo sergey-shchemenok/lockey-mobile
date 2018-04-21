@@ -161,7 +161,6 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
                 .setContentText(body)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
-                .setPriority(Notification.PRIORITY_MAX)
                 .setAutoCancel(true)
                 .setSound(notificationSound)
                 .setContentIntent(pendingIntent);

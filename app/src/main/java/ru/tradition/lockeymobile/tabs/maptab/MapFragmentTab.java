@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -36,9 +37,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import org.osmdroid.api.IMapController;
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.AuthActivity;
@@ -58,10 +67,13 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         GeofencePolygonAdapter.ListItemClickListener,
         GeofencePolygonAdapter.ListItemLongClickListener {
 
-    //google map
+    //Google Map
     public static GoogleMap google_map;
 
-
+    //Open Street Map
+    public static MapView osm_map;
+    public static TreeMap<Integer, org.osmdroid.views.overlay.Marker> osm_markers = new TreeMap<>();
+    //**
 
     public static GeofencePolygonAdapter mAdapter;
     private RecyclerView mPolygonsList;
@@ -110,22 +122,38 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         return fragment;
     }
 
-    SupportMapFragment mapFragment;
+    SupportMapFragment googleMapFragment;
+
+//    SupportMapFragment osmMapFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         FragmentManager fm = getChildFragmentManager();
-        mapFragment = (SupportMapFragment) fm.findFragmentByTag("mapFragment");
-        if (mapFragment == null) {
-            mapFragment = new SupportMapFragment();
+        googleMapFragment = (SupportMapFragment) fm.findFragmentByTag("google_mapFragment");
+        if (googleMapFragment == null) {
+            googleMapFragment = new SupportMapFragment();
             FragmentTransaction ft = fm.beginTransaction();
-            ft.add(R.id.google_mapFragmentContainer, mapFragment, "mapFragment");
+            ft.add(R.id.google_mapFragmentContainer, googleMapFragment, "google_mapFragment");
             ft.commit();
             fm.executePendingTransactions();
         }
-        mapFragment.getMapAsync(this);
+        googleMapFragment.getMapAsync(this);
+
+//        osmMapFragment = (SupportMapFragment) fm.findFragmentByTag("osm_mapFragment");
+//        if (osmMapFragment == null) {
+//            osmMapFragment = new SupportMapFragment();
+//            FragmentTransaction ft = fm.beginTransaction();
+//            ft.add(R.id.osm_FragmentContainer, osmMapFragment, "osm_mapFragment");
+//            ft.commit();
+//            fm.executePendingTransactions();
+//        }
+
+        //for osm map
+        Context ctx = AppData.mainActivity.getApplicationContext();
+        Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        //**
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -137,6 +165,24 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.tab_fragment_map_drawer, container, false);
+
+        /****
+         for osm map
+         */
+        osm_map = (MapView) rootView.findViewById(R.id.osm_map);
+        osm_map.setTileSource(TileSourceFactory.MAPNIK);
+
+        //Then we add default zoom buttons, and ability to zoom with 2 fingers (multi-touch)
+        osm_map.setBuiltInZoomControls(true);
+        osm_map.setMultiTouchControls(true);
+
+        //todo We can move the map on a default view point. For this, we need access to the map controller:
+        IMapController mapController = osm_map.getController();
+        mapController.setZoom(AppData.osmCameraZoom);
+        mapController.setCenter(AppData.osmStartPoint);
+        //******
+
+
         // Inflate the layout for this fragment
         fabLayers = (FloatingActionButton) rootView.findViewById(R.id.fab_layers);
         fabBottomDrawer = (FloatingActionButton) rootView.findViewById(R.id.fab_bottom_drawer);
@@ -255,6 +301,10 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         }
         //to remove zones after rotation
         clearPolygonSet();
+
+        //for osm map
+        osmGetDataAndShowMarkers();
+
         return rootView;
     }
 
@@ -342,6 +392,38 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         super.onStart();
         startMarkerUpdating();
     }
+
+    /*
+    for osm map
+    */
+    public void osmGetDataAndShowMarkers() {
+//        GeoPoint startPoint = new GeoPoint(55.7522200, 37.6155600);
+//
+//        org.osmdroid.views.overlay.Marker startMarker = new org.osmdroid.views.overlay.Marker(osm_map);
+//        startMarker.setPosition(startPoint);
+//        startMarker.setAnchor(org.osmdroid.views.overlay.Marker.ANCHOR_CENTER, org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM);
+//        osm_map.getOverlays().add(startMarker);
+
+
+        try {
+            for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
+                org.osmdroid.views.overlay.Marker osmMarker = new org.osmdroid.views.overlay.Marker(osm_map);
+                GeoPoint point = new GeoPoint(pair.getValue().getLatitude(), pair.getValue().getLongitude());
+                osmMarker.setPosition(point);
+                osmMarker.setAnchor(org.osmdroid.views.overlay.Marker.ANCHOR_CENTER, org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM);
+                osm_markers.put(pair.getValue().getId(), osmMarker);
+            }
+        } catch (NullPointerException e) {
+            startActivity(new Intent(getActivity(), AuthActivity.class));
+            Log.i(LOG_TAG, "onMapReady..........NullPointerException");
+        }
+
+        for (Map.Entry<Integer, org.osmdroid.views.overlay.Marker> pair : osm_markers.entrySet()) {
+            osm_map.getOverlays().add(pair.getValue());
+        }
+
+    }
+    //***
 
     //Get data from mAssetMap list and make marker from it
     @Override

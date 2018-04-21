@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity implements
                         .zoom(13)
                         .build();
                 //go to map tab
-                AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+                MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
                 bundle.clear();
             }
 
@@ -423,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements
                     changeModeToNormal();
                     updateListView();
                     AppData.viewPager.setCurrentItem(1);
-                    AppData.m_map.moveCamera(cu);
+                    MapFragmentTab.google_map.moveCamera(cu);
                 }
                 return true;
         }

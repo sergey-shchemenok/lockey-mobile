@@ -72,8 +72,6 @@ public final class AppData {
     public static Menu mMenu;
     public static ViewPager viewPager;
 
-    public static GoogleMap m_map;
-
     //Flags for managing the updating thread
     public static boolean isRepeated = false;
     public static boolean isFinished = false;

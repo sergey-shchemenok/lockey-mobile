@@ -23,7 +23,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import java.net.HttpURLConnection;
 
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
-import ru.tradition.lockeymobile.auth.TokenLoader;
+import ru.tradition.lockeymobile.auth.AuthTokenLoader;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
@@ -232,7 +232,7 @@ public class AuthActivity extends AppCompatActivity
     public Loader<String> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
         Log.v(LOG_TAG, "onCreateLoader");
-        return new TokenLoader(this, AppData.AUTH_REQUEST_URL, AppData.pwd, AppData.usr);
+        return new AuthTokenLoader(this, AppData.AUTH_REQUEST_URL, AppData.pwd, AppData.usr);
     }
 
     @Override

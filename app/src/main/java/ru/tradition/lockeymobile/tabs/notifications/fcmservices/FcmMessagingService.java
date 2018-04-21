@@ -13,6 +13,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.firebase.messaging.RemoteMessage;
@@ -145,30 +146,34 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
                     "Primary", NotificationManager.IMPORTANCE_MAX);
 
             // Configure the notification channel.
-            notificationChannel.setDescription("Channel description");
-            notificationChannel.enableLights(true);
-            notificationChannel.setLightColor(Color.RED);
-            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
-            notificationChannel.enableVibration(true);
+//            notificationChannel.setDescription("Channel description");
+//            notificationChannel.enableLights(true);
+//            notificationChannel.setLightColor(Color.RED);
+//            notificationChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+//            notificationChannel.enableVibration(true);
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        @SuppressWarnings("deprecation")
-        NotificationCompat.Builder notifiBuilder = new NotificationCompat.Builder(this, FCM_NOTIFICATION_CHANNEL_ID)
-                .setDefaults(Notification.DEFAULT_ALL)
-                .setWhen(System.currentTimeMillis())
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, FCM_NOTIFICATION_CHANNEL_ID)
+                .setColor(Color.LTGRAY)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(title)
-                .setPriority(Notification.PRIORITY_MAX) // this is deprecated in API 26 but we can still use for below 26.
                 .setContentText(body)
-                //.setContentInfo("Info")
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setWhen(System.currentTimeMillis())
+                .setPriority(Notification.PRIORITY_MAX)
                 .setAutoCancel(true)
                 .setSound(notificationSound)
-                .setColor(Color.LTGRAY)
                 .setContentIntent(pendingIntent);
 
+        // this is deprecated in API 26 but we can still use for below 26.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+                && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            notificationBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
+        }
+
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(FCM_NOTIFICATION_ID /*ID of notification*/, notifiBuilder.build());
+        notificationManager.notify(FCM_NOTIFICATION_ID /*ID of notification*/, notificationBuilder.build());
 
 
     }

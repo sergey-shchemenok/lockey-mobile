@@ -58,6 +58,11 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         GeofencePolygonAdapter.ListItemClickListener,
         GeofencePolygonAdapter.ListItemLongClickListener {
 
+    //google map
+    public static GoogleMap google_map;
+
+
+
     public static GeofencePolygonAdapter mAdapter;
     private RecyclerView mPolygonsList;
 
@@ -116,7 +121,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         if (mapFragment == null) {
             mapFragment = new SupportMapFragment();
             FragmentTransaction ft = fm.beginTransaction();
-            ft.add(R.id.mapFragmentContainer, mapFragment, "mapFragment");
+            ft.add(R.id.google_mapFragmentContainer, mapFragment, "mapFragment");
             ft.commit();
             fm.executePendingTransactions();
         }
@@ -206,15 +211,15 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         fabLayers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mapReady && AppData.m_map != null) {
+                if (mapReady && google_map != null) {
                     if (mapType == GoogleMap.MAP_TYPE_NORMAL) {
-                        AppData.m_map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                        google_map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                         mapType = GoogleMap.MAP_TYPE_SATELLITE;
                     } else if (mapType == GoogleMap.MAP_TYPE_SATELLITE) {
-                        AppData.m_map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                        google_map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
                         mapType = GoogleMap.MAP_TYPE_HYBRID;
                     } else {
-                        AppData.m_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                        google_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                         mapType = GoogleMap.MAP_TYPE_NORMAL;
                     }
                 }
@@ -234,7 +239,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 int padding = 5; // offset from edges of the map in pixels
                 CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
 
-                AppData.m_map.animateCamera(cu);
+                google_map.animateCamera(cu);
                 return true;
             }
         });
@@ -265,7 +270,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        if (AppData.m_map != null) {
+        if (google_map != null) {
             if (!polygons.isEmpty()) {
                 for (Map.Entry<Integer, Polygon> pair : polygons.entrySet())
                     pair.getValue().remove();
@@ -281,7 +286,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 for (LatLng point : latLngArray) {
                     popt.add(point);
                 }
-                Polygon geozone = AppData.m_map.addPolygon(popt);
+                Polygon geozone = google_map.addPolygon(popt);
                 polygons.put(geof.getGeofence_id(), geozone);
                 geozone.setFillColor(Color.parseColor("#6421a30d"));
                 geozone.setStrokeColor(Color.parseColor("#FF21A30D"));
@@ -299,7 +304,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onListItemLongClick(int clickedItemIndex) {
-        if (AppData.m_map != null) {
+        if (google_map != null) {
             if (polygonNamesNumber != clickedItemIndex) {
                 this.onListItemClick(clickedItemIndex);
 
@@ -320,7 +325,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         int padding = 5; // offset from edges of the map in pixels
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
 
-        AppData.m_map.animateCamera(cu);
+        google_map.animateCamera(cu);
 
 
     }
@@ -342,11 +347,11 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap map) {
         mapReady = true;
-        AppData.m_map = map;
-        AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+        google_map = map;
+        google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
 
         //clicking on marker
-        AppData.m_map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+        google_map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 Toast.makeText(getContext(), marker.getTitle() + " " + marker.getPosition(), Toast.LENGTH_LONG).show();
@@ -363,7 +368,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                 if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
                     marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 }
-                markers.put(pair.getKey(), AppData.m_map.addMarker(marker));
+                markers.put(pair.getKey(), google_map.addMarker(marker));
             }
         } catch (NullPointerException e) {
             //AppData.mainActivity.logout();
@@ -377,7 +382,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     @Override
     public void onStop() {
         try {
-            AppData.target = AppData.m_map.getCameraPosition();
+            AppData.target = google_map.getCameraPosition();
         } catch (NullPointerException e) {
             startActivity(new Intent(getActivity(), AuthActivity.class));
             Log.i(LOG_TAG, "onMapStop..........NullPointerException");
@@ -408,10 +413,10 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     Log.i(LOG_TAG, "Repeating loading assets");
                 }
 
-                if (AppData.m_map != null) {
-                    AppData.target = AppData.m_map.getCameraPosition();
+                if (google_map != null) {
+                    AppData.target = google_map.getCameraPosition();
                     //m_map.clear();
-                    AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+                    google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
 
                     //updating marker position
                     for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
@@ -432,7 +437,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                                 }
                                 savedMarker.remove();
                                 markers.remove(id);
-                                markers.put(id, AppData.m_map.addMarker(marker));
+                                markers.put(id, google_map.addMarker(marker));
                                 Log.i(LOG_TAG, "The markers have moved");
                             } else {
                                 if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {

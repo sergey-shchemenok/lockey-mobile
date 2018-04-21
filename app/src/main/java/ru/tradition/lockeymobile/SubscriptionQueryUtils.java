@@ -59,8 +59,11 @@ public final class SubscriptionQueryUtils {
                 String title = subscription.getString("Title");
                 int zid = subscription.getInt("ZID");
                 String zoneTitle = "Empty";
-                if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty())
-                    zoneTitle = AppData.mPolygonsMap.get(zid).getPolygonName();
+                try {
+                    if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty())
+                        zoneTitle = AppData.mPolygonsMap.get(zid).getPolygonName();
+                } catch (NullPointerException e) {
+                }
                 boolean isSubscribed = subscription.getBoolean("Subscribed");
                 JSONArray carsArray = subscription.getJSONArray("Cars");
                 int[] cars = new int[carsArray.length()];

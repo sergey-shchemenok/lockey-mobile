@@ -24,6 +24,7 @@ import ru.tradition.lockeymobile.AssetActivity;
 import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
+import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTab;
 
 import static ru.tradition.lockeymobile.AppData.mAssetMap;
 
@@ -124,7 +125,7 @@ public class AssetsFragmentTab extends Fragment {
                         .build();
                 //go to map tab
                 AppData.viewPager.setCurrentItem(1);
-                AppData.m_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+                MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
 
                 return true;
             }

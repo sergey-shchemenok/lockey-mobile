@@ -1,22 +1,20 @@
-package ru.tradition.lockeymobile;
+package ru.tradition.lockeymobile.subscriptions;
 
 import android.app.Activity;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
+import ru.tradition.lockeymobile.AppData;
+import ru.tradition.lockeymobile.R;
 
 /**
  * Created by Caelestis on 13.04.2018.

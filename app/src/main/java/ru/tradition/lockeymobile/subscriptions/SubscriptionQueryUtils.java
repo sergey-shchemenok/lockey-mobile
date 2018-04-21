@@ -1,10 +1,9 @@
-package ru.tradition.lockeymobile;
+package ru.tradition.lockeymobile.subscriptions;
 
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONArray;
@@ -19,9 +18,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.TreeMap;
 
+import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
 
 import static ru.tradition.lockeymobile.auth.AuthQueryUtils.authCookieManager;

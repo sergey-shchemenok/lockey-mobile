@@ -4,20 +4,18 @@ import android.net.Uri;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.util.GeoPoint;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import ru.tradition.lockeymobile.subscriptions.SubscriptionData;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
 
@@ -48,7 +46,7 @@ public final class AppData {
             .build();
 
     //to save osm map camera position
-    public static GeoPoint osmStartPoint = new GeoPoint(55.7522200, 37.6155600);
+    public static IGeoPoint osmStartPoint = new GeoPoint(55.7522200, 37.6155600);
     public static double osmCameraZoom = 12.0;
 
 
@@ -77,7 +75,7 @@ public final class AppData {
 
     //store main menu
     public static Menu mMenu;
-    public static ViewPager viewPager;
+    public static CustomViewPager viewPager;
 
     //Flags for managing the updating thread
     public static boolean isRepeated = false;

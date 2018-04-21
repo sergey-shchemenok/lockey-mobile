@@ -1,4 +1,4 @@
-package ru.tradition.lockeymobile;
+package ru.tradition.lockeymobile.subscriptions;
 
 /**
  * Created by Caelestis on 12.04.2018.

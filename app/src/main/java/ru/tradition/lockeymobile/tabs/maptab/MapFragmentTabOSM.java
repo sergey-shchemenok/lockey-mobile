@@ -23,7 +23,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -37,6 +36,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -45,9 +45,7 @@ import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.AuthActivity;
@@ -58,27 +56,27 @@ import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link MapFragmentTab.OnFragmentInteractionListener} interface
+ * {@link MapFragmentTabOSM.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link MapFragmentTab#newInstance} factory method to
+ * Use the {@link MapFragmentTabOSM#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
+public class MapFragmentTabOSM extends Fragment implements
         GeofencePolygonAdapter.ListItemClickListener,
         GeofencePolygonAdapter.ListItemLongClickListener {
 
-    //Google Map
-    public static GoogleMap google_map;
+    //Open Street Map
+    public static MapView osm_map;
+    public static IMapController mapController;
+    public static TreeMap<Integer, org.osmdroid.views.overlay.Marker> osm_markers = new TreeMap<>();
+    //**
 
     public static GeofencePolygonAdapter mAdapter;
     private RecyclerView mPolygonsList;
 
-    private Toast mToast;
-
-    private final String LOG_TAG = MapFragmentTab.class.getSimpleName();
+    private final String LOG_TAG = MapFragmentTabOSM.class.getSimpleName();
     private static View rootView;
 
-    boolean mapReady = false;
 
     //add fabLayers button
     private FloatingActionButton fabLayers;
@@ -86,16 +84,13 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     //add fab and other elements for bottom drawer
     private FloatingActionButton fabBottomDrawer;
     private LinearLayout geoFenceBottomSheet;
-    private LinearLayout osmFragmentContainer;
     public static BottomSheetBehavior bottomSheetBehavior;
 
     private LinearLayoutManager layoutManager;
+    private LinearLayout googleMapFragmentContainer;
     private int recyclerViewScrollState = 0;
 
 
-    private int mapType = GoogleMap.MAP_TYPE_NORMAL;
-
-    private static TreeMap<Integer, Marker> markers = new TreeMap<>();
     private static TreeMap<Integer, Polygon> polygons = new TreeMap<>();
     public static int polygonNamesNumber = -1;
 
@@ -105,12 +100,11 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     private String mParam2;
     private OnFragmentInteractionListener mListener;
 
-    public MapFragmentTab() {
-        // Required empty public constructor
+    public MapFragmentTabOSM() {
     }
 
-    public static MapFragmentTab newInstance(String param1, String param2) {
-        MapFragmentTab fragment = new MapFragmentTab();
+    public static MapFragmentTabOSM newInstance(String param1, String param2) {
+        MapFragmentTabOSM fragment = new MapFragmentTabOSM();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -118,24 +112,19 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         return fragment;
     }
 
-    SupportMapFragment googleMapFragment;
-
 //    SupportMapFragment osmMapFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        FragmentManager fm = getChildFragmentManager();
-        googleMapFragment = (SupportMapFragment) fm.findFragmentByTag("google_mapFragment");
-        if (googleMapFragment == null) {
-            googleMapFragment = new SupportMapFragment();
-            FragmentTransaction ft = fm.beginTransaction();
-            ft.add(R.id.google_mapFragmentContainer, googleMapFragment, "google_mapFragment");
-            ft.commit();
-            fm.executePendingTransactions();
+        try {
+            Context ctx = AppData.mainActivity.getApplicationContext();
+            Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+        } catch (NullPointerException e) {
+            startActivity(new Intent(getActivity(), AuthActivity.class));
+
         }
-        googleMapFragment.getMapAsync(this);
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -148,70 +137,71 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.tab_fragment_map_drawer, container, false);
 
-        osmFragmentContainer = (LinearLayout)rootView.findViewById(R.id.osm_FragmentContainer);
-        osmFragmentContainer.setVisibility(View.GONE);
+        googleMapFragmentContainer = (LinearLayout) rootView.findViewById(R.id.google_mapFragmentContainer);
+        googleMapFragmentContainer.setVisibility(View.GONE);
+
+        osm_map = (MapView) rootView.findViewById(R.id.osm_map);
+        osm_map.setTileSource(TileSourceFactory.MAPNIK);
+
+        //Then we add default zoom buttons, and ability to zoom with 2 fingers (multi-touch)
+        osm_map.setBuiltInZoomControls(true);
+        osm_map.setMultiTouchControls(true);
+        //todo process it later
+
+        //We can move the map on a default view point. For this, we need access to the map controller:
+        mapController = osm_map.getController();
+        mapController.setZoom(AppData.osmCameraZoom);
+        mapController.setCenter(AppData.osmStartPoint);
+
+//        Log.i(LOG_TAG, "osm start coordinates  " + osm_map.getMapCenter().getLatitude() + " "
+//                + osm_map.getMapCenter().getLongitude());
+
+        //******
+
 
         // Inflate the layout for this fragment
         fabLayers = (FloatingActionButton) rootView.findViewById(R.id.fab_layers);
         fabBottomDrawer = (FloatingActionButton) rootView.findViewById(R.id.fab_bottom_drawer);
         geoFenceBottomSheet = (LinearLayout) rootView.findViewById(R.id.bottom_sheet);
-        // init the bottom sheet behavior
         bottomSheetBehavior = BottomSheetBehavior.from(geoFenceBottomSheet);
-        // set the peek height
-//        bottomSheetBehavior.setPeekHeight(340);
-        // set hideable or not
         bottomSheetBehavior.setHideable(true);
-//        bottomSheetBehavior.setSkipCollapsed(true);
-        // set callback for changes
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-//                if (BottomSheetBehavior.STATE_DRAGGING == newState) {
-//                    fabBottomDrawer.animate().scaleX(0).scaleY(0).setDuration(300).start();
-//                } else if (BottomSheetBehavior.STATE_COLLAPSED == newState || BottomSheetBehavior.STATE_HIDDEN == newState) {
-//                    fabBottomDrawer.animate().scaleX(1).scaleY(1).setDuration(300).start();
-//                }
                 if (BottomSheetBehavior.STATE_HIDDEN == newState) {
-//                    fabBottomDrawer.animate().scaleX(1).scaleY(1).setDuration(100).start();
                     fabLayers.show();
                     fabBottomDrawer.show();
                     clearPolygonSet();
                     mAdapter.notifyDataSetChanged();
+                    osm_map.setBuiltInZoomControls(true);
                 }
 
                 if (BottomSheetBehavior.STATE_EXPANDED == newState) {
-                    //recyclerViewScrollState = mPolygonsList.getScrollState();
                     recyclerViewScrollState = layoutManager.findFirstCompletelyVisibleItemPosition();
                     layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                    mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), MapFragmentTab.this, MapFragmentTab.this);
+                    mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), MapFragmentTabOSM.this, MapFragmentTabOSM.this);
                     mPolygonsList.setAdapter(mAdapter);
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.hide();
                     fabBottomDrawer.hide();
+                    osm_map.setBuiltInZoomControls(false);
                 }
                 if (BottomSheetBehavior.STATE_COLLAPSED == newState) {
-                    //recyclerViewScrollState = mPolygonsList.getScrollState();
                     recyclerViewScrollState = layoutManager.findFirstCompletelyVisibleItemPosition();
                     layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-                    mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), MapFragmentTab.this, MapFragmentTab.this);
+                    mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), MapFragmentTabOSM.this, MapFragmentTabOSM.this);
                     mPolygonsList.setAdapter(mAdapter);
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.show();
                     fabBottomDrawer.hide();
+                    osm_map.setBuiltInZoomControls(false);
                 }
-
-
             }
 
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                 bottomSheetBehavior.getPeekHeight();
-//                if (slideOffset >= 0) {
-//                    fabBottomDrawer.animate().scaleX(1 - slideOffset).scaleY(1 - slideOffset).setDuration(0).start();
-//                }
-                //fabBottomDrawer.animate().scaleX(1 - Math.abs(slideOffset)).scaleY(1 - Math.abs(slideOffset)).setDuration(0).start();
-
             }
         });
 
@@ -225,35 +215,16 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         fabLayers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mapReady && google_map != null) {
-                    if (mapType == GoogleMap.MAP_TYPE_NORMAL) {
-                        google_map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                        mapType = GoogleMap.MAP_TYPE_SATELLITE;
-                    } else if (mapType == GoogleMap.MAP_TYPE_SATELLITE) {
-                        google_map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-                        mapType = GoogleMap.MAP_TYPE_HYBRID;
-                    } else {
-                        google_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                        mapType = GoogleMap.MAP_TYPE_NORMAL;
-                    }
-                }
+                //todo change map mode
+
             }
         });
 
         fabLayers.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                for (Map.Entry<Integer, Marker> pair : markers.entrySet()) {
-                    Marker marker = pair.getValue();
-                    builder.include(marker.getPosition());
-                }
-                LatLngBounds bounds = builder.build();
+                //todo centre the markers
 
-                int padding = 5; // offset from edges of the map in pixels
-                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-
-                google_map.animateCamera(cu);
                 return true;
             }
         });
@@ -271,6 +242,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         clearPolygonSet();
 
         //for osm map
+        osmGetDataAndShowMarkers();
         return rootView;
     }
 
@@ -286,64 +258,18 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        if (google_map != null) {
-            if (!polygons.isEmpty()) {
-                for (Map.Entry<Integer, Polygon> pair : polygons.entrySet())
-                    pair.getValue().remove();
-                polygons.clear();
-            }
-            if (polygonNamesNumber != clickedItemIndex) {
-                ArrayList<GeofencePolygon> polygonList = new ArrayList<>(AppData.mPolygonsMap.values());
-                GeofencePolygon geof = polygonList.get(clickedItemIndex);
-                LatLng[] latLngArray = geof.getPolygon();
+        //todo emphasize polygon
 
-                PolygonOptions popt = new PolygonOptions().geodesic(true);
-
-                for (LatLng point : latLngArray) {
-                    popt.add(point);
-                }
-                Polygon geozone = google_map.addPolygon(popt);
-                polygons.put(geof.getGeofence_id(), geozone);
-                geozone.setFillColor(Color.parseColor("#6421a30d"));
-                geozone.setStrokeColor(Color.parseColor("#FF21A30D"));
-                int lastPosition = polygonNamesNumber;
-                polygonNamesNumber = clickedItemIndex;
-                if (lastPosition >= 0) {
-                    mAdapter.notifyDataSetChanged();
-                }
-
-            } else {
-                polygonNamesNumber = -1;
-            }
-        }
     }
 
     @Override
     public void onListItemLongClick(int clickedItemIndex) {
-        if (google_map != null) {
+        if (osm_map != null) {
             if (polygonNamesNumber != clickedItemIndex) {
                 this.onListItemClick(clickedItemIndex);
 
             }
         }
-
-        ArrayList<GeofencePolygon> polygonList = new ArrayList<>(AppData.mPolygonsMap.values());
-        GeofencePolygon geof = polygonList.get(clickedItemIndex);
-        LatLng[] latLng = geof.getPolygon();
-        Log.i(LOG_TAG, "long click.....");
-
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (LatLng ll : latLng) {
-            builder.include(ll);
-        }
-        LatLngBounds bounds = builder.build();
-
-        int padding = 5; // offset from edges of the map in pixels
-        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-
-        google_map.animateCamera(cu);
-
-
     }
 
     //Handler for map updating here
@@ -359,46 +285,38 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         startMarkerUpdating();
     }
 
-    //Get data from mAssetMap list and make marker from it
-    @Override
-    public void onMapReady(GoogleMap map) {
-        mapReady = true;
-        google_map = map;
-        google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
-
-        //clicking on marker
-        google_map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(getContext(), marker.getTitle() + " " + marker.getPosition(), Toast.LENGTH_LONG).show();
-                return true;
-            }
-        });
-
+    /*
+    for osm map
+    */
+    public void osmGetDataAndShowMarkers() {
         try {
-            markers.clear();
             for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
-                MarkerOptions marker = new MarkerOptions()
-                        .position(new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude()))
-                        .title(String.valueOf(pair.getValue().getId()));
-                if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
-                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                }
-                markers.put(pair.getKey(), google_map.addMarker(marker));
+                org.osmdroid.views.overlay.Marker osmMarker = new org.osmdroid.views.overlay.Marker(osm_map);
+                GeoPoint point = new GeoPoint(pair.getValue().getLatitude(), pair.getValue().getLongitude());
+                osmMarker.setPosition(point);
+                osmMarker.setAnchor(org.osmdroid.views.overlay.Marker.ANCHOR_CENTER, org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM);
+                osm_markers.put(pair.getValue().getId(), osmMarker);
             }
         } catch (NullPointerException e) {
-            //AppData.mainActivity.logout();
             startActivity(new Intent(getActivity(), AuthActivity.class));
             Log.i(LOG_TAG, "onMapReady..........NullPointerException");
         }
+
+        for (Map.Entry<Integer, org.osmdroid.views.overlay.Marker> pair : osm_markers.entrySet()) {
+            osm_map.getOverlays().add(pair.getValue());
+        }
+
     }
+    //***
 
 
     //Save camera position
     @Override
     public void onStop() {
         try {
-            AppData.target = google_map.getCameraPosition();
+            AppData.osmStartPoint = osm_map.getMapCenter();
+            AppData.osmCameraZoom = osm_map.getZoomLevelDouble();
+
         } catch (NullPointerException e) {
             startActivity(new Intent(getActivity(), AuthActivity.class));
             Log.i(LOG_TAG, "onMapStop..........NullPointerException");
@@ -428,48 +346,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     AppData.mainActivity.repeatLoader();
                     Log.i(LOG_TAG, "Repeating loading assets");
                 }
-
-                if (google_map != null) {
-                    AppData.target = google_map.getCameraPosition();
-                    //m_map.clear();
-                    google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
-
-                    //updating marker position
-                    for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
-                        int id = pair.getKey();
-                        Marker savedMarker = markers.get(id);
-                        LatLng savedPosition;
-                        //need this check in case killing process
-                        if (savedMarker != null) {
-                            savedPosition = savedMarker.getPosition();
-                            //compare saved and new position
-                            LatLng newPosition = new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude());
-                            if (!savedPosition.equals(newPosition)) {
-                                MarkerOptions marker = new MarkerOptions()
-                                        .position(newPosition)
-                                        .title(String.valueOf(pair.getValue().getId()));
-                                if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
-                                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                                }
-                                savedMarker.remove();
-                                markers.remove(id);
-                                markers.put(id, google_map.addMarker(marker));
-                                Log.i(LOG_TAG, "The markers have moved");
-                            } else {
-                                if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
-                                    savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                                } else
-                                    savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                            }
-                        }
-                    }
-                    Log.i(LOG_TAG, String.valueOf(AppData.isFinished));
-                    Log.i(LOG_TAG, String.valueOf(AppData.isRepeated));
-                    Log.i(LOG_TAG, "The position of markers was updated");
-
-                } else
-                    Log.i(LOG_TAG, "the map................. is null");
-
             } finally {
                 mHandler.postDelayed(mMarkerPositionUpdater, mInterval);
             }

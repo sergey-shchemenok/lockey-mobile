@@ -1,4 +1,4 @@
-package ru.tradition.lockeymobile;
+package ru.tradition.lockeymobile.subscriptions;
 
 import android.net.Uri;
 import android.text.TextUtils;
@@ -9,15 +9,14 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
 
 import static ru.tradition.lockeymobile.auth.AuthQueryUtils.authCookieManager;

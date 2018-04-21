@@ -125,7 +125,8 @@ public class AssetsFragmentTab extends Fragment {
                         .build();
                 //go to map tab
                 AppData.viewPager.setCurrentItem(1);
-                MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+                if (MapFragmentTab.google_map != null)
+                    MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
 
                 return true;
             }

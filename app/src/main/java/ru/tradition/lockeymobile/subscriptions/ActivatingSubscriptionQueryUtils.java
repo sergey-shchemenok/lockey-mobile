@@ -1,4 +1,4 @@
-package ru.tradition.lockeymobile;
+package ru.tradition.lockeymobile.subscriptions;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,13 +13,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
+import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
 
 import static ru.tradition.lockeymobile.auth.AuthQueryUtils.authCookieManager;

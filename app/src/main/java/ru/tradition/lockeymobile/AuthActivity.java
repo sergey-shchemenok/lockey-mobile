@@ -20,6 +20,8 @@ import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.net.HttpURLConnection;
 
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
@@ -106,6 +108,12 @@ public class AuthActivity extends AppCompatActivity
             loginView.setText(AppData.usr);
         if (!AppData.pwd.isEmpty())
             passwordView.setText(AppData.pwd);
+
+        if ((AppData.usr.isEmpty()&&AppData.pwd.isEmpty())||
+                (AppData.usr.equals("")&&AppData.pwd.equals(""))){
+            AppData.osmStartPoint = new GeoPoint(55.7522200, 37.6155600);
+            AppData.osmCameraZoom = 12.0;
+        }
 
         mHandler = new Handler();
 

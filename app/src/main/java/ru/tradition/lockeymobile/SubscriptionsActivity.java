@@ -24,6 +24,12 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru.tradition.lockeymobile.subscriptions.ActivatingSubscriptionQueryUtils;
+import ru.tradition.lockeymobile.subscriptions.DeactivatingSubscriptionQueryUtils;
+import ru.tradition.lockeymobile.subscriptions.SubscriptionData;
+import ru.tradition.lockeymobile.subscriptions.SubscriptionDataAdapter;
+import ru.tradition.lockeymobile.subscriptions.SubscriptionQueryUtils;
+
 import static ru.tradition.lockeymobile.AppData.ACTIVATE_SUBSCRIPTION_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.DEACTIVATE_SUBSCRIPTION_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.SUBSCRIPTIONS_LOADER_ID;

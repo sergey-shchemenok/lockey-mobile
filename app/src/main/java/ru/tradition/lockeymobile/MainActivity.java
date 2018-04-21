@@ -15,9 +15,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -39,6 +42,7 @@ import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragmentTab;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTab;
+import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTabOSM;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 
 import static ru.tradition.lockeymobile.AppData.ASSETS_LOADER_ID;
@@ -49,6 +53,7 @@ import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUr
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<LoadedData>,
         MapFragmentTab.OnFragmentInteractionListener,
+        MapFragmentTabOSM.OnFragmentInteractionListener,
         NotificationsFragmentTab.OnFragmentInteractionListener,
         AssetsFragmentTab.OnFragmentInteractionListener {
 
@@ -67,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements
     //preferences
     public static boolean allowNotification;
     public static String orderBy;
+    public static String useMap;
 
     public static final String LOG_TAG = MainActivity.class.getName();
 
@@ -107,7 +113,13 @@ public class MainActivity extends AppCompatActivity implements
                 getString(R.string.settings_order_by_key),
                 getString(R.string.settings_order_by_default)
         );
+        useMap = sharedPrefs.getString(
+                getString(R.string.settings_use_map_key),
+                getString(R.string.settings_default_map)
+        );
         Log.i(LOG_TAG, "orderBy.........." + orderBy);
+        Log.i(LOG_TAG, "useMap.........." + useMap);
+
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         //launch loading data from server
@@ -144,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void getZones(){
+    public void getZones() {
         Log.i(LOG_TAG, "....getZones....");
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
@@ -237,8 +249,8 @@ public class MainActivity extends AppCompatActivity implements
             mEmptyStateTextView.setText("");
             Log.i(LOG_TAG, "the first load has finished");
 
-            AppData.viewPager = (ViewPager) findViewById(R.id.viewpager);
-            adapter = new AppTabAdapter(this, getSupportFragmentManager());
+            AppData.viewPager = (CustomViewPager) findViewById(R.id.viewpager);
+            adapter = new AppTabAdapter(this, getSupportFragmentManager(), useMap);
             AppData.viewPager.setAdapter(adapter);
             TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
             tabLayout.setupWithViewPager(AppData.viewPager);
@@ -267,10 +279,21 @@ public class MainActivity extends AppCompatActivity implements
                     }
                     if (position == 1) {
                         AppData.mMenu.getItem(1).setVisible(false);
-                    }
+                        AppData.viewPager.setPagingEnabled(false);
+                    } else
+                        AppData.viewPager.setPagingEnabled(true);
 
-                    if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
-                        MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    if (MapFragmentTab.bottomSheetBehavior != null) {
+                        if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
+                                MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                            MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                        }
+                    }
+                    if (MapFragmentTabOSM.bottomSheetBehavior != null) {
+                        if (MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
+                                MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                            MapFragmentTabOSM.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                        }
                     }
 
                 }
@@ -292,7 +315,9 @@ public class MainActivity extends AppCompatActivity implements
                         .zoom(13)
                         .build();
                 //go to map tab
-                MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+                if (MapFragmentTab.google_map != null) {
+                    MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+                }
                 bundle.clear();
             }
 
@@ -409,21 +434,23 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             case R.id.main_menu_zoom_out:
                 if (!AppData.selectedAsset.isEmpty() && AppData.selectedAsset != null) {
-                    //first calculate the bounds of all the markers like so:
-                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                    for (Integer id : AppData.selectedAsset) {
-                        AssetsData as = AppData.mAssetMap.get(id);
-                        builder.include(new LatLng(as.getLatitude(), as.getLongitude()));
+                    if (MapFragmentTab.google_map != null) {
+                        //first calculate the bounds of all the markers like so:
+                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                        for (Integer id : AppData.selectedAsset) {
+                            AssetsData as = AppData.mAssetMap.get(id);
+                            builder.include(new LatLng(as.getLatitude(), as.getLongitude()));
+                        }
+                        LatLngBounds bounds = builder.build();
+                        //Then obtain a movement description object by using the factory: CameraUpdateFactory:
+                        int padding = 5; // offset from edges of the map in pixels
+                        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+//                        changeModeToNormal();
+//                        updateListView();
+                        MapFragmentTab.google_map.moveCamera(cu);
                     }
-                    LatLngBounds bounds = builder.build();
-
-                    //Then obtain a movement description object by using the factory: CameraUpdateFactory:
-                    int padding = 5; // offset from edges of the map in pixels
-                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-                    changeModeToNormal();
-                    updateListView();
                     AppData.viewPager.setCurrentItem(1);
-                    MapFragmentTab.google_map.moveCamera(cu);
+
                 }
                 return true;
         }
@@ -483,11 +510,19 @@ public class MainActivity extends AppCompatActivity implements
         } else if (AppData.isNotificationSelectingMode) {
             changeModeToNormal();
             NotificationsFragmentTab.adapter.notifyDataSetChanged();
-        } else if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+        } else if (MapFragmentTab.bottomSheetBehavior != null &&
+                MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
             MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        } else if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+        } else if (MapFragmentTab.bottomSheetBehavior != null &&
+                MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
             MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        } else
+        } else if (MapFragmentTabOSM.bottomSheetBehavior != null &&
+                MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            MapFragmentTabOSM.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        } else if (MapFragmentTabOSM.bottomSheetBehavior != null &&
+                MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+            MapFragmentTabOSM.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }else
             logout();
     }
 
@@ -495,4 +530,5 @@ public class MainActivity extends AppCompatActivity implements
     public void onFragmentInteraction(Uri uri) {
 
     }
+
 }

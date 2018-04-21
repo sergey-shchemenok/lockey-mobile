@@ -4,8 +4,10 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 
 import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTab;
+import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTabOSM;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 import ru.tradition.lockeymobile.R;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragmentTab;
@@ -15,6 +17,8 @@ import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragmentTab;
  */
 
 public class AppTabAdapter extends FragmentPagerAdapter {
+
+    private String mUseMap;
 
     /**
      * Context of the app
@@ -27,9 +31,10 @@ public class AppTabAdapter extends FragmentPagerAdapter {
      * @param fm is the fragment manager that will keep each fragment's state in the adapter
      *           across swipes.
      */
-    public AppTabAdapter(Context context, FragmentManager fm) {
+    public AppTabAdapter(Context context, FragmentManager fm, String useMap) {
         super(fm);
         mContext = context;
+        mUseMap = useMap;
     }
 
     /**
@@ -40,7 +45,10 @@ public class AppTabAdapter extends FragmentPagerAdapter {
         if (position == 0) {
             return new AssetsFragmentTab();
         } else if (position == 1) {
-            return new MapFragmentTab();
+            if (mUseMap.equals(mContext.getString(R.string.settings_google_map_value)))
+                return new MapFragmentTab();
+            else
+                return new MapFragmentTabOSM();
         } else {
             return new NotificationsFragmentTab();
         }

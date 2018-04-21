@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--for order by-->
     <string-array name="settings_order_by_labels">
         <item>@string/settings_order_by_kit_id_label</item>
         <item>@string/settings_order_by_signal_time_label</item>
@@ -9,4 +10,17 @@
         <item>@string/settings_order_by_kit_id_value</item>
         <item>@string/settings_order_by_signal_time_value</item>
     </string-array>
+
+    <!--for use map-->
+    <string-array name="settings_use_map_labels">
+        <item>@string/settings_google_map_label</item>
+        <item>@string/settings_osm_label</item>
+    </string-array>
+
+    <string-array name="settings_use_map_values">
+        <item>@string/settings_google_map_value</item>
+        <item>@string/settings_osm_value</item>
+    </string-array>
+
+
 </resources>

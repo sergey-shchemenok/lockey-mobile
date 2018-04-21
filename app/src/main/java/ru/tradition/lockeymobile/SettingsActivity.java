@@ -52,6 +52,9 @@ public class SettingsActivity extends AppCompatActivity {
             Preference orderBy = findPreference(getString(R.string.settings_order_by_key));
             bindPreferenceSummaryToValue(orderBy);
 
+            Preference useMap = findPreference(getString(R.string.settings_use_map_key));
+            bindPreferenceSummaryToValue(useMap);
+
         }
 
         @Override
@@ -89,4 +92,9 @@ public class SettingsActivity extends AppCompatActivity {
 //        return true;
 //    }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onSupportNavigateUp();
+    }
 }

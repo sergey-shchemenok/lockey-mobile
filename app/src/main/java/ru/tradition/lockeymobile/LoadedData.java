@@ -1,14 +1,10 @@
 package ru.tradition.lockeymobile;
 
-import java.util.List;
 import java.util.Map;
 
+import ru.tradition.lockeymobile.subscriptions.SubscriptionData;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
-
-import static ru.tradition.lockeymobile.AppData.ASSETS_LOADER_ID;
-import static ru.tradition.lockeymobile.AppData.SUBSCRIPTIONS_LOADER_ID;
-import static ru.tradition.lockeymobile.AppData.ZONES_LOADER_ID;
 
 /**
  * Created by Caelestis on 11.04.2018.

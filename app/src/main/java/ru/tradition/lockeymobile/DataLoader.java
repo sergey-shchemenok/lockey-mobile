@@ -6,6 +6,10 @@ import android.util.Log;
 
 import java.util.Map;
 
+import ru.tradition.lockeymobile.subscriptions.ActivatingSubscriptionQueryUtils;
+import ru.tradition.lockeymobile.subscriptions.DeactivatingSubscriptionQueryUtils;
+import ru.tradition.lockeymobile.subscriptions.SubscriptionData;
+import ru.tradition.lockeymobile.subscriptions.SubscriptionQueryUtils;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;

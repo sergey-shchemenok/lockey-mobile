@@ -40,6 +40,9 @@ public final class GeofenceQueryUtils {
     //Stores the response message for the request
     public static String zonesUrlResponseMessage;
 
+    public static int zonesUrlResponseCode;
+
+
     /**
      * Create a private constructor because no one should ever create a {@link GeofenceQueryUtils} object.
      */
@@ -152,9 +155,9 @@ public final class GeofenceQueryUtils {
             // If the request was successful (response code 200),
             // then read the input stream and parse the response.
 
-            AppData.zonesUrlResponseCode = urlConnection.getResponseCode();
+            zonesUrlResponseCode = urlConnection.getResponseCode();
             zonesUrlResponseMessage = urlConnection.getResponseMessage();
-            if (AppData.zonesUrlResponseCode == HttpURLConnection.HTTP_OK) {
+            if (zonesUrlResponseCode == HttpURLConnection.HTTP_OK) {
                 inputStream = urlConnection.getInputStream();
                 jsonResponse = readFromStream(inputStream);
             } else {

@@ -2,8 +2,11 @@ package ru.tradition.lockeymobile.tabs.assetstab;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -40,9 +45,29 @@ public class AssetsFragmentTab extends Fragment {
     public AssetsFragmentTab() {
     }
 
+    public static AssetsFragmentTab aft;
+
     public static final String LOG_TAG = AssetsFragmentTab.class.getName();
     public static AssetsDataAdapter assetsDataAdapter;
     private ListView assetsListView;
+
+    public TextView mEmptyStateTextView;
+    public ProgressBar progressCircle;
+    public TextView infoMessage;
+
+    public static String orderBy;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        aft = this;
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        orderBy = sharedPrefs.getString(
+                getString(R.string.settings_order_by_key),
+                getString(R.string.settings_order_by_default)
+        );
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,24 +76,35 @@ public class AssetsFragmentTab extends Fragment {
 
         assetsListView = (ListView) rootView.findViewById(R.id.assets_list);
 
+        progressCircle = (ProgressBar) rootView.findViewById(R.id.loading_spinner);
+        mEmptyStateTextView = (TextView) rootView.findViewById(R.id.empty_view);
+        infoMessage = (TextView) rootView.findViewById(R.id.main_info_message);
+        infoMessage.setVisibility(View.GONE);
+        progressCircle.setVisibility(View.VISIBLE);
+
         assetsDataAdapter = new AssetsDataAdapter(getActivity(), new ArrayList<AssetsData>());
         assetsListView.setAdapter(assetsDataAdapter);
 
 
         //to prevent crash in some killing process situations
-        try {
-            if (MainActivity.orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
-                assetsDataAdapter.addAll(new ArrayList<>(mAssetMap.values()));
-            } else if (MainActivity.orderBy.equals(getString(R.string.settings_order_by_signal_time_value))) {
-                ArrayList<AssetsData> ads = new ArrayList<>(mAssetMap.values());
-                Collections.sort(ads, AssetsData.COMPARE_BY_LAST_SIGNAL_TIME);
-                assetsDataAdapter.addAll(ads);
-            }
-        } catch (NullPointerException e) {
-            startActivity(new Intent(getActivity(), AuthActivity.class));
-            //AppData.mainActivity.logout();
-            Log.i(LOG_TAG, "onAssetsFragmentCreateView..........NullPointerException");
+//        try {
+//            if (orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
+//                assetsDataAdapter.addAll(new ArrayList<>(mAssetMap.values()));
+//            } else if (orderBy.equals(getString(R.string.settings_order_by_signal_time_value))) {
+//                ArrayList<AssetsData> ads = new ArrayList<>(mAssetMap.values());
+//                Collections.sort(ads, AssetsData.COMPARE_BY_LAST_SIGNAL_TIME);
+//                assetsDataAdapter.addAll(ads);
+//            }
+//        } catch (NullPointerException e) {
+//            startActivity(new Intent(getActivity(), AuthActivity.class));
+//            //AppData.mainActivity.logout();
+//            Log.i(LOG_TAG, "onAssetsFragmentCreateView..........NullPointerException");
+//
+//        }
 
+        try {
+            updateListView();
+        } catch (NullPointerException e) {
         }
 
         //selecting mode has the other title
@@ -133,6 +169,20 @@ public class AssetsFragmentTab extends Fragment {
         });
 
         return rootView;
+    }
+
+    //update the list of assets
+    public void updateListView() {
+        AssetsFragmentTab.assetsDataAdapter.clear();
+        //AssetsFragmentTab.assetsDataAdapter.notifyDataSetChanged();
+        Log.i(LOG_TAG, "order by list..........." + getString(R.string.settings_order_by_kit_id_value));
+        if (orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
+            AssetsFragmentTab.assetsDataAdapter.addAll(new ArrayList<>(mAssetMap.values()));
+        } else if (orderBy.equals(getString(R.string.settings_order_by_signal_time_value))) {
+            ArrayList<AssetsData> ads = new ArrayList<>(mAssetMap.values());
+            Collections.sort(ads, AssetsData.COMPARE_BY_LAST_SIGNAL_TIME);
+            AssetsFragmentTab.assetsDataAdapter.addAll(ads);
+        }
     }
 
 //    @Override

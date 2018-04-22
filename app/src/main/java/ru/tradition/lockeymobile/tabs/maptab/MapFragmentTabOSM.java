@@ -276,13 +276,13 @@ public class MapFragmentTabOSM extends Fragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mHandler = new Handler();
+        //mHandler = new Handler();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        startMarkerUpdating();
+        //startMarkerUpdating();
     }
 
     /*
@@ -298,7 +298,7 @@ public class MapFragmentTabOSM extends Fragment implements
                 osm_markers.put(pair.getValue().getId(), osmMarker);
             }
         } catch (NullPointerException e) {
-            startActivity(new Intent(getActivity(), AuthActivity.class));
+            //startActivity(new Intent(getActivity(), AuthActivity.class));
             Log.i(LOG_TAG, "onMapReady..........NullPointerException");
         }
 
@@ -321,7 +321,7 @@ public class MapFragmentTabOSM extends Fragment implements
             startActivity(new Intent(getActivity(), AuthActivity.class));
             Log.i(LOG_TAG, "onMapStop..........NullPointerException");
         }
-        stopMarkerUpdating();
+        //stopMarkerUpdating();
         super.onStop();
 
     }
@@ -334,31 +334,31 @@ public class MapFragmentTabOSM extends Fragment implements
 //    }
 
     //The code for map updating
-    private int mInterval = 1000 * 5; // 5 seconds by default, can be changed later
-    private Handler mHandler;
-
-    Runnable mMarkerPositionUpdater = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                //first we need to update data
-                if (AppData.isFinished) {
-                    AppData.mainActivity.repeatLoader();
-                    Log.i(LOG_TAG, "Repeating loading assets");
-                }
-            } finally {
-                mHandler.postDelayed(mMarkerPositionUpdater, mInterval);
-            }
-        }
-    };
-
-    void startMarkerUpdating() {
-        mMarkerPositionUpdater.run();
-    }
-
-    void stopMarkerUpdating() {
-        mHandler.removeCallbacks(mMarkerPositionUpdater);
-    }
+//    private int mInterval = 1000 * 5; // 5 seconds by default, can be changed later
+//    private Handler mHandler;
+//
+//    Runnable mMarkerPositionUpdater = new Runnable() {
+//        @Override
+//        public void run() {
+//            try {
+//                //first we need to update data
+//                if (AppData.isFinished) {
+//                    AppData.mainActivity.repeatLoader();
+//                    Log.i(LOG_TAG, "Repeating loading assets");
+//                }
+//            } finally {
+//                mHandler.postDelayed(mMarkerPositionUpdater, mInterval);
+//            }
+//        }
+//    };
+//
+//    void startMarkerUpdating() {
+//        mMarkerPositionUpdater.run();
+//    }
+//
+//    void stopMarkerUpdating() {
+//        mHandler.removeCallbacks(mMarkerPositionUpdater);
+//    }
 
 
     // TODO: Rename method, update argument and hook method into UI event

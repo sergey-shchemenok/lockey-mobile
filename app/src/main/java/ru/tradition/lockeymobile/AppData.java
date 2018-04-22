@@ -29,11 +29,6 @@ public final class AppData {
 
     public static MainActivity mainActivity;
 
-    //Stores the response code for the request
-    public static int assetsUrlResponseCode;
-    public static int zonesUrlResponseCode;
-    public static int subscriptionsUrlResponseCode;
-
     //whether it need new token to download data
     public static volatile boolean needToken = false;
 

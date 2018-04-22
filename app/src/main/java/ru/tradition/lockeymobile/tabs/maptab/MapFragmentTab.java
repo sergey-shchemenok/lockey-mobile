@@ -67,6 +67,8 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         GeofencePolygonAdapter.ListItemClickListener,
         GeofencePolygonAdapter.ListItemLongClickListener {
 
+    public static MapFragmentTab mft;
+
     //Google Map
     public static GoogleMap google_map;
 
@@ -125,6 +127,8 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mft = this;
 
         FragmentManager fm = getChildFragmentManager();
         googleMapFragment = (SupportMapFragment) fm.findFragmentByTag("google_mapFragment");
@@ -350,13 +354,13 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mHandler = new Handler();
+        //mHandler = new Handler();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        startMarkerUpdating();
+        //startMarkerUpdating();
     }
 
     //Get data from mAssetMap list and make marker from it
@@ -403,7 +407,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
             startActivity(new Intent(getActivity(), AuthActivity.class));
             Log.i(LOG_TAG, "onMapStop..........NullPointerException");
         }
-        stopMarkerUpdating();
+        //stopMarkerUpdating();
         super.onStop();
 
     }
@@ -416,72 +420,116 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 //    }
 
     //The code for map updating
-    private int mInterval = 1000 * 5; // 5 seconds by default, can be changed later
-    private Handler mHandler;
+//    private int mInterval = 1000 * 5; // 5 seconds by default, can be changed later
+//    private Handler mHandler;
+//
+//    Runnable mMarkerPositionUpdater = new Runnable() {
+//        @Override
+//        public void run() {
+//            try {
+//                //first we need to update data
+//                if (AppData.isFinished) {
+//                    AppData.mainActivity.repeatLoader();
+//                    Log.i(LOG_TAG, "Repeating loading assets");
+//                }
+//
+//                if (google_map != null) {
+//                    AppData.target = google_map.getCameraPosition();
+//                    //m_map.clear();
+//                    google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+//
+//                    //updating marker position
+//                    for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
+//                        int id = pair.getKey();
+//                        Marker savedMarker = markers.get(id);
+//                        LatLng savedPosition;
+//                        //need this check in case killing process
+//                        if (savedMarker != null) {
+//                            savedPosition = savedMarker.getPosition();
+//                            //compare saved and new position
+//                            LatLng newPosition = new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude());
+//                            if (!savedPosition.equals(newPosition)) {
+//                                MarkerOptions marker = new MarkerOptions()
+//                                        .position(newPosition)
+//                                        .title(String.valueOf(pair.getValue().getId()));
+//                                if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
+//                                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+//                                }
+//                                savedMarker.remove();
+//                                markers.remove(id);
+//                                markers.put(id, google_map.addMarker(marker));
+//                                Log.i(LOG_TAG, "The markers have moved");
+//                            } else {
+//                                if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
+//                                    savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+//                                } else
+//                                    savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+//                            }
+//                        }
+//                    }
+//                    Log.i(LOG_TAG, String.valueOf(AppData.isFinished));
+//                    Log.i(LOG_TAG, String.valueOf(AppData.isRepeated));
+//                    Log.i(LOG_TAG, "The position of markers was updated");
+//
+//                } else
+//                    Log.i(LOG_TAG, "the map................. is null");
+//
+//            } finally {
+//                mHandler.postDelayed(mMarkerPositionUpdater, mInterval);
+//            }
+//        }
+//    };
+//
+//    void startMarkerUpdating() {
+//        mMarkerPositionUpdater.run();
+//    }
+//
+//    void stopMarkerUpdating() {
+//        mHandler.removeCallbacks(mMarkerPositionUpdater);
+//    }
 
-    Runnable mMarkerPositionUpdater = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                //first we need to update data
-                if (AppData.isFinished) {
-                    AppData.mainActivity.repeatLoader();
-                    Log.i(LOG_TAG, "Repeating loading assets");
-                }
 
-                if (google_map != null) {
-                    AppData.target = google_map.getCameraPosition();
-                    //m_map.clear();
-                    google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+    public void updateMarkers(){
+        if (google_map != null) {
+            AppData.target = google_map.getCameraPosition();
+            //m_map.clear();
+            google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
 
-                    //updating marker position
-                    for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
-                        int id = pair.getKey();
-                        Marker savedMarker = markers.get(id);
-                        LatLng savedPosition;
-                        //need this check in case killing process
-                        if (savedMarker != null) {
-                            savedPosition = savedMarker.getPosition();
-                            //compare saved and new position
-                            LatLng newPosition = new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude());
-                            if (!savedPosition.equals(newPosition)) {
-                                MarkerOptions marker = new MarkerOptions()
-                                        .position(newPosition)
-                                        .title(String.valueOf(pair.getValue().getId()));
-                                if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
-                                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                                }
-                                savedMarker.remove();
-                                markers.remove(id);
-                                markers.put(id, google_map.addMarker(marker));
-                                Log.i(LOG_TAG, "The markers have moved");
-                            } else {
-                                if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
-                                    savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                                } else
-                                    savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-                            }
+            //updating marker position
+            for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
+                int id = pair.getKey();
+                Marker savedMarker = markers.get(id);
+                LatLng savedPosition;
+                //need this check in case killing process
+                if (savedMarker != null) {
+                    savedPosition = savedMarker.getPosition();
+                    //compare saved and new position
+                    LatLng newPosition = new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude());
+                    if (!savedPosition.equals(newPosition)) {
+                        MarkerOptions marker = new MarkerOptions()
+                                .position(newPosition)
+                                .title(String.valueOf(pair.getValue().getId()));
+                        if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
+                            marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                         }
+                        savedMarker.remove();
+                        markers.remove(id);
+                        markers.put(id, google_map.addMarker(marker));
+                        Log.i(LOG_TAG, "The markers have moved");
+                    } else {
+                        if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
+                            savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                        } else
+                            savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
                     }
-                    Log.i(LOG_TAG, String.valueOf(AppData.isFinished));
-                    Log.i(LOG_TAG, String.valueOf(AppData.isRepeated));
-                    Log.i(LOG_TAG, "The position of markers was updated");
-
-                } else
-                    Log.i(LOG_TAG, "the map................. is null");
-
-            } finally {
-                mHandler.postDelayed(mMarkerPositionUpdater, mInterval);
+                }
             }
-        }
-    };
+            Log.i(LOG_TAG, String.valueOf(AppData.isFinished));
+            Log.i(LOG_TAG, String.valueOf(AppData.isRepeated));
+            Log.i(LOG_TAG, "The position of markers was updated");
 
-    void startMarkerUpdating() {
-        mMarkerPositionUpdater.run();
-    }
-
-    void stopMarkerUpdating() {
-        mHandler.removeCallbacks(mMarkerPositionUpdater);
+        } else
+            Log.i(LOG_TAG, "the map................. is null");
     }
 
 

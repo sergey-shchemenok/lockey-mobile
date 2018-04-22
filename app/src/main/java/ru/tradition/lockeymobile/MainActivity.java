@@ -27,14 +27,20 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import ru.tradition.lockeymobile.tabs.AppTabAdapter;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
@@ -57,13 +63,12 @@ public class MainActivity extends AppCompatActivity implements
         NotificationsFragmentTab.OnFragmentInteractionListener,
         AssetsFragmentTab.OnFragmentInteractionListener {
 
+    private static final int UPDATING_INTERVAL = 5000;
+
     private AppTabAdapter adapter;
 
     private Toolbar toolbar;
 
-    private TextView mEmptyStateTextView;
-    private ProgressBar progressCircle;
-    private TextView infoMessage;
     private ConnectivityManager connectivityManager;
     private NetworkInfo activeNetwork;
     private LoaderManager loaderManager;
@@ -71,7 +76,6 @@ public class MainActivity extends AppCompatActivity implements
 
     //preferences
     public static boolean allowNotification;
-    public static String orderBy;
     public static String useMap;
 
     public static final String LOG_TAG = MainActivity.class.getName();
@@ -99,32 +103,93 @@ public class MainActivity extends AppCompatActivity implements
         //todo later
         FirebaseMessaging.getInstance().subscribeToTopic("NEWS");
 
-        progressCircle = (ProgressBar) findViewById(R.id.loading_spinner);
-        mEmptyStateTextView = (TextView) findViewById(R.id.empty_view);
-        infoMessage = (TextView) findViewById(R.id.main_info_message);
-        infoMessage.setVisibility(View.GONE);
-        progressCircle.setVisibility(View.VISIBLE);
-
         //todo when server part be ready
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        allowNotification = sharedPrefs.getBoolean(getString(R.string.settings_allow_notifications_key), false);
-//        Log.i(LOG_TAG, "allowNotification.........." + allowNotification);
-        orderBy = sharedPrefs.getString(
-                getString(R.string.settings_order_by_key),
-                getString(R.string.settings_order_by_default)
-        );
         useMap = sharedPrefs.getString(
                 getString(R.string.settings_use_map_key),
                 getString(R.string.settings_default_map)
         );
-        Log.i(LOG_TAG, "orderBy.........." + orderBy);
         Log.i(LOG_TAG, "useMap.........." + useMap);
 
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
+        AppData.viewPager = (CustomViewPager) findViewById(R.id.viewpager);
+        adapter = new AppTabAdapter(this, getSupportFragmentManager(), useMap);
+        AppData.viewPager.setAdapter(adapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(AppData.viewPager);
+
+        AppData.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (AppData.isAssetSelectingMode && position != 0) {
+                    changeModeToNormal();
+                    AssetsFragmentTab.aft.updateListView();
+                } else if (AppData.isNotificationSelectingMode && position != 2) {
+                    changeModeToNormal();
+                    NotificationsFragmentTab.adapter.notifyDataSetChanged();
+                }
+
+                if (!AppData.isAssetSelectingMode && position == 0) {
+                    AppData.mMenu.getItem(1).setVisible(true);
+                }
+                if (!AppData.isNotificationSelectingMode && position == 2) {
+                    AppData.mMenu.getItem(1).setVisible(true);
+                }
+                if (position == 1) {
+                    AppData.mMenu.getItem(1).setVisible(false);
+                    AppData.viewPager.setPagingEnabled(false);
+                } else
+                    AppData.viewPager.setPagingEnabled(true);
+
+                if (MapFragmentTab.bottomSheetBehavior != null) {
+                    if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
+                            MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                        MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    }
+                }
+                if (MapFragmentTabOSM.bottomSheetBehavior != null) {
+                    if (MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
+                            MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                        MapFragmentTabOSM.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        //get data from asset activity to open map
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null && !bundle.isEmpty()) {
+            AppData.viewPager.setCurrentItem(1);
+            AppData.target = CameraPosition.builder()
+                    .target(new LatLng(bundle.getDouble("latitude"), bundle.getDouble("longitude")))
+                    .zoom(13)
+                    .build();
+            //go to map tab
+            if (MapFragmentTab.google_map != null) {
+                MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+            }
+            bundle.clear();
+        }
+
+        Log.i(LOG_TAG, "Before starting loaders");
+
         //launch loading data from server
-        startLoader();
+        getAssetsData();
         getZones();
+        startMainDataUpdater();
+
     }
 
     //The method adds "up" button to toolbar
@@ -144,15 +209,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     //For initial data loading
-    public void startLoader() {
-        Log.i(LOG_TAG, "....startLoader....");
+    public void getAssetsData() {
+        Log.i(LOG_TAG, "....getting assets....");
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
             loaderManager = getLoaderManager();
             loaderManager.initLoader(AppData.ASSETS_LOADER_ID, null, this);
-            Log.i(LOG_TAG, "initLoader");
+            Log.i(LOG_TAG, "starting loader");
         } else {
-            logout();
+            AssetsFragmentTab.aft.infoMessage.setVisibility(View.VISIBLE);
+            AssetsFragmentTab.aft.infoMessage.setText(R.string.no_connection);
         }
     }
 
@@ -165,23 +231,8 @@ public class MainActivity extends AppCompatActivity implements
 
             Log.i(LOG_TAG, "initLoader");
         } else {
-            infoMessage.setVisibility(View.VISIBLE);
-            infoMessage.setText(R.string.no_connection);
-        }
-    }
-
-    //For periodic data loading
-    public synchronized void repeatLoader() {
-        activeNetwork = connectivityManager.getActiveNetworkInfo();
-        if (activeNetwork != null && activeNetwork.isConnected()) {
-            loaderManager.destroyLoader(AppData.ASSETS_LOADER_ID);
-            loaderManager.initLoader(AppData.ASSETS_LOADER_ID, null, this);
-            Log.i(LOG_TAG, "repeatLoader");
-        } else {
-            infoMessage.setVisibility(View.VISIBLE);
-            infoMessage.setText(R.string.no_connection);
-            //todo set red bar status
-            Log.i(LOG_TAG, "No connection");
+            AssetsFragmentTab.aft.infoMessage.setVisibility(View.VISIBLE);
+            AssetsFragmentTab.aft.infoMessage.setText(R.string.no_connection);
         }
     }
 
@@ -201,156 +252,176 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onLoadFinished(Loader<LoadedData> loader, LoadedData loadedData) {
+
+        loaderManager.destroyLoader(AppData.ASSETS_LOADER_ID);
+        loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
+
         if (loadedData.getPolygonsMap() != null && !loadedData.getPolygonsMap().isEmpty()) {
             AppData.mPolygonsMap = loadedData.getPolygonsMap();
-            loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
             Log.i(LOG_TAG, "Polygons loaded" + "\n" + AppData.mPolygonsMap.toString());
             return;
         }
 
         //whether it can be authorized. The token has not expired
-        if (AppData.zonesUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
-            loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
+        if (GeofenceQueryUtils.zonesUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             AppData.needToken = true;
             //todo something later
             getZones();
+            return;
         }
 
         //whether it can be authorized. The token has not expired
-        if (AppData.assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+        if (AssetsQueryUtils.assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             AppData.needToken = true;
-            getZones();
+            getAssetsData();
+            return;
         }
 
 
         //whether it has some problem
-        if (AppData.assetsUrlResponseCode != HttpURLConnection.HTTP_OK &&
-                AppData.assetsUrlResponseCode != HttpURLConnection.HTTP_UNAUTHORIZED) {
-            infoMessage.setVisibility(View.VISIBLE);
-            infoMessage.setText(assetsUrlResponseMessage);
+        if (AssetsQueryUtils.assetsUrlResponseCode != HttpURLConnection.HTTP_OK &&
+                AssetsQueryUtils.assetsUrlResponseCode != HttpURLConnection.HTTP_UNAUTHORIZED) {
+            AssetsFragmentTab.aft.infoMessage.setVisibility(View.VISIBLE);
+            AssetsFragmentTab.aft.infoMessage.setText(assetsUrlResponseMessage);
             return;
         }
-        infoMessage.setVisibility(View.GONE);
+        AssetsFragmentTab.aft.infoMessage.setVisibility(View.GONE);
 
-        if (!AppData.isRepeated) {
-            AppData.isFinished = true;
-            if (loadedData.getAssetMap() == null || loadedData.getAssetMap().isEmpty()) {
-                if (AppData.mAssetMap == null || AppData.mAssetMap.isEmpty()) {
-                    mEmptyStateTextView.setText(R.string.no_assets);
-                    return;
-                }
-                Log.i(LOG_TAG, "the first load has finished with old data");
-
-            } else {
-                AppData.mAssetMap = loadedData.getAssetMap();
-                Log.i(LOG_TAG, "the first load has finished without mistakes");
-
-            }
-            mEmptyStateTextView.setText("");
-            Log.i(LOG_TAG, "the first load has finished");
-
-            AppData.viewPager = (CustomViewPager) findViewById(R.id.viewpager);
-            adapter = new AppTabAdapter(this, getSupportFragmentManager(), useMap);
-            AppData.viewPager.setAdapter(adapter);
-            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-            tabLayout.setupWithViewPager(AppData.viewPager);
-
-            AppData.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-                @Override
-                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-                }
-
-                @Override
-                public void onPageSelected(int position) {
-                    if (AppData.isAssetSelectingMode && position != 0) {
-                        changeModeToNormal();
-                        updateListView();
-                    } else if (AppData.isNotificationSelectingMode && position != 2) {
-                        changeModeToNormal();
-                        NotificationsFragmentTab.adapter.notifyDataSetChanged();
-                    }
-
-                    if (!AppData.isAssetSelectingMode && position == 0) {
-                        AppData.mMenu.getItem(1).setVisible(true);
-                    }
-                    if (!AppData.isNotificationSelectingMode && position == 2) {
-                        AppData.mMenu.getItem(1).setVisible(true);
-                    }
-                    if (position == 1) {
-                        AppData.mMenu.getItem(1).setVisible(false);
-                        AppData.viewPager.setPagingEnabled(false);
-                    } else
-                        AppData.viewPager.setPagingEnabled(true);
-
-                    if (MapFragmentTab.bottomSheetBehavior != null) {
-                        if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
-                                MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                            MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                        }
-                    }
-                    if (MapFragmentTabOSM.bottomSheetBehavior != null) {
-                        if (MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
-                                MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                            MapFragmentTabOSM.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                        }
-                    }
-
-                }
-
-                @Override
-                public void onPageScrollStateChanged(int state) {
-
-                }
-            });
-
-            AppData.isRepeated = true;
-
-            //if we come here from the asset activity
-            Bundle bundle = getIntent().getExtras();
-            if (bundle != null && !bundle.isEmpty()) {
-                AppData.viewPager.setCurrentItem(1);
-                AppData.target = CameraPosition.builder()
-                        .target(new LatLng(bundle.getDouble("latitude"), bundle.getDouble("longitude")))
-                        .zoom(13)
-                        .build();
-                //go to map tab
-                if (MapFragmentTab.google_map != null) {
-                    MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
-                }
-                bundle.clear();
-            }
-
-            if (progressCircle.getVisibility() != View.GONE)
-                progressCircle.setVisibility(View.GONE);
-
-
-        } else {
-            Log.i(LOG_TAG, "the second load has finished");
-            if (loadedData.getAssetMap() == null || loadedData.getAssetMap().isEmpty()) {
+        if (loadedData.getAssetMap() == null || loadedData.getAssetMap().isEmpty()) {
+            if (AppData.mAssetMap == null || AppData.mAssetMap.isEmpty()) {
+                AssetsFragmentTab.aft.mEmptyStateTextView.setText(R.string.no_assets);
                 return;
             }
+            Log.i(LOG_TAG, "the loading has finished with old data");
+        } else {
             AppData.mAssetMap = loadedData.getAssetMap();
-            updateListView();
-
-            if (progressCircle.getVisibility() != View.GONE)
-                progressCircle.setVisibility(View.GONE);
+            Log.i(LOG_TAG, "the loading has finished without mistakes");
         }
+        AssetsFragmentTab.aft.mEmptyStateTextView.setText("");
+        AssetsFragmentTab.aft.progressCircle.setVisibility(View.GONE);
+
+        AssetsFragmentTab.aft.updateListView();
     }
 
-    //update the list of assets
-    public void updateListView() {
-        AssetsFragmentTab.assetsDataAdapter.clear();
-        //AssetsFragmentTab.assetsDataAdapter.notifyDataSetChanged();
-        Log.i(LOG_TAG, "order by list..........." + getString(R.string.settings_order_by_kit_id_value));
-        if (orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
-            AssetsFragmentTab.assetsDataAdapter.addAll(new ArrayList<>(mAssetMap.values()));
-        } else if (orderBy.equals(getString(R.string.settings_order_by_signal_time_value))) {
-            ArrayList<AssetsData> ads = new ArrayList<>(mAssetMap.values());
-            Collections.sort(ads, AssetsData.COMPARE_BY_LAST_SIGNAL_TIME);
-            AssetsFragmentTab.assetsDataAdapter.addAll(ads);
-        }
-    }
+//        if (!AppData.isRepeated) {
+//            AppData.isFinished = true;
+//            if (loadedData.getAssetMap() == null || loadedData.getAssetMap().isEmpty()) {
+//                if (AppData.mAssetMap == null || AppData.mAssetMap.isEmpty()) {
+//                    mEmptyStateTextView.setText(R.string.no_assets);
+//                    return;
+//                }
+//                Log.i(LOG_TAG, "the first load has finished with old data");
+//
+//            } else {
+//                AppData.mAssetMap = loadedData.getAssetMap();
+//                Log.i(LOG_TAG, "the first load has finished without mistakes");
+//
+//            }
+//            mEmptyStateTextView.setText("");
+//            Log.i(LOG_TAG, "the first load has finished");
+
+//            AppData.viewPager = (CustomViewPager) findViewById(R.id.viewpager);
+//            adapter = new AppTabAdapter(this, getSupportFragmentManager(), useMap);
+//            AppData.viewPager.setAdapter(adapter);
+//            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+//            tabLayout.setupWithViewPager(AppData.viewPager);
+//
+//            AppData.viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+//                @Override
+//                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//
+//                }
+//
+//                @Override
+//                public void onPageSelected(int position) {
+//                    if (AppData.isAssetSelectingMode && position != 0) {
+//                        changeModeToNormal();
+//                        updateListView();
+//                    } else if (AppData.isNotificationSelectingMode && position != 2) {
+//                        changeModeToNormal();
+//                        NotificationsFragmentTab.adapter.notifyDataSetChanged();
+//                    }
+//
+//                    if (!AppData.isAssetSelectingMode && position == 0) {
+//                        AppData.mMenu.getItem(1).setVisible(true);
+//                    }
+//                    if (!AppData.isNotificationSelectingMode && position == 2) {
+//                        AppData.mMenu.getItem(1).setVisible(true);
+//                    }
+//                    if (position == 1) {
+//                        AppData.mMenu.getItem(1).setVisible(false);
+//                        AppData.viewPager.setPagingEnabled(false);
+//                    } else
+//                        AppData.viewPager.setPagingEnabled(true);
+//
+//                    if (MapFragmentTab.bottomSheetBehavior != null) {
+//                        if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
+//                                MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+//                            MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//                        }
+//                    }
+//                    if (MapFragmentTabOSM.bottomSheetBehavior != null) {
+//                        if (MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
+//                                MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+//                            MapFragmentTabOSM.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//                        }
+//                    }
+//
+//                }
+//
+//                @Override
+//                public void onPageScrollStateChanged(int state) {
+//
+//                }
+//            });
+
+//            AppData.isRepeated = true;
+//
+            //if we come here from the asset activity
+//            Bundle bundle = getIntent().getExtras();
+//            if (bundle != null && !bundle.isEmpty()) {
+//                AppData.viewPager.setCurrentItem(1);
+//                AppData.target = CameraPosition.builder()
+//                        .target(new LatLng(bundle.getDouble("latitude"), bundle.getDouble("longitude")))
+//                        .zoom(13)
+//                        .build();
+//                //go to map tab
+//                if (MapFragmentTab.google_map != null) {
+//                    MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+//                }
+//                bundle.clear();
+//            }
+
+//            if (progressCircle.getVisibility() != View.GONE)
+//                progressCircle.setVisibility(View.GONE);
+
+
+//        } else {
+//            Log.i(LOG_TAG, "the second load has finished");
+//            if (loadedData.getAssetMap() == null || loadedData.getAssetMap().isEmpty()) {
+//                return;
+//            }
+//            AppData.mAssetMap = loadedData.getAssetMap();
+//            updateListView();
+//
+//            if (progressCircle.getVisibility() != View.GONE)
+//                progressCircle.setVisibility(View.GONE);
+//        }
+//    }
+
+//    //update the list of assets
+//    public void updateListView() {
+//        AssetsFragmentTab.assetsDataAdapter.clear();
+//        //AssetsFragmentTab.assetsDataAdapter.notifyDataSetChanged();
+//        Log.i(LOG_TAG, "order by list..........." + getString(R.string.settings_order_by_kit_id_value));
+//        if (orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
+//            AssetsFragmentTab.assetsDataAdapter.addAll(new ArrayList<>(mAssetMap.values()));
+//        } else if (orderBy.equals(getString(R.string.settings_order_by_signal_time_value))) {
+//            ArrayList<AssetsData> ads = new ArrayList<>(mAssetMap.values());
+//            Collections.sort(ads, AssetsData.COMPARE_BY_LAST_SIGNAL_TIME);
+//            AssetsFragmentTab.assetsDataAdapter.addAll(ads);
+//        }
+//    }
 
     //we need to interrupt the loading thread
     @Override
@@ -405,7 +476,7 @@ public class MainActivity extends AppCompatActivity implements
                         AppData.mMenu.getItem(3).setVisible(true);
                         AppData.mMenu.getItem(1).setVisible(false);
                         AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(AppData.selectedAssetCounter));
-                        AppData.mainActivity.updateListView();
+                        AssetsFragmentTab.aft.updateListView();
                     } else if (AppData.viewPager.getCurrentItem() == 2) {
                         AppData.isNotificationSelectingMode = true;
                         Log.i(LOG_TAG, "the mode......... has changed");
@@ -489,7 +560,7 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onSupportNavigateUp() {
         if (AppData.isAssetSelectingMode) {
             changeModeToNormal();
-            updateListView();
+            AssetsFragmentTab.aft.updateListView();
         } else if (AppData.isNotificationSelectingMode) {
             changeModeToNormal();
             NotificationsFragmentTab.adapter.notifyDataSetChanged();
@@ -506,7 +577,7 @@ public class MainActivity extends AppCompatActivity implements
         //This button is upper to the left arrow
         if (AppData.isAssetSelectingMode) {
             changeModeToNormal();
-            updateListView();
+            AssetsFragmentTab.aft.updateListView();
         } else if (AppData.isNotificationSelectingMode) {
             changeModeToNormal();
             NotificationsFragmentTab.adapter.notifyDataSetChanged();
@@ -522,7 +593,7 @@ public class MainActivity extends AppCompatActivity implements
         } else if (MapFragmentTabOSM.bottomSheetBehavior != null &&
                 MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
             MapFragmentTabOSM.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-        }else
+        } else
             logout();
     }
 
@@ -530,5 +601,53 @@ public class MainActivity extends AppCompatActivity implements
     public void onFragmentInteraction(Uri uri) {
 
     }
+
+    //let's check up the Timer
+    private Timer mainDataUpdaterTimer;
+    private MainActivity.MainDataUpdater mainDataUpdater;
+
+    private void startMainDataUpdater() {
+        if (mainDataUpdaterTimer != null) {
+            mainDataUpdaterTimer.cancel();
+        }
+        // re-schedule timer here otherwise, IllegalStateException of "TimerTask is scheduled already" will be thrown
+        mainDataUpdaterTimer = new Timer();
+        mainDataUpdater = new MainActivity.MainDataUpdater();
+        mainDataUpdaterTimer.scheduleAtFixedRate(mainDataUpdater, UPDATING_INTERVAL, UPDATING_INTERVAL);
+    }
+
+    class MainDataUpdater extends TimerTask {
+
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    //first we need to update data
+                    getAssetsData();
+                    Log.i(LOG_TAG, "Repeating loading assets");
+                    try {
+                        MapFragmentTab.mft.updateMarkers();
+                    }catch (NullPointerException e){}
+                }
+            });
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mainDataUpdaterTimer != null) {
+            mainDataUpdaterTimer.cancel();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startMainDataUpdater();
+    }
+
 
 }

@@ -39,9 +39,13 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.MapBoxTileSource;
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.OverlayItem;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -49,6 +53,7 @@ import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.AuthActivity;
+import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
@@ -65,11 +70,11 @@ public class MapFragmentTabOSM extends Fragment implements
         GeofencePolygonAdapter.ListItemClickListener,
         GeofencePolygonAdapter.ListItemLongClickListener {
 
-    //Open Street Map
+    public static MapFragmentTabOSM mftosm;
+
     public static MapView osm_map;
     public static IMapController mapController;
     public static TreeMap<Integer, org.osmdroid.views.overlay.Marker> osm_markers = new TreeMap<>();
-    //**
 
     public static GeofencePolygonAdapter mAdapter;
     private RecyclerView mPolygonsList;
@@ -117,6 +122,8 @@ public class MapFragmentTabOSM extends Fragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mftosm = this;
 
         try {
             Context ctx = AppData.mainActivity.getApplicationContext();
@@ -208,14 +215,25 @@ public class MapFragmentTabOSM extends Fragment implements
         fabBottomDrawer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty())
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                else {
+                    Toast.makeText(getContext(), "Получение списка зон", Toast.LENGTH_LONG).show();
+                    AppData.mainActivity.getZones();
+                }
+
+
             }
         });
 
         fabLayers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //todo change map mode
+                if (osm_map != null) {
+                    osm_map.setTileSource(TileSourceFactory.CLOUDMADESMALLTILES);
+
+
+                }
 
             }
         });
@@ -223,10 +241,36 @@ public class MapFragmentTabOSM extends Fragment implements
         fabLayers.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                //todo centre the markers
+                if (osm_markers != null && !osm_markers.isEmpty()) {
+                    int minLat = Integer.MAX_VALUE;
+                    int maxLat = Integer.MIN_VALUE;
+                    int minLong = Integer.MAX_VALUE;
+                    int maxLong = Integer.MIN_VALUE;
+                    for (Map.Entry<Integer, org.osmdroid.views.overlay.Marker> pair : osm_markers.entrySet()) {
+                        GeoPoint point = pair.getValue().getPosition();
+                        if (Math.round(point.getLatitude() * 10000000) < minLat)
+                            minLat = (int) Math.round(point.getLatitude() * 10000000);
+                        if (Math.round(point.getLatitude() * 10000000) > maxLat)
+                            maxLat = (int) Math.round(point.getLatitude() * 10000000);
+                        if (Math.round(point.getLongitude() * 10000000) < minLong)
+                            minLong = (int) Math.round(point.getLongitude() * 10000000);
+                        if (Math.round(point.getLongitude() * 10000000) > maxLong)
+                            maxLong = (int) Math.round(point.getLongitude() * 10000000);
+                    }
+                    BoundingBox boundingBox = new BoundingBox((double) maxLat / 10000000,
+                            (double) maxLong / 10000000,
+                            (double) minLat / 10000000,
+                            (double) minLong / 10000000);
+                    osm_map.zoomToBoundingBox(boundingBox, true, 10);
+                } else {
+                    osmGetDataAndShowMarkers();
+                    Toast.makeText(getContext(), "Получение координат объектов", Toast.LENGTH_LONG).show();
+
+                }
 
                 return true;
             }
+
         });
 
 
@@ -285,11 +329,10 @@ public class MapFragmentTabOSM extends Fragment implements
         //startMarkerUpdating();
     }
 
-    /*
-    for osm map
-    */
     public void osmGetDataAndShowMarkers() {
         try {
+            osm_markers.clear();
+            osm_map.getOverlays().clear();
             for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
                 org.osmdroid.views.overlay.Marker osmMarker = new org.osmdroid.views.overlay.Marker(osm_map);
                 GeoPoint point = new GeoPoint(pair.getValue().getLatitude(), pair.getValue().getLongitude());
@@ -305,9 +348,47 @@ public class MapFragmentTabOSM extends Fragment implements
         for (Map.Entry<Integer, org.osmdroid.views.overlay.Marker> pair : osm_markers.entrySet()) {
             osm_map.getOverlays().add(pair.getValue());
         }
-
+        osm_map.invalidate();
     }
-    //***
+
+    public void updateMarkers() {
+//        if (osm_markers == null || osm_markers.isEmpty()) {
+//            osmGetDataAndShowMarkers();
+//            return;
+//        }
+//
+//        if (osm_map != null && AppData.mAssetMap != null && !AppData.mAssetMap.isEmpty()) {
+//            //updating marker position
+//            for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
+//                int id = pair.getKey();
+//                org.osmdroid.views.overlay.Marker savedMarker = osm_markers.get(id);
+//                GeoPoint savedPosition;
+//                //need this check in case killing process
+//                if (savedMarker != null) {
+//                    savedPosition = savedMarker.getPosition();
+//                    //compare saved and new position
+//                    GeoPoint newPosition = new GeoPoint(pair.getValue().getLatitude(), pair.getValue().getLongitude());
+//                    if (!savedPosition.equals(newPosition)) {
+//                        org.osmdroid.views.overlay.Marker newMarker = new org.osmdroid.views.overlay.Marker(osm_map);
+//                        newMarker.setPosition(newPosition);
+//                        newMarker.setAnchor(org.osmdroid.views.overlay.Marker.ANCHOR_CENTER, org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM);
+//                        osm_map.getOverlays().remove(savedMarker);
+//                        osm_markers.remove(id);
+//                        osm_map.getOverlays().add(newMarker);
+//                        osm_markers.put(id, newMarker);
+//                        //osm_map.getOverlays().remove()
+//                        Log.i(LOG_TAG, "The markers have moved");
+//                    } else {
+//
+//                    }
+//                }
+//            }
+//            Log.i(LOG_TAG, "The position of markers was updated");
+//
+//        } else
+//            Log.i(LOG_TAG, "the map................. is null");
+        osmGetDataAndShowMarkers();
+    }
 
 
     //Save camera position
@@ -332,34 +413,6 @@ public class MapFragmentTabOSM extends Fragment implements
 //        MainActivity.isRepeated = false;
 //        super.onDestroyView();
 //    }
-
-    //The code for map updating
-//    private int mInterval = 1000 * 5; // 5 seconds by default, can be changed later
-//    private Handler mHandler;
-//
-//    Runnable mMarkerPositionUpdater = new Runnable() {
-//        @Override
-//        public void run() {
-//            try {
-//                //first we need to update data
-//                if (AppData.isFinished) {
-//                    AppData.mainActivity.repeatLoader();
-//                    Log.i(LOG_TAG, "Repeating loading assets");
-//                }
-//            } finally {
-//                mHandler.postDelayed(mMarkerPositionUpdater, mInterval);
-//            }
-//        }
-//    };
-//
-//    void startMarkerUpdating() {
-//        mMarkerPositionUpdater.run();
-//    }
-//
-//    void stopMarkerUpdating() {
-//        mHandler.removeCallbacks(mMarkerPositionUpdater);
-//    }
-
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

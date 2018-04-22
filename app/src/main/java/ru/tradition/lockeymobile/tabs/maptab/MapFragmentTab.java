@@ -97,7 +97,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 
     private int mapType = GoogleMap.MAP_TYPE_NORMAL;
 
-    private static TreeMap<Integer, Marker> markers = new TreeMap<>();
+    public static TreeMap<Integer, Marker> markers = new TreeMap<>();
     private static TreeMap<Integer, Polygon> polygons = new TreeMap<>();
     public static int polygonNamesNumber = -1;
 
@@ -152,7 +152,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.tab_fragment_map_drawer, container, false);
 
-        osmFragmentContainer = (LinearLayout)rootView.findViewById(R.id.osm_FragmentContainer);
+        osmFragmentContainer = (LinearLayout) rootView.findViewById(R.id.osm_FragmentContainer);
         osmFragmentContainer.setVisibility(View.GONE);
 
         // Inflate the layout for this fragment
@@ -222,7 +222,12 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         fabBottomDrawer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty())
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                else {
+                    Toast.makeText(getContext(), "Получение списка зон", Toast.LENGTH_LONG).show();
+                    AppData.mainActivity.getZones();
+                }
             }
         });
 
@@ -247,17 +252,22 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         fabLayers.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                for (Map.Entry<Integer, Marker> pair : markers.entrySet()) {
-                    Marker marker = pair.getValue();
-                    builder.include(marker.getPosition());
+                if (markers != null && !markers.isEmpty()) {
+                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                    for (Map.Entry<Integer, Marker> pair : markers.entrySet()) {
+                        Marker marker = pair.getValue();
+                        builder.include(marker.getPosition());
+                    }
+                    LatLngBounds bounds = builder.build();
+
+                    int padding = 10; // offset from edges of the map in pixels
+                    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+                    google_map.animateCamera(cu);
+                } else{
+                    Toast.makeText(getContext(), "Получение координат объектов", Toast.LENGTH_LONG).show();
+                    placeMarkersOnMap();
                 }
-                LatLngBounds bounds = builder.build();
-
-                int padding = 5; // offset from edges of the map in pixels
-                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-
-                google_map.animateCamera(cu);
                 return true;
             }
         });
@@ -379,6 +389,11 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
             }
         });
 
+        placeMarkersOnMap();
+
+    }
+
+    private void placeMarkersOnMap() {
         try {
             markers.clear();
             for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
@@ -392,7 +407,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
             }
         } catch (NullPointerException e) {
             //AppData.mainActivity.logout();
-            startActivity(new Intent(getActivity(), AuthActivity.class));
+            //startActivity(new Intent(getActivity(), AuthActivity.class));
             Log.i(LOG_TAG, "onMapReady..........NullPointerException");
         }
     }
@@ -412,89 +427,13 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 
     }
 
-//    @Override
-//    public void onDestroyView() {
-//        MainActivity.isFinished = false;
-//        MainActivity.isRepeated = false;
-//        super.onDestroyView();
-//    }
+    public void updateMarkers() {
+        if (markers == null || markers.isEmpty()) {
+            placeMarkersOnMap();
+            return;
+        }
 
-    //The code for map updating
-//    private int mInterval = 1000 * 5; // 5 seconds by default, can be changed later
-//    private Handler mHandler;
-//
-//    Runnable mMarkerPositionUpdater = new Runnable() {
-//        @Override
-//        public void run() {
-//            try {
-//                //first we need to update data
-//                if (AppData.isFinished) {
-//                    AppData.mainActivity.repeatLoader();
-//                    Log.i(LOG_TAG, "Repeating loading assets");
-//                }
-//
-//                if (google_map != null) {
-//                    AppData.target = google_map.getCameraPosition();
-//                    //m_map.clear();
-//                    google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
-//
-//                    //updating marker position
-//                    for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
-//                        int id = pair.getKey();
-//                        Marker savedMarker = markers.get(id);
-//                        LatLng savedPosition;
-//                        //need this check in case killing process
-//                        if (savedMarker != null) {
-//                            savedPosition = savedMarker.getPosition();
-//                            //compare saved and new position
-//                            LatLng newPosition = new LatLng(pair.getValue().getLatitude(), pair.getValue().getLongitude());
-//                            if (!savedPosition.equals(newPosition)) {
-//                                MarkerOptions marker = new MarkerOptions()
-//                                        .position(newPosition)
-//                                        .title(String.valueOf(pair.getValue().getId()));
-//                                if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
-//                                    marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-//                                }
-//                                savedMarker.remove();
-//                                markers.remove(id);
-//                                markers.put(id, google_map.addMarker(marker));
-//                                Log.i(LOG_TAG, "The markers have moved");
-//                            } else {
-//                                if (pair.getValue().getLastSignalTime() < 15 && pair.getValue().getLastSignalTime() >= 0) {
-//                                    savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-//                                } else
-//                                    savedMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-//                            }
-//                        }
-//                    }
-//                    Log.i(LOG_TAG, String.valueOf(AppData.isFinished));
-//                    Log.i(LOG_TAG, String.valueOf(AppData.isRepeated));
-//                    Log.i(LOG_TAG, "The position of markers was updated");
-//
-//                } else
-//                    Log.i(LOG_TAG, "the map................. is null");
-//
-//            } finally {
-//                mHandler.postDelayed(mMarkerPositionUpdater, mInterval);
-//            }
-//        }
-//    };
-//
-//    void startMarkerUpdating() {
-//        mMarkerPositionUpdater.run();
-//    }
-//
-//    void stopMarkerUpdating() {
-//        mHandler.removeCallbacks(mMarkerPositionUpdater);
-//    }
-
-
-    public void updateMarkers(){
-        if (google_map != null) {
-            AppData.target = google_map.getCameraPosition();
-            //m_map.clear();
-            google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
-
+        if (mapReady && google_map != null && AppData.mAssetMap != null && !AppData.mAssetMap.isEmpty()) {
             //updating marker position
             for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
                 int id = pair.getKey();
@@ -524,8 +463,6 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     }
                 }
             }
-            Log.i(LOG_TAG, String.valueOf(AppData.isFinished));
-            Log.i(LOG_TAG, String.valueOf(AppData.isRepeated));
             Log.i(LOG_TAG, "The position of markers was updated");
 
         } else

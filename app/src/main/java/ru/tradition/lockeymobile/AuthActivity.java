@@ -120,6 +120,8 @@ public class AuthActivity extends AppCompatActivity
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (AppData.mAssetMap != null)
+                    AppData.mAssetMap.clear();
                 AppData.pwd = passwordView.getText().toString();
                 AppData.usr = loginView.getText().toString();
                 //get token. If it is correct start main activity
@@ -256,8 +258,6 @@ public class AuthActivity extends AppCompatActivity
             infoMessage.setText(R.string.no_credentials);
             return;
         }
-        AppData.isFinished = false;
-        AppData.isRepeated = false;
         if (AppData.viewPager != null)
             AppData.viewPager.setCurrentItem(0);
         infoMessage.setVisibility(View.INVISIBLE);

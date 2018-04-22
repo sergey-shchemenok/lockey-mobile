@@ -352,8 +352,6 @@ public class SubscriptionsActivity extends AppCompatActivity implements
 
     public void logout() {
         Intent intent = new Intent(this, AuthActivity.class);
-        AppData.isFinished = false;
-        AppData.isRepeated = false;
         startActivity(intent);
     }
 

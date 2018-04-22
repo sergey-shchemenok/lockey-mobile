@@ -181,8 +181,6 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
     public void logout() {
         Intent intent = new Intent(this, AuthActivity.class);
-        AppData.isFinished = false;
-        AppData.isRepeated = false;
         startActivity(intent);
     }
 

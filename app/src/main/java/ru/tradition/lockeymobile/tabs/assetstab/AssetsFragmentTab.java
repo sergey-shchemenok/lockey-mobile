@@ -53,7 +53,6 @@ public class AssetsFragmentTab extends Fragment {
 
     public TextView mEmptyStateTextView;
     public ProgressBar progressCircle;
-    public TextView infoMessage;
 
     public static String orderBy;
 
@@ -78,29 +77,11 @@ public class AssetsFragmentTab extends Fragment {
 
         progressCircle = (ProgressBar) rootView.findViewById(R.id.loading_spinner);
         mEmptyStateTextView = (TextView) rootView.findViewById(R.id.empty_view);
-        infoMessage = (TextView) rootView.findViewById(R.id.main_info_message);
-        infoMessage.setVisibility(View.GONE);
         progressCircle.setVisibility(View.VISIBLE);
 
         assetsDataAdapter = new AssetsDataAdapter(getActivity(), new ArrayList<AssetsData>());
         assetsListView.setAdapter(assetsDataAdapter);
 
-
-        //to prevent crash in some killing process situations
-//        try {
-//            if (orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
-//                assetsDataAdapter.addAll(new ArrayList<>(mAssetMap.values()));
-//            } else if (orderBy.equals(getString(R.string.settings_order_by_signal_time_value))) {
-//                ArrayList<AssetsData> ads = new ArrayList<>(mAssetMap.values());
-//                Collections.sort(ads, AssetsData.COMPARE_BY_LAST_SIGNAL_TIME);
-//                assetsDataAdapter.addAll(ads);
-//            }
-//        } catch (NullPointerException e) {
-//            startActivity(new Intent(getActivity(), AuthActivity.class));
-//            //AppData.mainActivity.logout();
-//            Log.i(LOG_TAG, "onAssetsFragmentCreateView..........NullPointerException");
-//
-//        }
 
         try {
             updateListView();
@@ -167,6 +148,10 @@ public class AssetsFragmentTab extends Fragment {
                 return true;
             }
         });
+
+        if (AppData.mAssetMap != null && !AppData.mAssetMap.isEmpty())
+            AssetsFragmentTab.aft.progressCircle.setVisibility(View.GONE);
+
 
         return rootView;
     }

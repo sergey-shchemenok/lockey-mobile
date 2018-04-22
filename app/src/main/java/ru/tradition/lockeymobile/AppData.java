@@ -72,10 +72,6 @@ public final class AppData {
     public static Menu mMenu;
     public static CustomViewPager viewPager;
 
-    //Flags for managing the updating thread
-    public static boolean isRepeated = false;
-    public static boolean isFinished = false;
-
     //user's login and password
     public static boolean isAuthorized = false;
     public static String pwd = "";

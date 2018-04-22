@@ -60,8 +60,6 @@ public class AssetActivity extends AppCompatActivity {
         toMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppData.isRepeated = false;
-                AppData.isFinished = false;
                 Intent intent = new Intent(AssetActivity.this, MainActivity.class);
                 intent.putExtra("latitude", assetData.getLatitude());
                 intent.putExtra("longitude", assetData.getLongitude());
@@ -107,8 +105,6 @@ public class AssetActivity extends AppCompatActivity {
 
     public void logout() {
         Intent intent = new Intent(this, AuthActivity.class);
-        AppData.isFinished = false;
-        AppData.isRepeated = false;
         startActivity(intent);
     }
 

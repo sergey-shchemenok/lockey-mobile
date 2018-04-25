@@ -119,7 +119,7 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
     public void onBindViewHolder(PolygonNameViewHolder holder, int position) {
         Log.d(LOG_TAG, "#" + position);
         if (holder != null) {
-            if (position == MapFragmentTab.polygonNamesNumber)
+            if (position == MapFragmentTab.polygonNamesNumber||position == MapFragmentTabOSM.polygonNamesNumber)
                 holder.setColorRed();
             else
                 holder.setColorDarkGray();
@@ -202,7 +202,8 @@ public class GeofencePolygonAdapter extends RecyclerView.Adapter<GeofencePolygon
         public void onClick(View v) {
             int clickedPosition = getAdapterPosition();
             mOnClickListener.onListItemClick(clickedPosition);
-            if (clickedPosition == MapFragmentTab.polygonNamesNumber)
+            if (clickedPosition == MapFragmentTab.polygonNamesNumber ||
+                    clickedPosition == MapFragmentTabOSM.polygonNamesNumber)
                 setColorRed();
             else
                 setColorDarkGray();

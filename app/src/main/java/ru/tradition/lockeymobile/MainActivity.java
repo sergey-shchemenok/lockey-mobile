@@ -24,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,6 +35,9 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.osmdroid.util.BoundingBox;
+import org.osmdroid.util.GeoPoint;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -184,13 +188,18 @@ public class MainActivity extends AppCompatActivity implements
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && !bundle.isEmpty()) {
             AppData.viewPager.setCurrentItem(1);
-            AppData.target = CameraPosition.builder()
-                    .target(new LatLng(bundle.getDouble("latitude"), bundle.getDouble("longitude")))
-                    .zoom(13)
-                    .build();
             //go to map tab
-            if (MapFragmentTab.google_map != null) {
+            if (MapFragmentTab.google_map != null && useMap.equals(getString(R.string.settings_google_map_value))) {
+                AppData.target = CameraPosition.builder()
+                        .target(new LatLng(bundle.getDouble("latitude"), bundle.getDouble("longitude")))
+                        .zoom(14)
+                        .build();
                 MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+            } else if (MapFragmentTabOSM.mapController != null && useMap.equals(getString(R.string.settings_osm_value))) {
+                AppData.osmCameraZoom = 16.0;
+                AppData.osmStartPoint = new GeoPoint(bundle.getDouble("latitude"), bundle.getDouble("longitude"));
+                MapFragmentTabOSM.mapController.setZoom(AppData.osmCameraZoom);
+                MapFragmentTabOSM.mapController.setCenter(AppData.osmStartPoint);
             }
             bundle.clear();
         }
@@ -368,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements
                         AppData.mMenu.getItem(1).setVisible(false);
                         AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(AppData.selectedAssetCounter));
                         AssetsFragmentTab.aft.updateListView();
-                    } else if (AppData.viewPager.getCurrentItem() == 2) {
+                    } else if (AppData.viewPager.getCurrentItem() == 2 && NotificationsFragmentTab.notificationListView.getCount() != 0) {
                         AppData.isNotificationSelectingMode = true;
                         Log.i(LOG_TAG, "the mode......... has changed");
                         AppData.mainActivity.setUpButton();
@@ -377,6 +386,7 @@ public class MainActivity extends AppCompatActivity implements
                         AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(AppData.selectedNotificationCounter));
                         NotificationsFragmentTab.adapter.notifyDataSetChanged();
                     }
+
                 }
                 return true;
             case R.id.main_menu_settings:
@@ -393,10 +403,11 @@ public class MainActivity extends AppCompatActivity implements
                 //Let it be here for a while
                 NotificationsFragmentTab.notificationsFragmentTab.showDeleteConfirmationDialog();
                 NotificationsFragmentTab.adapter.notifyDataSetChanged();
+
                 return true;
             case R.id.main_menu_zoom_out:
                 if (!AppData.selectedAsset.isEmpty() && AppData.selectedAsset != null) {
-                    if (MapFragmentTab.google_map != null) {
+                    if (MapFragmentTab.google_map != null && useMap.equals(getString(R.string.settings_google_map_value))) {
                         //first calculate the bounds of all the markers like so:
                         LatLngBounds.Builder builder = new LatLngBounds.Builder();
                         for (Integer id : AppData.selectedAsset) {
@@ -410,8 +421,41 @@ public class MainActivity extends AppCompatActivity implements
 //                        changeModeToNormal();
 //                        updateListView();
                         MapFragmentTab.google_map.moveCamera(cu);
+                    } else if (MapFragmentTabOSM.mapController != null && useMap.equals(getString(R.string.settings_osm_value))) {
+                        if (AppData.selectedAsset.size() > 1) {
+                            int minLat = Integer.MAX_VALUE;
+                            int maxLat = Integer.MIN_VALUE;
+                            int minLong = Integer.MAX_VALUE;
+                            int maxLong = Integer.MIN_VALUE;
+                            for (Integer id : AppData.selectedAsset) {
+                                AssetsData as = AppData.mAssetMap.get(id);
+                                GeoPoint point = new GeoPoint(as.getLatitude(), as.getLongitude());
+                                if (Math.round(point.getLatitude() * 10000000) < minLat)
+                                    minLat = (int) Math.round(point.getLatitude() * 10000000);
+                                if (Math.round(point.getLatitude() * 10000000) > maxLat)
+                                    maxLat = (int) Math.round(point.getLatitude() * 10000000);
+                                if (Math.round(point.getLongitude() * 10000000) < minLong)
+                                    minLong = (int) Math.round(point.getLongitude() * 10000000);
+                                if (Math.round(point.getLongitude() * 10000000) > maxLong)
+                                    maxLong = (int) Math.round(point.getLongitude() * 10000000);
+                            }
+                            //todo something more
+                            BoundingBox boundingBox = new BoundingBox((double) maxLat / 10000000,
+                                    (double) maxLong / 10000000,
+                                    (double) minLat / 10000000,
+                                    (double) minLong / 10000000);
+                            MapFragmentTabOSM.osm_map.zoomToBoundingBox(boundingBox, true, 10);
+                        } else {
+                            AppData.osmCameraZoom = 22.0;
+                            AppData.osmStartPoint = new GeoPoint(
+                                    AppData.mAssetMap.get(AppData.selectedAsset.toArray()[0]).getLatitude(),
+                                    AppData.mAssetMap.get(AppData.selectedAsset.toArray()[0]).getLongitude());
+                            MapFragmentTabOSM.mapController.setZoom(AppData.osmCameraZoom);
+                            MapFragmentTabOSM.mapController.setCenter(AppData.osmStartPoint);
+                        }
                     }
                     AppData.viewPager.setCurrentItem(1);
+
 
                 }
                 return true;

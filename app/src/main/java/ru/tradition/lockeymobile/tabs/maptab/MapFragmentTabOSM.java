@@ -5,15 +5,12 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,37 +20,24 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.PolygonOptions;
 
-import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.MapBoxTileSource;
-import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polygon;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.AuthActivity;
-import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
@@ -229,11 +213,12 @@ public class MapFragmentTabOSM extends Fragment implements
         fabLayers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (osm_map != null) {
-                    osm_map.setTileSource(TileSourceFactory.CLOUDMADESMALLTILES);
-
-
-                }
+//                if (osm_map != null) {
+//                    osm_map.setTileSource(TileSourceFactory.CLOUDMADESMALLTILES);
+//
+//
+//                }
+                Toast.makeText(getContext(), "Функция переключения режимов отображения карт OpenStreetMap недоступна в текущей версии приложения", Toast.LENGTH_LONG).show();
 
             }
         });
@@ -242,26 +227,28 @@ public class MapFragmentTabOSM extends Fragment implements
             @Override
             public boolean onLongClick(View v) {
                 if (osm_markers != null && !osm_markers.isEmpty()) {
-                    int minLat = Integer.MAX_VALUE;
-                    int maxLat = Integer.MIN_VALUE;
-                    int minLong = Integer.MAX_VALUE;
-                    int maxLong = Integer.MIN_VALUE;
-                    for (Map.Entry<Integer, org.osmdroid.views.overlay.Marker> pair : osm_markers.entrySet()) {
-                        GeoPoint point = pair.getValue().getPosition();
-                        if (Math.round(point.getLatitude() * 10000000) < minLat)
-                            minLat = (int) Math.round(point.getLatitude() * 10000000);
-                        if (Math.round(point.getLatitude() * 10000000) > maxLat)
-                            maxLat = (int) Math.round(point.getLatitude() * 10000000);
-                        if (Math.round(point.getLongitude() * 10000000) < minLong)
-                            minLong = (int) Math.round(point.getLongitude() * 10000000);
-                        if (Math.round(point.getLongitude() * 10000000) > maxLong)
-                            maxLong = (int) Math.round(point.getLongitude() * 10000000);
+                    if (osm_markers.size() > 1) {
+                        int minLat = Integer.MAX_VALUE;
+                        int maxLat = Integer.MIN_VALUE;
+                        int minLong = Integer.MAX_VALUE;
+                        int maxLong = Integer.MIN_VALUE;
+                        for (Map.Entry<Integer, Marker> pair : osm_markers.entrySet()) {
+                            GeoPoint point = pair.getValue().getPosition();
+                            if (Math.round(point.getLatitude() * 10000000) < minLat)
+                                minLat = (int) Math.round(point.getLatitude() * 10000000);
+                            if (Math.round(point.getLatitude() * 10000000) > maxLat)
+                                maxLat = (int) Math.round(point.getLatitude() * 10000000);
+                            if (Math.round(point.getLongitude() * 10000000) < minLong)
+                                minLong = (int) Math.round(point.getLongitude() * 10000000);
+                            if (Math.round(point.getLongitude() * 10000000) > maxLong)
+                                maxLong = (int) Math.round(point.getLongitude() * 10000000);
+                        }
+                        BoundingBox boundingBox = new BoundingBox((double) maxLat / 10000000,
+                                (double) maxLong / 10000000,
+                                (double) minLat / 10000000,
+                                (double) minLong / 10000000);
+                        osm_map.zoomToBoundingBox(boundingBox, true, 10);
                     }
-                    BoundingBox boundingBox = new BoundingBox((double) maxLat / 10000000,
-                            (double) maxLong / 10000000,
-                            (double) minLat / 10000000,
-                            (double) minLong / 10000000);
-                    osm_map.zoomToBoundingBox(boundingBox, true, 10);
                 } else {
                     osmGetDataAndShowMarkers();
                     Toast.makeText(getContext(), "Получение координат объектов", Toast.LENGTH_LONG).show();
@@ -294,15 +281,49 @@ public class MapFragmentTabOSM extends Fragment implements
     private void clearPolygonSet() {
         if (!polygons.isEmpty()) {
             for (Map.Entry<Integer, Polygon> pair : polygons.entrySet())
-                pair.getValue().remove();
+                osm_map.getOverlayManager().remove(pair.getValue());
             polygons.clear();
         }
         polygonNamesNumber = -1;
+        osm_map.invalidate();
     }
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        //todo emphasize polygon
+        if (osm_map != null) {
+            if (!polygons.isEmpty()) {
+                for (Map.Entry<Integer, Polygon> pair : polygons.entrySet())
+                    osm_map.getOverlayManager().remove(pair.getValue());
+                polygons.clear();
+            }
+            if (polygonNamesNumber != clickedItemIndex) {
+                ArrayList<GeofencePolygon> polygonList = new ArrayList<>(AppData.mPolygonsMap.values());
+                GeofencePolygon geof = polygonList.get(clickedItemIndex);
+                LatLng[] latLngArray = geof.getPolygon();
+                List<GeoPoint> geoPoints = new ArrayList<>();
+                for (int i = 0; i < latLngArray.length; i++) {
+                    geoPoints.add(new GeoPoint(latLngArray[i].latitude, latLngArray[i].longitude));
+                }
+
+                Polygon polygon = new Polygon();    //see note below
+                polygon.setFillColor(Color.parseColor("#6421a30d"));
+                polygon.setStrokeColor(Color.parseColor("#FF21A30D"));
+                polygon.setPoints(geoPoints);
+                osm_map.getOverlayManager().add(polygon);
+                polygons.put(geof.getGeofence_id(), polygon);
+                osm_map.invalidate();
+
+                int lastPosition = polygonNamesNumber;
+                polygonNamesNumber = clickedItemIndex;
+                if (lastPosition >= 0) {
+                    mAdapter.notifyDataSetChanged();
+                }
+
+            } else {
+                polygonNamesNumber = -1;
+                osm_map.invalidate();
+            }
+        }
 
     }
 
@@ -314,6 +335,35 @@ public class MapFragmentTabOSM extends Fragment implements
 
             }
         }
+
+        ArrayList<GeofencePolygon> polygonList = new ArrayList<>(AppData.mPolygonsMap.values());
+        GeofencePolygon geof = polygonList.get(clickedItemIndex);
+        LatLng[] latLngArray = geof.getPolygon();
+        List<GeoPoint> geoPoints = new ArrayList<>();
+        for (int i = 0; i < latLngArray.length; i++) {
+            geoPoints.add(new GeoPoint(latLngArray[i].latitude, latLngArray[i].longitude));
+        }
+        Log.i(LOG_TAG, "long click.....");
+
+        int minLat = Integer.MAX_VALUE;
+        int maxLat = Integer.MIN_VALUE;
+        int minLong = Integer.MAX_VALUE;
+        int maxLong = Integer.MIN_VALUE;
+        for (GeoPoint point: geoPoints) {
+            if (Math.round(point.getLatitude() * 10000000) < minLat)
+                minLat = (int) Math.round(point.getLatitude() * 10000000);
+            if (Math.round(point.getLatitude() * 10000000) > maxLat)
+                maxLat = (int) Math.round(point.getLatitude() * 10000000);
+            if (Math.round(point.getLongitude() * 10000000) < minLong)
+                minLong = (int) Math.round(point.getLongitude() * 10000000);
+            if (Math.round(point.getLongitude() * 10000000) > maxLong)
+                maxLong = (int) Math.round(point.getLongitude() * 10000000);
+        }
+        BoundingBox boundingBox = new BoundingBox((double) maxLat / 10000000,
+                (double) maxLong / 10000000,
+                (double) minLat / 10000000,
+                (double) minLong / 10000000);
+        osm_map.zoomToBoundingBox(boundingBox, true, 10);
     }
 
     //Handler for map updating here
@@ -338,6 +388,7 @@ public class MapFragmentTabOSM extends Fragment implements
                 GeoPoint point = new GeoPoint(pair.getValue().getLatitude(), pair.getValue().getLongitude());
                 osmMarker.setPosition(point);
                 osmMarker.setAnchor(org.osmdroid.views.overlay.Marker.ANCHOR_CENTER, org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM);
+                osmMarker.setTitle(String.valueOf(pair.getValue().getId()));
                 osm_markers.put(pair.getValue().getId(), osmMarker);
             }
         } catch (NullPointerException e) {
@@ -348,45 +399,16 @@ public class MapFragmentTabOSM extends Fragment implements
         for (Map.Entry<Integer, org.osmdroid.views.overlay.Marker> pair : osm_markers.entrySet()) {
             osm_map.getOverlays().add(pair.getValue());
         }
+
+        if (!polygons.isEmpty()) {
+            for (Map.Entry<Integer, Polygon> pair : polygons.entrySet())
+                osm_map.getOverlayManager().add(pair.getValue());
+        }
+
         osm_map.invalidate();
     }
 
     public void updateMarkers() {
-//        if (osm_markers == null || osm_markers.isEmpty()) {
-//            osmGetDataAndShowMarkers();
-//            return;
-//        }
-//
-//        if (osm_map != null && AppData.mAssetMap != null && !AppData.mAssetMap.isEmpty()) {
-//            //updating marker position
-//            for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
-//                int id = pair.getKey();
-//                org.osmdroid.views.overlay.Marker savedMarker = osm_markers.get(id);
-//                GeoPoint savedPosition;
-//                //need this check in case killing process
-//                if (savedMarker != null) {
-//                    savedPosition = savedMarker.getPosition();
-//                    //compare saved and new position
-//                    GeoPoint newPosition = new GeoPoint(pair.getValue().getLatitude(), pair.getValue().getLongitude());
-//                    if (!savedPosition.equals(newPosition)) {
-//                        org.osmdroid.views.overlay.Marker newMarker = new org.osmdroid.views.overlay.Marker(osm_map);
-//                        newMarker.setPosition(newPosition);
-//                        newMarker.setAnchor(org.osmdroid.views.overlay.Marker.ANCHOR_CENTER, org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM);
-//                        osm_map.getOverlays().remove(savedMarker);
-//                        osm_markers.remove(id);
-//                        osm_map.getOverlays().add(newMarker);
-//                        osm_markers.put(id, newMarker);
-//                        //osm_map.getOverlays().remove()
-//                        Log.i(LOG_TAG, "The markers have moved");
-//                    } else {
-//
-//                    }
-//                }
-//            }
-//            Log.i(LOG_TAG, "The position of markers was updated");
-//
-//        } else
-//            Log.i(LOG_TAG, "the map................. is null");
         osmGetDataAndShowMarkers();
     }
 

@@ -21,15 +21,17 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.AssetActivity;
-import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.R;
 import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTab;
+import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTabOSM;
 
 import static ru.tradition.lockeymobile.AppData.mAssetMap;
 
@@ -75,8 +77,8 @@ public class AssetsFragmentTab extends Fragment {
 
         assetsListView = (ListView) rootView.findViewById(R.id.assets_list);
 
-        progressCircle = (ProgressBar) rootView.findViewById(R.id.loading_spinner);
-        mEmptyStateTextView = (TextView) rootView.findViewById(R.id.empty_view);
+        progressCircle = (ProgressBar) rootView.findViewById(R.id.asset_tab_loading_spinner);
+        mEmptyStateTextView = (TextView) rootView.findViewById(R.id.asset_tab_empty_view);
         progressCircle.setVisibility(View.VISIBLE);
 
         assetsDataAdapter = new AssetsDataAdapter(getActivity(), new ArrayList<AssetsData>());
@@ -136,21 +138,26 @@ public class AssetsFragmentTab extends Fragment {
                 }
                 assetsDataAdapter.notifyDataSetChanged();
                 AssetsData as = (AssetsData) adapterView.getItemAtPosition(position);
-                AppData.target = CameraPosition.builder()
-                        .target(new LatLng(as.getLatitude(), as.getLongitude()))
-                        .zoom(13)
-                        .build();
-                //go to map tab
                 AppData.viewPager.setCurrentItem(1);
-                if (MapFragmentTab.google_map != null)
-                    MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
 
+                if (MapFragmentTab.google_map != null && MainActivity.useMap.equals(getString(R.string.settings_google_map_value))) {
+                    AppData.target = CameraPosition.builder()
+                            .target(new LatLng(as.getLatitude(), as.getLongitude()))
+                            .zoom(14)
+                            .build();
+                    MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+                } else if (MapFragmentTabOSM.mapController != null && MainActivity.useMap.equals(getString(R.string.settings_osm_value))) {
+                    AppData.osmCameraZoom = 16.0;
+                    AppData.osmStartPoint = new GeoPoint(as.getLatitude(), as.getLongitude());
+                    MapFragmentTabOSM.mapController.setZoom(AppData.osmCameraZoom);
+                    MapFragmentTabOSM.mapController.setCenter(AppData.osmStartPoint);
+                }
                 return true;
             }
         });
 
         if (AppData.mAssetMap != null && !AppData.mAssetMap.isEmpty())
-            AssetsFragmentTab.aft.progressCircle.setVisibility(View.GONE);
+            progressCircle.setVisibility(View.GONE);
 
 
         return rootView;

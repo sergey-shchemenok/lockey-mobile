@@ -69,5 +69,6 @@
     <string name="no_subscriptions">Нет подписок</string>
     <string name="menu_subscribe">Активировать</string>
     <string name="menu_unsubscribe">Деактивировать</string>
+    <string name="notification_tab_empty_view_text">Нет сохраненных уведомлений</string>
 
 </resources>

@@ -18,6 +18,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.tradition.lockeymobile.AppData;
@@ -38,9 +40,11 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
     public static final String LOG_TAG = NotificationsFragmentTab.class.getName();
 
     public static NotificationCursorAdapter adapter;
+    public static ListView notificationListView;
     public static int loaderSwitch = 0;
     private static final int CURSOR_LOADER_ID = 3;
 
+    private TextView mEmptyStateTextView;
 
     //to access methods from other tabs
     public static NotificationsFragmentTab notificationsFragmentTab;
@@ -54,7 +58,9 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.tab_fragment_notification, container, false);
 
-        ListView notificationListView = (ListView) rootView.findViewById(R.id.notification_list);
+        notificationListView = (ListView) rootView.findViewById(R.id.notification_list);
+        mEmptyStateTextView = (TextView) rootView.findViewById(R.id.notification_tab_empty_view);
+        notificationListView.setEmptyView(mEmptyStateTextView);
 
         adapter = new NotificationCursorAdapter(getActivity(), null);
         notificationListView.setAdapter(adapter);

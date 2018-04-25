@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -38,6 +39,8 @@ public class AuthActivity extends AppCompatActivity
     private EditText loginView;
     private EditText passwordView;
     private Button loginButton;
+
+    private ProgressBar progressCircle;
 
     public static final String LOG_TAG = AuthActivity.class.getName();
 
@@ -93,6 +96,10 @@ public class AuthActivity extends AppCompatActivity
         connectionStatusMessage = (TextView) findViewById(R.id.main_connection_message);
         connectionStatusMessage.setVisibility(View.GONE);
 
+        progressCircle = (ProgressBar)findViewById(R.id.auth_loading_spinner);
+        progressCircle.setVisibility(View.GONE);
+
+
         //to prevent authorization from notification activity
         if (getIntent().getExtras() != null) {
             boolean hasCredentials = true;
@@ -125,6 +132,7 @@ public class AuthActivity extends AppCompatActivity
                 AppData.pwd = passwordView.getText().toString();
                 AppData.usr = loginView.getText().toString();
                 //get token. If it is correct start main activity
+                progressCircle.setVisibility(View.VISIBLE);
                 getToken();
             }
         });
@@ -235,6 +243,7 @@ public class AuthActivity extends AppCompatActivity
         } else {
             connectionStatusMessage.setVisibility(View.VISIBLE);
             connectionStatusMessage.setText(R.string.no_connection);
+            progressCircle.setVisibility(View.GONE);
         }
     }
 
@@ -248,6 +257,7 @@ public class AuthActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<String> loader, String message) {
         loaderManager.destroyLoader(AppData.AUTH_LOADER_ID);
+        progressCircle.setVisibility(View.GONE);
         if (!message.equals("OK") && AuthQueryUtils.authUrlResponseCode != HttpURLConnection.HTTP_OK) {
             infoMessage.setVisibility(View.VISIBLE);
             infoMessage.setText(AuthQueryUtils.authUrlResponseMessage);

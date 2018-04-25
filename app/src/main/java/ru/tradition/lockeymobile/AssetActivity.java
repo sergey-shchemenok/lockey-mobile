@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
@@ -41,13 +42,13 @@ public class AssetActivity extends AppCompatActivity {
 
         toolbar.setTitle(R.string.asset_activity_title);
 
-        kitNumber = (TextView)findViewById(R.id.asset_kit_number);
-        regNumber = (TextView)findViewById(R.id.asset_reg_number);
-        carModel = (TextView)findViewById(R.id.asset_car_model);
-        name = (TextView)findViewById(R.id.asset_name);
+        kitNumber = (TextView) findViewById(R.id.asset_kit_number);
+        regNumber = (TextView) findViewById(R.id.asset_reg_number);
+        carModel = (TextView) findViewById(R.id.asset_car_model);
+        name = (TextView) findViewById(R.id.asset_name);
         //lastTime = (TextView)findViewById(R.id.asset_last_time);
-        toMapButton = (Button)findViewById(R.id.activity_asset_to_map);
-        blockEngineButton = (Button)findViewById(R.id.activity_asset_block_engine);
+        toMapButton = (Button) findViewById(R.id.activity_asset_to_map);
+        blockEngineButton = (Button) findViewById(R.id.activity_asset_block_engine);
 
         assetData = (AssetsData) getIntent().getSerializableExtra("AssetData");
 
@@ -70,7 +71,7 @@ public class AssetActivity extends AppCompatActivity {
         blockEngineButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Toast.makeText(AssetActivity.this, "Функция блокировки недоступна в текущей версии приложения", Toast.LENGTH_LONG).show();
             }
         });
 

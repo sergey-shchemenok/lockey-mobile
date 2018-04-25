@@ -21,50 +21,69 @@
         android:orientation="vertical"
         android:padding="@dimen/auth_activity_padding">
 
-
-
-        <TextView
-            android:id="@+id/main_connection_message"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp" />
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/main_info_message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
-            android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingTop="32dp">
-
-            <TextView
-                android:layout_width="0dp"
+            <ProgressBar
+                android:id="@+id/auth_loading_spinner"
+                style="@style/Widget.AppCompat.ProgressBar"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="sans-serif-medium"
+                android:layout_centerHorizontal="true" />
 
-                android:text="@string/auth_login"
-                android:textAppearance="?android:textAppearanceSmall"
-                android:textColor="@color/colorAccent" />
-
-            <EditText
-                android:id="@+id/edit_login"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="2.5"
-                android:fontFamily="sans-serif-light"
-                android:hint="@string/auth_user_hint"
-                android:textAppearance="?android:textAppearanceMedium" />
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/main_connection_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp" />
+
+                <TextView
+                    android:id="@+id/main_info_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:orientation="horizontal"
+                    android:paddingLeft="16dp"
+                    android:paddingTop="32dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="sans-serif-medium"
+
+                        android:text="@string/auth_login"
+                        android:textAppearance="?android:textAppearanceSmall"
+                        android:textColor="@color/colorAccent" />
+
+                    <EditText
+                        android:id="@+id/edit_login"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2.5"
+                        android:fontFamily="sans-serif-light"
+                        android:hint="@string/auth_user_hint"
+                        android:textAppearance="?android:textAppearanceMedium" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

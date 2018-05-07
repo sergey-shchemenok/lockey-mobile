@@ -129,8 +129,8 @@ public class AuthActivity extends AppCompatActivity
             public void onClick(View view) {
                 if (AppData.mAssetMap != null)
                     AppData.mAssetMap.clear();
-                AppData.pwd = passwordView.getText().toString();
-                AppData.usr = loginView.getText().toString();
+                AppData.pwd = passwordView.getText().toString().trim();
+                AppData.usr = loginView.getText().toString().trim();
                 //get token. If it is correct start main activity
                 progressCircle.setVisibility(View.VISIBLE);
                 getToken();

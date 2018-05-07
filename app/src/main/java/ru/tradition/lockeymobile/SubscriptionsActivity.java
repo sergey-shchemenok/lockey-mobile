@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -210,6 +211,9 @@ public class SubscriptionsActivity extends AppCompatActivity implements
     @Override
     public void onLoadFinished(android.content.Loader<LoadedData> loader, LoadedData loadedData) {
         mEmptyStateTextView.setText(R.string.no_subscriptions);
+        mEmptyStateTextView.setGravity(Gravity.CENTER);
+//        mEmptyStateTextView.setText("Нет подписок.\nСоздайте подписки на портале my.lockey.ru\nПри создании подписки укажите способ доставки Push");
+
         progressCircle.setVisibility(View.GONE);
         loaderManager.destroyLoader(AppData.SUBSCRIPTIONS_LOADER_ID);
         loaderManager.destroyLoader(AppData.ACTIVATE_SUBSCRIPTION_LOADER_ID);

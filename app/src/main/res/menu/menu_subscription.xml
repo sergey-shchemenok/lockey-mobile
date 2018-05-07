@@ -24,4 +24,9 @@
         android:title="@string/menu_unsubscribe"
         app:showAsAction="ifRoom" />
 
+    <item
+        android:id="@+id/subscription_menu_feedback"
+        android:title="@string/menu_feedback"
+        app:showAsAction="never" />
+
 </menu>

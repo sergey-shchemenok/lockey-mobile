@@ -98,8 +98,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-        <activity android:name=".SubscriptionsActivity"></activity>
+        <activity android:name=".SubscriptionsActivity" />
+        <activity android:name=".FeedbackActivity"></activity>
     </application>
 
-</manifest>
-    <!--android:launchMode="singleTop"-->
+</manifest> <!-- android:launchMode="singleTop" -->

@@ -205,21 +205,20 @@ public class MapFragmentTabOSM extends Fragment implements
                     Toast.makeText(getContext(), "Получение списка зон", Toast.LENGTH_LONG).show();
                     AppData.mainActivity.getZones();
                 }
-
-
             }
         });
 
         fabLayers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (osm_map != null) {
-//                    osm_map.setTileSource(TileSourceFactory.CLOUDMADESMALLTILES);
-//
-//
-//                }
-                Toast.makeText(getContext(), "Функция переключения режимов отображения карт OpenStreetMap недоступна в текущей версии приложения", Toast.LENGTH_LONG).show();
-
+                if (osm_map != null) {
+                    //CloudmadeUtil.retrieveCloudmadeKey(getContext());
+                    if (osm_map.getTileProvider().getTileSource() == TileSourceFactory.MAPNIK)
+                        osm_map.setTileSource(TileSourceFactory.OpenTopo);
+                    else
+                        osm_map.setTileSource(TileSourceFactory.MAPNIK);
+                }
+//                Toast.makeText(getContext(), "Функция переключения режимов отображения карт OpenStreetMap недоступна в текущей версии приложения", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -349,7 +348,7 @@ public class MapFragmentTabOSM extends Fragment implements
         int maxLat = Integer.MIN_VALUE;
         int minLong = Integer.MAX_VALUE;
         int maxLong = Integer.MIN_VALUE;
-        for (GeoPoint point: geoPoints) {
+        for (GeoPoint point : geoPoints) {
             if (Math.round(point.getLatitude() * 10000000) < minLat)
                 minLat = (int) Math.round(point.getLatitude() * 10000000);
             if (Math.round(point.getLatitude() * 10000000) > maxLat)

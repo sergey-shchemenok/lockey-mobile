@@ -19,4 +19,9 @@
         android:title="@string/menu_subscriptions"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/notification_menu_feedback"
+        android:title="@string/menu_feedback"
+        app:showAsAction="never" />
+
 </menu>

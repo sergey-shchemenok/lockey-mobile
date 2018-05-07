@@ -455,9 +455,13 @@ public class MainActivity extends AppCompatActivity implements
                         }
                     }
                     AppData.viewPager.setCurrentItem(1);
-
-
                 }
+                return true;
+
+            case R.id.main_menu_feedback:
+                Intent feedbackIntent = new Intent(this, FeedbackActivity.class);
+                feedbackIntent.putExtra("currentPage", AppData.viewPager.getCurrentItem());
+                startActivity(feedbackIntent);
                 return true;
         }
         return super.onOptionsItemSelected(item);

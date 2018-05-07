@@ -89,7 +89,6 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
 
             sendNotification(id, title, body, click_action, date, latitude, longitude);
         }
-
     }
 
     /**
@@ -119,13 +118,8 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
         if (id != 0 && title != null
                 && body != null
                 && date != null
-                && latitude != 0.0
-                && longitude != 0.0) {
+                ) {
             notificationsData = new NotificationsData(id, title, body, date, latitude, longitude);
-        } else if (id != 0 && title != null
-                && body != null
-                && date != null) {
-            notificationsData = new NotificationsData(id, title, body, date);
         }
         if (notificationsData != null) {
             //todo nd could be empty

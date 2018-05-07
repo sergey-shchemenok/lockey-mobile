@@ -205,23 +205,6 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
     }
 
-//    //update listView after changes
-//    public void updateList() {
-//        if (loaderSwitch == 0) {
-//            getLoaderManager().initLoader(CURSOR_UPDATE_LOADER_ID, null, this);
-//            getLoaderManager().getLoader(CURSOR_LOADER_ID).reset();
-//            loaderSwitch = 1;
-//        } else if (loaderSwitch == 1) {
-//            getLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
-//            getLoaderManager().getLoader(CURSOR_UPDATE_LOADER_ID).reset();
-//            loaderSwitch = 2;
-//        } else if (loaderSwitch == 2) {
-//            getLoaderManager().restartLoader(CURSOR_UPDATE_LOADER_ID, null, this);
-//            getLoaderManager().getLoader(CURSOR_LOADER_ID).reset();
-//            loaderSwitch = 1;
-//        }
-//    }
-
     @Override
     public void onDestroyView() {
         getLoaderManager().destroyLoader(CURSOR_LOADER_ID);
@@ -234,11 +217,12 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         String[] projection = {
                 //id column is always needed for the cursor
                 NotificationContract.NotificationEntry._ID,
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME,
-
-
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE,
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE
         };
 
         String sortOrder =

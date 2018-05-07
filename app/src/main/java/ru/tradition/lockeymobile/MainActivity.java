@@ -459,9 +459,17 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
 
             case R.id.main_menu_feedback:
-                Intent feedbackIntent = new Intent(this, FeedbackActivity.class);
-                feedbackIntent.putExtra("currentPage", AppData.viewPager.getCurrentItem());
-                startActivity(feedbackIntent);
+                String[] addresses = new String[3];
+                addresses[0] = "alex.zador@gmail.com";
+                addresses[1] = "shemenok@tradition.ru";
+                addresses[2] = "panfilovai@tradition.ru";
+                Intent intent = new Intent(Intent.ACTION_SENDTO);
+                intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+                intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Сообщение от пользователя " + AppData.usr);
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);

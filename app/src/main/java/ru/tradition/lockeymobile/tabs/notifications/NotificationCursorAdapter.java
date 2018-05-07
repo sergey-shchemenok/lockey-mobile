@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
+import java.util.TimeZone;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.R;
@@ -83,7 +89,7 @@ public class NotificationCursorAdapter extends CursorAdapter {
             checkmark.setVisibility(View.INVISIBLE);
             if (AppData.selectedNotification.contains(
                     "content://ru.tradition.lockeymobile/notifications/"
-                    + cursor.getInt(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry._ID)))){
+                            + cursor.getInt(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry._ID)))) {
                 rootView.setBackgroundColor(Color.LTGRAY);
                 checkmark.setVisibility(View.VISIBLE);
             }
@@ -106,24 +112,54 @@ public class NotificationCursorAdapter extends CursorAdapter {
 
 
         // Extract properties from cursor
+        int notificationID = cursor.getInt(cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID));
+        double notificationLatitude = cursor.getDouble(cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE));
+        double notificationLongitude = cursor.getDouble(cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE));
         String notificationTitle = cursor.getString(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE));
         String notificationBody = cursor.getString(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY));
         String notificationSendingTime = cursor.getString(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME));
+        String formattedTime = getFormattedDate(notificationSendingTime);
+
         // Populate fields with extracted properties
         titleTextView.setText(notificationTitle);
-        sendingTimeTextView.setText(notificationSendingTime);
+        sendingTimeTextView.setText(formattedTime);
 
         titleTextViewOptional.setText(notificationTitle);
-        sendingTimeTextViewOptional.setText(notificationSendingTime);
+        sendingTimeTextViewOptional.setText(formattedTime);
+
+        bodyTextView.setText(notificationBody + " Номер бортового комплекта - " + String.valueOf(notificationID));
+        bodyTextViewOptional.setText(notificationBody + " Номер бортового комплекта - " + String.valueOf(notificationID));
 
 
-        //We need something to show if breed field is empty
-        if (!TextUtils.isEmpty(notificationBody)) {
-            bodyTextView.setText(notificationBody);
-            bodyTextViewOptional.setText(notificationBody);
-        } else {
-            bodyTextView.setText("Empty message");
-            bodyTextViewOptional.setText(notificationBody);
-        }
+        //We need something to show if body text field is empty
+//        if (!TextUtils.isEmpty(notificationBody)) {
+//            bodyTextView.setText(notificationBody);
+//            bodyTextViewOptional.setText(notificationBody);
+//        } else {
+//            bodyTextView.setText("Empty message");
+//            bodyTextViewOptional.setText(notificationBody);
+//        }
     }
+
+    private static String getFormattedDate (String sendingTime){
+        long milli = 0;
+        java.text.SimpleDateFormat simpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            Date date = simpleDateFormat.parse(sendingTime);
+            milli = date.getTime();
+
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+        if (milli == 0){
+            return sendingTime;
+        }
+        Date date = new Date(milli);
+        //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); // the format of your date
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy\nHH:mm");
+        //sdf.setTimeZone(TimeZone.getTimeZone("GMT-4")); // give a timezone reference for formatting (see comment at the bottom
+        return sdf.format(date);
+    }
+
 }

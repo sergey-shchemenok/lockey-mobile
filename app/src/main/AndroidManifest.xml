@@ -99,7 +99,6 @@
                 android:value=".MainActivity" />
         </activity>
         <activity android:name=".SubscriptionsActivity" />
-        <activity android:name=".FeedbackActivity"></activity>
     </application>
 
 </manifest> <!-- android:launchMode="singleTop" -->

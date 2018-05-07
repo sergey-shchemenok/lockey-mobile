@@ -16,6 +16,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
@@ -139,8 +143,9 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
             // Update the views on the screen with the values from the database
             notificationTitle.setText(title);
-            notificationBody.setText(body);
-            notificationSendingTime.setText(sendingTime);
+            notificationBody.setText(body +
+                    " Номер бортового комплекта - " + String.valueOf(assetID));
+            notificationSendingTime.setText(getFormattedDate(sendingTime));
 
         }
     }
@@ -253,19 +258,12 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         if (id != 0 && title != null
                 && body != null
                 && sending_time != null
-                && latitude != 0.0
-                && longitude != 0.0) {
+                ) {
             return new NotificationsData(id, title, body, sending_time, latitude, longitude);
-        } else if (id != 0 && title != null
-                && body != null
-                && sending_time != null) {
-            return new NotificationsData(id, title, body, sending_time);
-        }
-        //todo add other data (longitude and latitude)
-        else return null;
+        } else return null;
     }
 
-    //to insert data inte database
+    //to insert data into database
     private void insertNotification(NotificationsData nd) {
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
@@ -282,8 +280,30 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     private void showData(NotificationsData nd) {
         if (nd != null) {
             notificationTitle.setText(nd.getTitle());
-            notificationBody.setText(nd.getBody());
-            notificationSendingTime.setText(nd.getSending_time());
+            notificationBody.setText(nd.getBody() +
+                    " Номер бортового комплекта - " + String.valueOf(nd.getId()));
+            notificationSendingTime.setText(getFormattedDate(nd.getSending_time()));
         }
+    }
+
+    private static String getFormattedDate (String sendingTime){
+        long milli = 0;
+        java.text.SimpleDateFormat simpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            Date date = simpleDateFormat.parse(sendingTime);
+            milli = date.getTime();
+
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+        }
+        if (milli == 0){
+            return sendingTime;
+        }
+        Date date = new Date(milli);
+        //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); // the format of your date
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy\nHH:mm");
+        //sdf.setTimeZone(TimeZone.getTimeZone("GMT-4")); // give a timezone reference for formatting (see comment at the bottom
+        return sdf.format(date);
     }
 }

@@ -3,6 +3,7 @@ package ru.tradition.lockeymobile.tabs.notifications.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by Caelestis on 04.12.2017.
@@ -49,6 +50,8 @@ public class NotificationDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_NOTIFICATIONS_TABLE);
+        Log.i(LOG_TAG, "Creating new database... " + SQL_CREATE_NOTIFICATIONS_TABLE);
+
     }
 
     /**

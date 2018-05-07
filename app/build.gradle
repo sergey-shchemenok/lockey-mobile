@@ -27,7 +27,7 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.1.0'
 
     //for mail
-    implementation 'javax.mail:javax.mail-api:1.6.1'
+    //implementation 'javax.mail:javax.mail-api:1.6.1'
 
     implementation 'com.google.android.gms:play-services-maps:11.8.0'
     //for clustering

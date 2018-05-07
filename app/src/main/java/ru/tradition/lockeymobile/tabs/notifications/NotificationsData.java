@@ -15,12 +15,12 @@ public class NotificationsData implements Serializable {
     private double longitude;
 
 
-    public NotificationsData(int id, String title, String body, String sending_time) {
-        this.id = id;
-        this.title = title;
-        this.body = body;
-        this.sending_time = sending_time;
-    }
+//    public NotificationsData(int id, String title, String body, String sending_time) {
+//        this.id = id;
+//        this.title = title;
+//        this.body = body;
+//        this.sending_time = sending_time;
+//    }
 
     public NotificationsData(int id, String title, String body, String sending_time, double latitude, double longitude) {
         this.id = id;

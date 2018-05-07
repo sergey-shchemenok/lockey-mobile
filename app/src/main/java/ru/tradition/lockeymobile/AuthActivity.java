@@ -96,7 +96,7 @@ public class AuthActivity extends AppCompatActivity
         connectionStatusMessage = (TextView) findViewById(R.id.main_connection_message);
         connectionStatusMessage.setVisibility(View.GONE);
 
-        progressCircle = (ProgressBar)findViewById(R.id.auth_loading_spinner);
+        progressCircle = (ProgressBar) findViewById(R.id.auth_loading_spinner);
         progressCircle.setVisibility(View.GONE);
 
 
@@ -116,8 +116,8 @@ public class AuthActivity extends AppCompatActivity
         if (!AppData.pwd.isEmpty())
             passwordView.setText(AppData.pwd);
 
-        if ((AppData.usr.isEmpty()&&AppData.pwd.isEmpty())||
-                (AppData.usr.equals("")&&AppData.pwd.equals(""))){
+        if ((AppData.usr.isEmpty() && AppData.pwd.isEmpty()) ||
+                (AppData.usr.equals("") && AppData.pwd.equals(""))) {
             AppData.osmStartPoint = new GeoPoint(55.7522200, 37.6155600);
             AppData.osmCameraZoom = 12.0;
         }
@@ -129,8 +129,10 @@ public class AuthActivity extends AppCompatActivity
             public void onClick(View view) {
                 if (AppData.mAssetMap != null)
                     AppData.mAssetMap.clear();
-                AppData.pwd = passwordView.getText().toString().trim();
-                AppData.usr = loginView.getText().toString().trim();
+                AppData.pwd = passwordView.getText().toString();
+                //.trim();
+                AppData.usr = loginView.getText().toString();
+                //.trim();
                 //get token. If it is correct start main activity
                 progressCircle.setVisibility(View.VISIBLE);
                 getToken();
@@ -205,19 +207,9 @@ public class AuthActivity extends AppCompatActivity
                 }
             }
         }
-        if (id != 0 && title != null
-                && body != null
-                && sending_time != null
-                && latitude != 0.0
-                && longitude != 0.0) {
+        if (id != 0 && title != null && body != null && sending_time != null) {
             return new NotificationsData(id, title, body, sending_time, latitude, longitude);
-        } else if (id != 0 && title != null
-                && body != null
-                && sending_time != null) {
-            return new NotificationsData(id, title, body, sending_time);
-        }
-        //todo add other datas (longitude and latitude)
-        else return null;
+        } else return null;
     }
 
     private void insertNotification(NotificationsData nd) {

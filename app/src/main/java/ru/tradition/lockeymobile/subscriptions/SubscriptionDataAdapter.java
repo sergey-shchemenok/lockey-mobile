@@ -34,11 +34,11 @@ public class SubscriptionDataAdapter extends ArrayAdapter<SubscriptionData> {
         } else {
             swapList = oldList;
         }
-        for (int i = 0; i<swapList.size();i++) {
+        for (int i = 0; i < swapList.size(); i++) {
             if (i < newList.size()) {
                 this.insert(newList.get(i), i);
             }
-            if(i < oldList.size()) {
+            if (i < oldList.size()) {
                 this.remove(oldList.get(i));
             }
 
@@ -47,7 +47,7 @@ public class SubscriptionDataAdapter extends ArrayAdapter<SubscriptionData> {
         this.notifyDataSetChanged();
     }
 
-    public List<SubscriptionData> getAllAdapterList(){
+    public List<SubscriptionData> getAllAdapterList() {
         int count = this.getCount();
         List<SubscriptionData> objVal = new ArrayList<SubscriptionData>();
 
@@ -103,10 +103,14 @@ public class SubscriptionDataAdapter extends ArrayAdapter<SubscriptionData> {
 
         TextView kitsNumbers = (TextView) listItemView.findViewById(R.id.kits_numbers);
         int[] cars = currentSubscriptionsData.getCars();
-        String carString = "";
-        for (int x : cars)
-            carString += x + ", ";
-        kitsNumbers.setText(carString.substring(0, (carString.length() - 2)));
+        if (cars.length > 0) {
+            String carString = "";
+            for (int x : cars)
+                carString += x + ", ";
+            kitsNumbers.setText(carString.substring(0, (carString.length() - 2)));
+        } else {
+            kitsNumbers.setText("Получение списка объектов");
+        }
 
         return listItemView;
     }

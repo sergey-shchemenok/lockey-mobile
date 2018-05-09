@@ -18,10 +18,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
 import static ru.tradition.lockeymobile.auth.AuthQueryUtils.authCookieManager;
 
@@ -56,20 +59,69 @@ public final class SubscriptionQueryUtils {
                 JSONObject subscription = rootArray.getJSONObject(i);
                 int sid = subscription.getInt("SID");
                 String title = subscription.getString("Title");
-                int zid = subscription.getInt("ZID");
                 String zoneTitle = "Empty";
+
+                //todo remove after testing
+                int zid = 0;
                 try {
-                    if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty())
-                        zoneTitle = AppData.mPolygonsMap.get(zid).getPolygonName();
-                } catch (NullPointerException e) {
+                    zid = subscription.getInt("ZID");
+                    try {
+                        if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty())
+                            zoneTitle = AppData.mPolygonsMap.get(zid).getPolygonName();
+                    } catch (NullPointerException e) {
+                    }
+                } catch (JSONException e) {
                 }
+
                 boolean isSubscribed = subscription.getBoolean("Subscribed");
                 JSONArray carsArray = subscription.getJSONArray("Cars");
                 int[] cars = new int[carsArray.length()];
                 for (int j = 0; j < carsArray.length(); j++) {
                     cars[j] = carsArray.getInt(j);
                 }
-                subscriptions.put(sid, new SubscriptionData(sid, title, zid, zoneTitle, isSubscribed, cars));
+
+                //to get kit_id
+                int[] cars_id = new int[carsArray.length()];
+                Map<Integer, AssetsData> cidAssetMap = new TreeMap<>();
+                try {
+                    if (AppData.mAssetMap != null && !AppData.mAssetMap.isEmpty()) {
+                        for (Map.Entry<Integer, AssetsData> pair : AppData.mAssetMap.entrySet()) {
+                            AssetsData as = pair.getValue();
+                            cidAssetMap.put(as.getCID(), as);
+                        }
+                        for (int j = 0; j < cars_id.length; j++) {
+                            cars_id[j] = cidAssetMap.get(new Integer(cars[j])).getId();
+                        }
+                        Arrays.sort(cars_id);
+                    } else cars_id = new int[0];
+                } catch (NullPointerException e) {
+                    cars_id = new int[0];
+                }
+
+                //todo simplify after testing
+                try {
+                    JSONArray zidsArray = subscription.getJSONArray("ZIDS");
+                    int[] zids = new int[zidsArray.length()];
+                    for (int j = 0; j < zidsArray.length(); j++) {
+                        zids[j] = zidsArray.getInt(j);
+                    }
+
+                    if (zids.length > 0) {
+                        try {
+                            if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty()) {
+                                zoneTitle = "";
+                                for (int z : zids) {
+                                    zoneTitle += AppData.mPolygonsMap.get(z).getPolygonName() + ", ";
+                                }
+                                zoneTitle = zoneTitle.substring(0, (zoneTitle.length() - 2));
+                            }
+                        } catch (NullPointerException e) {
+                        }
+                    }
+                } catch (JSONException e) {                }
+                //***
+
+                subscriptions.put(sid, new SubscriptionData(sid, title, zid, zoneTitle, isSubscribed, cars_id));
             }
 
         } catch (JSONException e) {

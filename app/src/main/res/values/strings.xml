@@ -64,7 +64,7 @@
     <string name="subscription_name">Название:</string>
     <string name="zone_name">Зона:</string>
     <string name="subscription_status">Статус:</string>
-    <string name="kits_numbers">Комплекты:</string>
+    <string name="kits_numbers">Объекты:</string>
     <string name="subscriptions_activity_title">Подписки</string>
     <string name="menu_subscriptions">Подписки</string>
     <string name="no_subscriptions">Нет подписок с Push.\nСоздайте подписки на портале my.lockey.ru с доставкой Push.</string>

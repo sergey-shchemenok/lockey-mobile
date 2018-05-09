@@ -17,6 +17,7 @@ import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
 
 import static ru.tradition.lockeymobile.AppData.ACTIVATE_SUBSCRIPTION_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.ASSETS_LOADER_ID;
+import static ru.tradition.lockeymobile.AppData.ASSETS_REQUEST_URL;
 import static ru.tradition.lockeymobile.AppData.DEACTIVATE_SUBSCRIPTION_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.SUBSCRIPTIONS_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.ZONES_LIST_URL;
@@ -89,7 +90,10 @@ public class DataLoader extends AsyncTaskLoader<LoadedData> {
                 return new LoadedData(null, polygonsMap, null);
 
             case SUBSCRIPTIONS_LOADER_ID:
-                AppData.mPolygonsMap = GeofenceQueryUtils.fetchZonesData(ZONES_LIST_URL);
+                if (AppData.mPolygonsMap == null || AppData.mPolygonsMap.isEmpty())
+                    AppData.mPolygonsMap = GeofenceQueryUtils.fetchZonesData(ZONES_LIST_URL);
+                if (AppData.mAssetMap == null || AppData.mAssetMap.isEmpty())
+                    AppData.mAssetMap = AssetsQueryUtils.fetchAssetsData(ASSETS_REQUEST_URL);
                 Map<Integer, SubscriptionData> subscriptionsMap = SubscriptionQueryUtils.fetchSubscriptionsData(mUrl);
                 return new LoadedData(null, null, subscriptionsMap);
 

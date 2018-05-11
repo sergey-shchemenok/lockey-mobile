@@ -99,7 +99,7 @@
             android:maxLines="1"
             android:textColor="@color/assetTableContentColor"
             android:textSize="16sp"
-            tools:text="Активна" />
+            tools:text="Подписан" />
 
     </LinearLayout>
 

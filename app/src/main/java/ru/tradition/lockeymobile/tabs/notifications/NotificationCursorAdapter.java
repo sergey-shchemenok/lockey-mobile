@@ -127,8 +127,8 @@ public class NotificationCursorAdapter extends CursorAdapter {
         titleTextViewOptional.setText(notificationTitle);
         sendingTimeTextViewOptional.setText(formattedTime);
 
-        bodyTextView.setText(notificationBody + " Номер бортового комплекта - " + String.valueOf(notificationID));
-        bodyTextViewOptional.setText(notificationBody + " Номер бортового комплекта - " + String.valueOf(notificationID));
+        bodyTextView.setText(notificationBody);// + " Номер бортового комплекта - " + String.valueOf(notificationID));
+        bodyTextViewOptional.setText(notificationBody);// + " Номер бортового комплекта - " + String.valueOf(notificationID));
 
 
         //We need something to show if body text field is empty

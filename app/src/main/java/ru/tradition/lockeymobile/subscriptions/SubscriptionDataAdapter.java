@@ -88,16 +88,16 @@ public class SubscriptionDataAdapter extends ArrayAdapter<SubscriptionData> {
         boolean isSubscribed = currentSubscriptionsData.isSubscribed();
 
         if (AppData.activatingSubscription.contains(currentSubscriptionsData.getSid())) {
-            subscriptionStatus.setText("Активация");
+            subscriptionStatus.setText("Активация подписки");
             subscriptionStatus.setTextColor(ContextCompat.getColor(getContext(), R.color.assetTableHeaderColor));
         } else if (AppData.deactivatingSubscription.contains(currentSubscriptionsData.getSid())) {
-            subscriptionStatus.setText("Деактивация");
+            subscriptionStatus.setText("Деактивация подписки");
             subscriptionStatus.setTextColor(ContextCompat.getColor(getContext(), R.color.assetTableHeaderColor));
         } else if (isSubscribed) {
-            subscriptionStatus.setText("Активна");
+            subscriptionStatus.setText("Подписан");
             subscriptionStatus.setTextColor(ContextCompat.getColor(getContext(), R.color.assetTableContentColor));
         } else {
-            subscriptionStatus.setText("Неактивна");
+            subscriptionStatus.setText("Не подписан");
             subscriptionStatus.setTextColor(ContextCompat.getColor(getContext(), R.color.assetTableContentColor));
         }
 

@@ -97,5 +97,13 @@ public final class NotificationContract {
          * Type: REAL
          */
         public final static String COLUMN_NOTIFICATION_LONGITUDE = "longitude";
+
+        /**
+         * Status of notification.
+         * Type: INTEGER
+         */
+        public final static String COLUMN_NOTIFICATION_READ = "read";
     }
+
+
 }

@@ -7,15 +7,15 @@ package ru.tradition.lockeymobile.subscriptions;
 public class SubscriptionData {
     private int sid;
     private String title;
-    private int zid;
+    private int[] zids;
     private String zoneTitle;
     private boolean isSubscribed;
     private int[] cars;
 
-    public SubscriptionData(int sid, String title, int zid, String zoneTitle, boolean isSubscribed, int... cars) {
+    public SubscriptionData(int sid, String title, int[] zids, String zoneTitle, boolean isSubscribed, int... cars) {
         this.sid = sid;
         this.title = title;
-        this.zid = zid;
+        this.zids = zids;
         this.zoneTitle = zoneTitle;
         this.isSubscribed = isSubscribed;
         this.cars = cars;
@@ -33,8 +33,8 @@ public class SubscriptionData {
         return zoneTitle;
     }
 
-    public int getZid() {
-        return zid;
+    public int[] getZids() {
+        return zids;
     }
 
     public boolean isSubscribed() {

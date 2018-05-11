@@ -64,8 +64,12 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
         }
 
         // Check if message contains a notification payload.
+        String click_action = "NOTIFICATIONACTIVITY";
         if (remoteMessage.getNotification() != null) {
-            String click_action = remoteMessage.getNotification().getClickAction(); //get click_action
+            click_action = remoteMessage.getNotification().getClickAction(); //get click_action
+            Log.i(LOG_TAG, "Message Notification click_action: " + click_action);
+        }
+        if (remoteMessage.getData() != null) {
             String title = String.valueOf(remoteMessage.getData().get("title"));
             String body = String.valueOf(remoteMessage.getData().get("body"));
             String date = String.valueOf(remoteMessage.getData().get("date"));
@@ -81,7 +85,6 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
 
             Log.i(LOG_TAG, "Message Notification Title: " + title);
             Log.i(LOG_TAG, "Message Notification Body: " + body);
-            Log.i(LOG_TAG, "Message Notification click_action: " + click_action);
             Log.i(LOG_TAG, "Message Notification id: " + id);
             Log.i(LOG_TAG, "Message Notification date: " + date);
             Log.i(LOG_TAG, "Message Notification latitude: " + latitude);

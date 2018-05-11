@@ -226,7 +226,7 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         };
 
         String sortOrder =
-                NotificationContract.NotificationEntry._ID + " DESC";
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME + " DESC";
         return new CursorLoader(getContext(), NotificationContract.NotificationEntry.CONTENT_URI, projection,
                 null, null, sortOrder);
     }

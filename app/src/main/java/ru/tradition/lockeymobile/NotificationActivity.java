@@ -143,8 +143,8 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
             // Update the views on the screen with the values from the database
             notificationTitle.setText(title);
-            notificationBody.setText(body +
-                    " Номер бортового комплекта - " + String.valueOf(assetID));
+            notificationBody.setText(body);
+//                    + " Номер бортового комплекта - " + String.valueOf(assetID));
             notificationSendingTime.setText(getFormattedDate(sendingTime));
 
         }
@@ -280,8 +280,8 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     private void showData(NotificationsData nd) {
         if (nd != null) {
             notificationTitle.setText(nd.getTitle());
-            notificationBody.setText(nd.getBody() +
-                    " Номер бортового комплекта - " + String.valueOf(nd.getId()));
+            notificationBody.setText(nd.getBody());
+//                    +  " Номер бортового комплекта - " + String.valueOf(nd.getId()));
             notificationSendingTime.setText(getFormattedDate(nd.getSending_time()));
         }
     }

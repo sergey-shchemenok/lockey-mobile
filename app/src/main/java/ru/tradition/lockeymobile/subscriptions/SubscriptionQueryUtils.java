@@ -61,17 +61,17 @@ public final class SubscriptionQueryUtils {
                 String title = subscription.getString("Title");
                 String zoneTitle = "Empty";
 
-                //todo remove after testing
-                int zid = 0;
-                try {
-                    zid = subscription.getInt("ZID");
-                    try {
-                        if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty())
-                            zoneTitle = AppData.mPolygonsMap.get(zid).getPolygonName();
-                    } catch (NullPointerException e) {
-                    }
-                } catch (JSONException e) {
-                }
+//                //todo remove after testing
+//                int zid = 0;
+//                try {
+//                    zid = subscription.getInt("ZID");
+//                    try {
+//                        if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty())
+//                            zoneTitle = AppData.mPolygonsMap.get(zid).getPolygonName();
+//                    } catch (NullPointerException e) {
+//                    }
+//                } catch (JSONException e) {
+//                }
 
                 boolean isSubscribed = subscription.getBoolean("Subscribed");
                 JSONArray carsArray = subscription.getJSONArray("Cars");
@@ -98,30 +98,27 @@ public final class SubscriptionQueryUtils {
                     cars_id = new int[0];
                 }
 
-                //todo simplify after testing
-                try {
-                    JSONArray zidsArray = subscription.getJSONArray("ZIDS");
-                    int[] zids = new int[zidsArray.length()];
-                    for (int j = 0; j < zidsArray.length(); j++) {
-                        zids[j] = zidsArray.getInt(j);
-                    }
+                JSONArray zidsArray = subscription.getJSONArray("ZIDS");
+                int[] zids = new int[zidsArray.length()];
+                for (int j = 0; j < zidsArray.length(); j++) {
+                    zids[j] = zidsArray.getInt(j);
+                }
 
-                    if (zids.length > 0) {
-                        try {
-                            if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty()) {
-                                zoneTitle = "";
-                                for (int z : zids) {
-                                    zoneTitle += AppData.mPolygonsMap.get(z).getPolygonName() + ", ";
-                                }
-                                zoneTitle = zoneTitle.substring(0, (zoneTitle.length() - 2));
+                if (zids.length > 0) {
+                    try {
+                        if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty()) {
+                            zoneTitle = "";
+                            for (int z : zids) {
+                                zoneTitle += AppData.mPolygonsMap.get(z).getPolygonName() + ", ";
                             }
-                        } catch (NullPointerException e) {
+                            zoneTitle = zoneTitle.substring(0, (zoneTitle.length() - 2));
                         }
+                    } catch (NullPointerException e) {
                     }
-                } catch (JSONException e) {                }
-                //***
+                }
 
-                subscriptions.put(sid, new SubscriptionData(sid, title, zid, zoneTitle, isSubscribed, cars_id));
+
+                subscriptions.put(sid, new SubscriptionData(sid, title, zids, zoneTitle, isSubscribed, cars_id));
             }
 
         } catch (JSONException e) {

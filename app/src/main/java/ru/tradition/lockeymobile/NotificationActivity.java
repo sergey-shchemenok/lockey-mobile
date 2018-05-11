@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
+import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
 public class NotificationActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -47,11 +48,11 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         super.onCreate(savedInstanceState);
 
         //to get data from background notifications' intent
-        ndBackground = getNotificationData();
-        if (ndBackground != null) {
-            insertNotification(ndBackground);
-            fromItem = false;
-        }
+//        ndBackground = getNotificationData();
+//        if (ndBackground != null) {
+//            insertNotification(ndBackground);
+//            fromItem = false;
+//        }
 
 
         setContentView(R.layout.activity_notification);
@@ -84,7 +85,10 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
         //this occurs when we get here after clicking the notification banner that coming in foreground
         if (mCurrentNotificationUri == null) {
+            Bundle bundle = getIntent().getExtras();
             ndForeground = (NotificationsData) getIntent().getSerializableExtra("NotificationData");
+            Uri uri = bundle.getParcelable("Uri");
+            makeReadNotification(uri);
             fromItem = false;
         } else {
             getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
@@ -196,7 +200,10 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             super.onBackPressed();
         else {
             fromItem = true;
-            return super.onSupportNavigateUp();
+            Intent intent = new Intent(NotificationActivity.this, MainActivity.class);
+            intent.putExtra("page", 2);
+            startActivity(intent);
+            //return super.onSupportNavigateUp();
         }
         return true;
     }
@@ -207,7 +214,10 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             super.onBackPressed();
         else {
             fromItem = true;
-            super.onSupportNavigateUp();
+            Intent intent = new Intent(NotificationActivity.this, MainActivity.class);
+            intent.putExtra("page", 2);
+            startActivity(intent);
+            //super.onSupportNavigateUp();
         }
     }
 
@@ -306,4 +316,11 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         //sdf.setTimeZone(TimeZone.getTimeZone("GMT-4")); // give a timezone reference for formatting (see comment at the bottom
         return sdf.format(date);
     }
+
+    private void makeReadNotification(Uri currentNotificationUri){
+        ContentValues values = new ContentValues();
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_READ, 1);
+        int rowsAffected = getContentResolver().update(currentNotificationUri, values, null, null);
+    }
+
 }

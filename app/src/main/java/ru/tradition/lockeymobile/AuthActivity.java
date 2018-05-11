@@ -72,10 +72,10 @@ public class AuthActivity extends AppCompatActivity
         Log.i(LOG_TAG, "the token is: " + fcmToken);
 
         //in case we get this activity after clicking the notification from background
-        NotificationsData notificationsData = getNotificationData();
-        if (notificationsData != null) {
-            insertNotification(notificationsData);
-        }
+//        NotificationsData notificationsData = getNotificationData();
+//        if (notificationsData != null) {
+//            insertNotification(notificationsData);
+//        }
 
         try {
             AppData.mainActivity.changeModeToNormal();

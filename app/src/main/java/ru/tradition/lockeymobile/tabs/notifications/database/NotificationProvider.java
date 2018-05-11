@@ -200,32 +200,7 @@ public class NotificationProvider extends ContentProvider {
      * Return the number of rows that were successfully updated.
      */
     private int updateNotification(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        // Check that the asset id is not null
-        Integer assetID = values.getAsInteger(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID);
-        if (assetID == null) {
-            throw new IllegalArgumentException("Notification requires an asset ID");
-        }
-
-        // Check that the title is not null
-        String title = values.getAsString(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE);
-        if (title.isEmpty() || title == null) {
-            throw new IllegalArgumentException("Notification requires a title");
-        }
-
-        // Check that the body message is not null
-        String body = values.getAsString(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY);
-        if (body.isEmpty() || body == null) {
-            throw new IllegalArgumentException("Notification requires a body");
-        }
-
-        // Check that the sending time message is not null
-        String sendingTime = values.getAsString(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME);
-        if (sendingTime.isEmpty() || sendingTime == null) {
-            throw new IllegalArgumentException("Notification requires a sending time");
-        }
-
         // No need to check the other column values, any value is valid (including null).
-
         // If there are no values to update, then don't try to update the database
         if (values.size() == 0) {
             return 0;

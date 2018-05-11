@@ -3,6 +3,7 @@ package ru.tradition.lockeymobile.tabs.notifications;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.util.Log;
@@ -112,24 +113,34 @@ public class NotificationCursorAdapter extends CursorAdapter {
 
 
         // Extract properties from cursor
-        int notificationID = cursor.getInt(cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID));
-        double notificationLatitude = cursor.getDouble(cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE));
-        double notificationLongitude = cursor.getDouble(cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE));
+        int notificationID = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID));
+        double notificationLatitude = cursor.getDouble(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE));
+        double notificationLongitude = cursor.getDouble(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE));
         String notificationTitle = cursor.getString(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE));
         String notificationBody = cursor.getString(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY));
         String notificationSendingTime = cursor.getString(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME));
         String formattedTime = getFormattedDate(notificationSendingTime);
+        int isRead = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_READ));
 
         // Populate fields with extracted properties
         titleTextView.setText(notificationTitle);
         sendingTimeTextView.setText(formattedTime);
 
         titleTextViewOptional.setText(notificationTitle);
+        titleTextViewOptional.setTypeface(null, Typeface.NORMAL);
         sendingTimeTextViewOptional.setText(formattedTime);
 
         bodyTextView.setText(notificationBody);// + " Номер бортового комплекта - " + String.valueOf(notificationID));
         bodyTextViewOptional.setText(notificationBody);// + " Номер бортового комплекта - " + String.valueOf(notificationID));
-
+        if (isRead == 0) {
+            sendingTimeTextView.setTypeface(null, Typeface.BOLD);
+            bodyTextView.setTypeface(null, Typeface.BOLD);
+            titleTextView.setTypeface(null, Typeface.BOLD);
+        } else {
+            bodyTextView.setTypeface(null, Typeface.NORMAL);
+            sendingTimeTextView.setTypeface(null, Typeface.NORMAL);
+            titleTextView.setTypeface(null, Typeface.NORMAL);
+        }
 
         //We need something to show if body text field is empty
 //        if (!TextUtils.isEmpty(notificationBody)) {
@@ -141,7 +152,7 @@ public class NotificationCursorAdapter extends CursorAdapter {
 //        }
     }
 
-    private static String getFormattedDate (String sendingTime){
+    private static String getFormattedDate(String sendingTime) {
         long milli = 0;
         java.text.SimpleDateFormat simpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -152,7 +163,7 @@ public class NotificationCursorAdapter extends CursorAdapter {
         } catch (java.text.ParseException e) {
             e.printStackTrace();
         }
-        if (milli == 0){
+        if (milli == 0) {
             return sendingTime;
         }
         Date date = new Date(milli);

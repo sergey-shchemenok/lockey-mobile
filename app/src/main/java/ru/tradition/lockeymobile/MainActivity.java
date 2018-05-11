@@ -184,24 +184,28 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        //get data from asset activity to open map
+        //get data from asset and notification activity to open map
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && !bundle.isEmpty()) {
-            AppData.viewPager.setCurrentItem(1);
-            //go to map tab
-            if (MapFragmentTab.google_map != null && useMap.equals(getString(R.string.settings_google_map_value))) {
-                AppData.target = CameraPosition.builder()
-                        .target(new LatLng(bundle.getDouble("latitude"), bundle.getDouble("longitude")))
-                        .zoom(14)
-                        .build();
-                MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
-            } else if (MapFragmentTabOSM.mapController != null && useMap.equals(getString(R.string.settings_osm_value))) {
-                AppData.osmCameraZoom = 16.0;
-                AppData.osmStartPoint = new GeoPoint(bundle.getDouble("latitude"), bundle.getDouble("longitude"));
-                MapFragmentTabOSM.mapController.setZoom(AppData.osmCameraZoom);
-                MapFragmentTabOSM.mapController.setCenter(AppData.osmStartPoint);
+            if (bundle.containsKey("latitude")) {
+                AppData.viewPager.setCurrentItem(1);
+                //go to map tab
+                if (MapFragmentTab.google_map != null && useMap.equals(getString(R.string.settings_google_map_value))) {
+                    AppData.target = CameraPosition.builder()
+                            .target(new LatLng(bundle.getDouble("latitude"), bundle.getDouble("longitude")))
+                            .zoom(14)
+                            .build();
+                    MapFragmentTab.google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+                } else if (MapFragmentTabOSM.mapController != null && useMap.equals(getString(R.string.settings_osm_value))) {
+                    AppData.osmCameraZoom = 16.0;
+                    AppData.osmStartPoint = new GeoPoint(bundle.getDouble("latitude"), bundle.getDouble("longitude"));
+                    MapFragmentTabOSM.mapController.setZoom(AppData.osmCameraZoom);
+                    MapFragmentTabOSM.mapController.setCenter(AppData.osmStartPoint);
+                }
+                bundle.clear();
+            } else if (bundle.containsKey("page")){
+                AppData.viewPager.setCurrentItem(bundle.getInt("page"));
             }
-            bundle.clear();
         }
 
         Log.i(LOG_TAG, "Before starting loaders");

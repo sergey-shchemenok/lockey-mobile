@@ -2,6 +2,7 @@ package ru.tradition.lockeymobile.tabs.notifications;
 
 import android.app.AlertDialog;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -84,6 +85,7 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
                     //Make an URI for intent
                     Uri currentNotificationUri = ContentUris.withAppendedId(NotificationContract.NotificationEntry.CONTENT_URI, itemId);
                     intent.setData(currentNotificationUri);
+                    makeReadNotification(currentNotificationUri);
                     startActivity(intent);
                 }
                 //if it is selecting mode. Select or deselect asset
@@ -111,6 +113,8 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long itemId) {
                 Uri currentNotificationUri = ContentUris.withAppendedId(NotificationContract.NotificationEntry.CONTENT_URI, itemId);
+                makeReadNotification(currentNotificationUri);
+                Log.i(LOG_TAG, "Current uri is..." + currentNotificationUri.toString());
                 if (!AppData.selectedNotificationLong.contains(currentNotificationUri.toString())) {
                     AppData.selectedNotificationLong.add(currentNotificationUri.toString());
                     adapter.notifyDataSetChanged();
@@ -222,7 +226,8 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE,
-                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE,
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_READ
         };
 
         String sortOrder =
@@ -241,12 +246,22 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         adapter.swapCursor(null);
     }
 
-    //    @Override
-//    public void onDestroyView() {
-//        MainActivity.isFinished = false;
-//        MainActivity.isRepeated = false;
-//        super.onDestroyView();
-//    }
+    private void makeReadNotification(Uri currentNotificationUri){
+        ContentValues values = new ContentValues();
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_READ, 1);
+            int rowsAffected = getContext().getContentResolver().update(currentNotificationUri, values, null, null);
+
+            // Show a toast message depending on whether or not the update was successful.
+//            if (rowsAffected == 0) {
+//                // If no rows were affected, then there was an error with the update.
+//                Toast.makeText(getContext(), "Ошибка чтения",
+//                        Toast.LENGTH_SHORT).show();
+//            } else {
+//                // Otherwise, the update was successful and we can display a toast.
+//                Toast.makeText(getContext(), "Прочитано",
+//                        Toast.LENGTH_SHORT).show();
+//            }
+    }
 
 
     private OnFragmentInteractionListener mListener;

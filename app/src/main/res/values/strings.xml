@@ -66,11 +66,12 @@
     <string name="subscription_status">Статус:</string>
     <string name="kits_numbers">Объекты:</string>
     <string name="subscriptions_activity_title">События</string>
-    <string name="menu_subscriptions">Подписки</string>
+    <string name="menu_subscriptions">События</string>
     <string name="no_subscriptions">Нет подписок с Push.\nСоздайте подписки на портале my.lockey.ru с доставкой Push.</string>
     <string name="menu_subscribe">Подписаться</string>
     <string name="menu_unsubscribe">Отказаться</string>
     <string name="notification_tab_empty_view_text">Нет сохраненных уведомлений</string>
     <string name="menu_feedback">Обратная связь</string>
+    <string name="menu_about_program">О программе</string>
 
 </resources>

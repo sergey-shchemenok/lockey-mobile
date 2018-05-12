@@ -27,6 +27,8 @@ import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
 
 public final class AppData {
 
+    public static final String VERSION = "0.9.00";
+
     public static MainActivity mainActivity;
 
     //whether it need new token to download data

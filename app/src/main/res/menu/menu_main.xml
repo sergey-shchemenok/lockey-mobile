@@ -22,16 +22,15 @@
 
     <item
         android:id="@+id/main_menu_zoom_out"
-        android:title="zoom_out"
         android:icon="@drawable/ic_zoom_out_map"
+        android:title="zoom_out"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/main_menu_delete"
-        android:title="delete"
         android:icon="@drawable/ic_delete_forever"
-        app:showAsAction="always"
-        />
+        android:title="delete"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/main_menu_subscriptions"
@@ -43,5 +42,9 @@
         android:title="@string/menu_feedback"
         app:showAsAction="never" />
 
-</menu>
-    <!--android:visible="false"-->
+    <item
+        android:id="@+id/main_menu_about_program"
+        android:title="@string/menu_about_program"
+        app:showAsAction="never" />
+
+</menu><!--android:visible="false"-->

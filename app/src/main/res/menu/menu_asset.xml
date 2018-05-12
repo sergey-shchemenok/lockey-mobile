@@ -24,5 +24,10 @@
         android:title="@string/menu_feedback"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/asset_menu_about_program"
+        android:title="@string/menu_about_program"
+        app:showAsAction="never" />
+
 </menu>
     <!--android:visible="false"-->

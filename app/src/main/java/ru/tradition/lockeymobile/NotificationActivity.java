@@ -184,6 +184,10 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                 Intent subscriptionsIntent = new Intent(this, SubscriptionsActivity.class);
                 startActivity(subscriptionsIntent);
                 return true;
+
+            case R.id.notification_menu_about_program:
+                MainActivity.showAboutTheProgram(this);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

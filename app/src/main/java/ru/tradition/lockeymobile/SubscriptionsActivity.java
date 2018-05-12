@@ -350,6 +350,10 @@ public class SubscriptionsActivity extends AppCompatActivity implements
                     }
                 }
                 return true;
+
+            case R.id.subscription_menu_about_program:
+                MainActivity.showAboutTheProgram(this);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }

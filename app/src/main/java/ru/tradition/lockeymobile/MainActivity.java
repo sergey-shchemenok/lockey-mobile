@@ -1,7 +1,9 @@
 package ru.tradition.lockeymobile;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -163,18 +165,19 @@ public class MainActivity extends AppCompatActivity implements
                 } else
                     AppData.viewPager.setPagingEnabled(true);
 
-                if (MapFragmentTab.bottomSheetBehavior != null) {
-                    if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
-                            MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                        MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                    }
-                }
-                if (MapFragmentTabOSM.bottomSheetBehavior != null) {
-                    if (MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
-                            MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-                        MapFragmentTabOSM.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                    }
-                }
+                //do not delete!!!
+//                if (MapFragmentTab.bottomSheetBehavior != null) {
+//                    if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
+//                            MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+//                        MapFragmentTab.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//                    }
+//                }
+//                if (MapFragmentTabOSM.bottomSheetBehavior != null) {
+//                    if (MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
+//                            MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+//                        MapFragmentTabOSM.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//                    }
+//                }
 
             }
 
@@ -475,6 +478,10 @@ public class MainActivity extends AppCompatActivity implements
                     startActivity(intent);
                 }
                 return true;
+
+            case R.id.main_menu_about_program:
+                showAboutTheProgram(this);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -599,5 +606,19 @@ public class MainActivity extends AppCompatActivity implements
         startMainDataUpdater();
     }
 
+    public static void showAboutTheProgram(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("О программе")
+                .setMessage("Lockey Mobile\nВерсия: " + AppData.VERSION + "\nНПГ Традиция ©")
+                .setCancelable(false)
+                .setNegativeButton("Закрыть",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 
 }

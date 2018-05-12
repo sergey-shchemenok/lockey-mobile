@@ -167,6 +167,7 @@ public class AssetsFragmentTab extends Fragment {
     public void updateListView() {
         AssetsFragmentTab.assetsDataAdapter.clear();
         //AssetsFragmentTab.assetsDataAdapter.notifyDataSetChanged();
+        //todo something wrong here
         Log.i(LOG_TAG, "order by list..........." + getString(R.string.settings_order_by_kit_id_value));
         if (orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
             AssetsFragmentTab.assetsDataAdapter.addAll(new ArrayList<>(mAssetMap.values()));

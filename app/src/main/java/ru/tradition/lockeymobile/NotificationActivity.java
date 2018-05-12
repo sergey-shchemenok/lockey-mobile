@@ -86,9 +86,11 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         //this occurs when we get here after clicking the notification banner that coming in foreground
         if (mCurrentNotificationUri == null) {
             Bundle bundle = getIntent().getExtras();
-            ndForeground = (NotificationsData) getIntent().getSerializableExtra("NotificationData");
+            //ndForeground = (NotificationsData) getIntent().getSerializableExtra("NotificationData");
             Uri uri = bundle.getParcelable("Uri");
+            mCurrentNotificationUri = uri;
             makeReadNotification(uri);
+            getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
             fromItem = false;
         } else {
             getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);

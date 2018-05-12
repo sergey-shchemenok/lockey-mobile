@@ -133,7 +133,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
             intent.putExtra("NotificationData", notificationsData);
             intent.putExtra("Uri", uri);
         }
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, FCM_PENDING_INTENT_ID/*Request code*/, intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, fcmNotificationId/*Request code*/, intent, PendingIntent.FLAG_ONE_SHOT);
         //Set sound of notification
         Log.i(LOG_TAG, click_action + ".........pending intent");
 

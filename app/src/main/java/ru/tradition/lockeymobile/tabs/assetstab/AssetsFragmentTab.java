@@ -1,5 +1,6 @@
 package ru.tradition.lockeymobile.tabs.assetstab;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -167,14 +168,17 @@ public class AssetsFragmentTab extends Fragment {
     public void updateListView() {
         AssetsFragmentTab.assetsDataAdapter.clear();
         //AssetsFragmentTab.assetsDataAdapter.notifyDataSetChanged();
-        //todo something wrong here
-        Log.i(LOG_TAG, "order by list..........." + getString(R.string.settings_order_by_kit_id_value));
-        if (orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
-            AssetsFragmentTab.assetsDataAdapter.addAll(new ArrayList<>(mAssetMap.values()));
-        } else if (orderBy.equals(getString(R.string.settings_order_by_signal_time_value))) {
-            ArrayList<AssetsData> ads = new ArrayList<>(mAssetMap.values());
-            Collections.sort(ads, AssetsData.COMPARE_BY_LAST_SIGNAL_TIME);
-            AssetsFragmentTab.assetsDataAdapter.addAll(ads);
+        //this fragment can be detached
+        if (isAdded()) {
+            Log.i(LOG_TAG, "order by list..........." + getString(R.string.settings_order_by_kit_id_value));
+            // etc ...
+            if (orderBy.equals(getString(R.string.settings_order_by_kit_id_value))) {
+                AssetsFragmentTab.assetsDataAdapter.addAll(new ArrayList<>(mAssetMap.values()));
+            } else if (orderBy.equals(getString(R.string.settings_order_by_signal_time_value))) {
+                ArrayList<AssetsData> ads = new ArrayList<>(mAssetMap.values());
+                Collections.sort(ads, AssetsData.COMPARE_BY_LAST_SIGNAL_TIME);
+                AssetsFragmentTab.assetsDataAdapter.addAll(ads);
+            }
         }
     }
 

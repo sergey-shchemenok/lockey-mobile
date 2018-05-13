@@ -8,6 +8,8 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -34,11 +36,15 @@ import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContrac
  */
 public class FcmMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
 
+    private static final String NOTIFICATION_ID_PREFERENCES = "notification_id_preferences";
+    public static final String FCM_NOTIFICATION_ID = "fcm_notification_id";
+    SharedPreferences notificationIDIncrement;
+
     private static final String LOG_TAG = FcmInstanceIDService.class.getSimpleName();
 
     private static int isRead = 0;
 
-    private static final int FCM_NOTIFICATION_ID = 1000;
+    //private static final int FCM_NOTIFICATION_ID = 1000;
     private static int fcmNotificationId = 0;
     private static final int FCM_PENDING_INTENT_ID = 2000;
     private static final String FCM_NOTIFICATION_CHANNEL_ID = "fcm_notification_channel";
@@ -46,6 +52,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
     @Override
     public void onCreate() {
         super.onCreate();
+        notificationIDIncrement = getSharedPreferences(NOTIFICATION_ID_PREFERENCES, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -120,7 +127,6 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
         }
 
         NotificationsData notificationsData = null;
-
         if (id != 0 && title != null
                 && body != null
                 && date != null
@@ -130,15 +136,29 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
         if (notificationsData != null) {
             //todo nd could be empty
             Uri uri = insertNotification(notificationsData);
+            if (uri == null)
+                return;
             intent.putExtra("NotificationData", notificationsData);
             intent.putExtra("Uri", uri);
         }
+
+        if(notificationIDIncrement.contains(FCM_NOTIFICATION_ID)) {
+            fcmNotificationId = notificationIDIncrement.getInt(FCM_NOTIFICATION_ID, 0);
+            fcmNotificationId++;
+            SharedPreferences.Editor editor = notificationIDIncrement.edit();
+            editor.putInt(FCM_NOTIFICATION_ID, fcmNotificationId);
+            editor.commit();
+        }else {
+            SharedPreferences.Editor editor = notificationIDIncrement.edit();
+            fcmNotificationId = 0;
+            editor.putInt(FCM_NOTIFICATION_ID, fcmNotificationId);
+            editor.commit();
+        }
+
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, fcmNotificationId/*Request code*/, intent, PendingIntent.FLAG_ONE_SHOT);
-        //Set sound of notification
-        Log.i(LOG_TAG, click_action + ".........pending intent");
 
         Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -173,20 +193,39 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
         }
 
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(fcmNotificationId++ /*ID of notification*/, notificationBuilder.build());
+        notificationManager.notify(fcmNotificationId /*ID of notification*/, notificationBuilder.build());
     }
 
     private Uri insertNotification(NotificationsData nd) {
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID, nd.getId());
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE, nd.getTitle());
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY, nd.getBody());
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME, nd.getSending_time());
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE, nd.getLatitude());
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE, nd.getLongitude());
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_READ, isRead);
 
-        return getContentResolver().insert(NotificationContract.NotificationEntry.CONTENT_URI, values);
+        String[] projection = {NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME};
+        String selection = NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME + " = \"" + nd.getSending_time() + "\"";
+
+        Cursor cursor = getContentResolver().query(NotificationContract.NotificationEntry.CONTENT_URI, projection,
+                selection, null, null);
+
+        if (cursor.getCount() > 0)
+            return null;
+        else {
+//        String savedSendingTime = cursor.getString(0);
+//       int savedSendingTime = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME);
+            int savedSendingTime = cursor.getCount();
+
+            Log.i(LOG_TAG, "saved sending time  " + savedSendingTime + " " + cursor.getColumnCount());
+
+            //SQLiteException
+
+            values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID, nd.getId());
+            values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE, nd.getTitle());
+            values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY, nd.getBody());
+            values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME, nd.getSending_time());
+            values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE, nd.getLatitude());
+            values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE, nd.getLongitude());
+            values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_READ, isRead);
+
+            return getContentResolver().insert(NotificationContract.NotificationEntry.CONTENT_URI, values);
+        }
     }
 }

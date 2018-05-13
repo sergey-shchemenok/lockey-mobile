@@ -29,7 +29,7 @@ dependencies {
     //for mail
     //implementation 'javax.mail:javax.mail-api:1.6.1'
 
-    implementation 'com.google.android.gms:play-services-maps:11.8.0'
+    implementation 'com.google.android.gms:play-services-maps:11.4.0'
     //for clustering
     implementation 'com.androidmapsextensions:android-maps-extensions:2.4.0'
 
@@ -37,7 +37,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    implementation 'com.google.firebase:firebase-messaging:11.8.0'
+    implementation 'com.google.firebase:firebase-messaging:11.4.0'
     apply plugin: 'com.google.gms.google-services'
 }
 apply plugin: 'com.google.gms.google-services'
@@ -55,6 +55,4 @@ dependencies {
     //implementation 'org.osmdroid:osmdroid-third-party:6.0.1'
 }
 
-dependencies {
-    implementation 'com.android.support.constraint:constraint-layout:+'
-}
+

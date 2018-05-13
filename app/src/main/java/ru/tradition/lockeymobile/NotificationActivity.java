@@ -147,6 +147,12 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             String body = cursor.getString(bodyColumnIndex);
             String sendingTime = cursor.getString(sendingTimeColumnIndex);
 
+            if ((title == null || title.isEmpty())
+                    && (body == null || body.isEmpty())
+                    && (sendingTime == null || sendingTime.isEmpty())) {
+
+            }
+
             // Update the views on the screen with the values from the database
             notificationTitle.setText(title);
             notificationBody.setText(body);
@@ -302,7 +308,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         }
     }
 
-    private static String getFormattedDate (String sendingTime){
+    private static String getFormattedDate(String sendingTime) {
         long milli = 0;
         java.text.SimpleDateFormat simpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -313,7 +319,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         } catch (java.text.ParseException e) {
             e.printStackTrace();
         }
-        if (milli == 0){
+        if (milli == 0) {
             return sendingTime;
         }
         Date date = new Date(milli);
@@ -323,7 +329,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         return sdf.format(date);
     }
 
-    private void makeReadNotification(Uri currentNotificationUri){
+    private void makeReadNotification(Uri currentNotificationUri) {
         ContentValues values = new ContentValues();
         values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_READ, 1);
         int rowsAffected = getContentResolver().update(currentNotificationUri, values, null, null);

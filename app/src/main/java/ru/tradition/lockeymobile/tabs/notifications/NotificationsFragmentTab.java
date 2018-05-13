@@ -246,12 +246,14 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         adapter.swapCursor(null);
     }
 
-    private void makeReadNotification(Uri currentNotificationUri){
+    private void makeReadNotification(Uri currentNotificationUri) {
         ContentValues values = new ContentValues();
         values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_READ, 1);
-            int rowsAffected = getContext().getContentResolver().update(currentNotificationUri, values, null, null);
+        int rowsAffected;
+        if (isAdded())
+            rowsAffected = getContext().getContentResolver().update(currentNotificationUri, values, null, null);
 
-            // Show a toast message depending on whether or not the update was successful.
+        // Show a toast message depending on whether or not the update was successful.
 //            if (rowsAffected == 0) {
 //                // If no rows were affected, then there was an error with the update.
 //                Toast.makeText(getContext(), "Ошибка чтения",

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,8 +75,12 @@ public class AssetActivity extends AppCompatActivity {
                 Toast.makeText(AssetActivity.this, "Функция блокировки недоступна в текущей версии приложения", Toast.LENGTH_LONG).show();
             }
         });
+    }
 
-
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.i("AssetActivity", "starting asset activity...");
     }
 
     @Override
@@ -118,6 +123,8 @@ public class AssetActivity extends AppCompatActivity {
         super.onBackPressed();
         return true;
     }
+
+
 
 
 }

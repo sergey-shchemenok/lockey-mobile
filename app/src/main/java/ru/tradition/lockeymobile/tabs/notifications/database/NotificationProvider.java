@@ -134,7 +134,7 @@ public class NotificationProvider extends ContentProvider {
      */
     private Uri insertNotification(Uri uri, ContentValues values) {
         // Check that the asset id is not null
-        Integer assetID = values.getAsInteger(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID);
+        Integer assetID = values.getAsInteger(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID);
         if (assetID == null) {
             throw new IllegalArgumentException("Notification requires an asset ID");
         }

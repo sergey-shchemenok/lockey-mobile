@@ -51,6 +51,8 @@ public class AuthActivity extends AppCompatActivity
     private TextView infoMessage;
     private TextView connectionStatusMessage;
 
+    private int page = 0;
+
     //token of device
     String fcmToken;
 
@@ -91,7 +93,7 @@ public class AuthActivity extends AppCompatActivity
         loginButton = (Button) findViewById(R.id.login_button);
 
         infoMessage = (TextView) findViewById(R.id.main_info_message);
-        infoMessage.setVisibility(View.INVISIBLE);
+        infoMessage.setVisibility(View.GONE);
 
         connectionStatusMessage = (TextView) findViewById(R.id.main_connection_message);
         connectionStatusMessage.setVisibility(View.GONE);
@@ -108,6 +110,7 @@ public class AuthActivity extends AppCompatActivity
             if (hasCredentials == false) {
                 infoMessage.setVisibility(View.VISIBLE);
                 infoMessage.setText("Требуется авторизация");
+                page = 2;
             }
         }
 
@@ -215,7 +218,7 @@ public class AuthActivity extends AppCompatActivity
     private void insertNotification(NotificationsData nd) {
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID, nd.getId());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID, nd.getId());
         values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE, nd.getTitle());
         values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY, nd.getBody());
         values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME, nd.getSending_time());
@@ -262,10 +265,11 @@ public class AuthActivity extends AppCompatActivity
         }
         if (AppData.viewPager != null)
             AppData.viewPager.setCurrentItem(0);
-        infoMessage.setVisibility(View.INVISIBLE);
+        infoMessage.setVisibility(View.GONE);
         Log.v(LOG_TAG, "onLoadFinished");
         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
         AppData.isAuthorized = true;
+        intent.putExtra("page", page);
         startActivity(intent);
     }
 

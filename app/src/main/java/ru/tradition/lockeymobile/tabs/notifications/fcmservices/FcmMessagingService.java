@@ -15,7 +15,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.firebase.messaging.RemoteMessage;
@@ -23,11 +22,9 @@ import com.google.firebase.messaging.RemoteMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.NotificationActivity;
 import ru.tradition.lockeymobile.R;
-import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
@@ -200,24 +197,29 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
 
-        String[] projection = {NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME};
-        String selection = NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME + " = \"" + nd.getSending_time() + "\"";
+        String[] projectionTime = {NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME};
+        String selectionTime = NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME + " = \"" + nd.getSending_time() + "\"";
 
-        Cursor cursor = getContentResolver().query(NotificationContract.NotificationEntry.CONTENT_URI, projection,
-                selection, null, null);
+        String[] projectionBody = {NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY};
+        String selectionBody = NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY + " = \"" + nd.getBody() + "\"";
 
-        if (cursor.getCount() > 0)
+        Cursor cursorTime = getContentResolver().query(NotificationContract.NotificationEntry.CONTENT_URI, projectionTime,
+                selectionTime, null, null);
+        Cursor cursorBody = getContentResolver().query(NotificationContract.NotificationEntry.CONTENT_URI, projectionBody,
+                selectionBody, null, null);
+
+        if (cursorTime.getCount() > 0 && cursorBody.getCount() > 0)
             return null;
         else {
 //        String savedSendingTime = cursor.getString(0);
 //       int savedSendingTime = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME);
-            int savedSendingTime = cursor.getCount();
-
-            Log.i(LOG_TAG, "saved sending time  " + savedSendingTime + " " + cursor.getColumnCount());
+            Log.i(LOG_TAG, "time and body  " + cursorTime.getCount() + " " + cursorBody.getCount());
 
             //SQLiteException
 
-            values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID, nd.getId());
+            values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID, nd.getId());
+            //todo we can use this later
+            values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID, 0);
             values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE, nd.getTitle());
             values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY, nd.getBody());
             values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME, nd.getSending_time());

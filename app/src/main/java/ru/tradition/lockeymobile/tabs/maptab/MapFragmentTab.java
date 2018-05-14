@@ -264,7 +264,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
 
                     google_map.animateCamera(cu);
-                } else{
+                } else {
                     Toast.makeText(getContext(), "Получение координат объектов", Toast.LENGTH_LONG).show();
                     placeMarkersOnMap();
                 }
@@ -416,15 +416,10 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     //Save camera position
     @Override
     public void onStop() {
-        try {
+        if (google_map != null)
             AppData.target = google_map.getCameraPosition();
-        } catch (NullPointerException e) {
-            startActivity(new Intent(getActivity(), AuthActivity.class));
-            Log.i(LOG_TAG, "onMapStop..........NullPointerException");
-        }
         //stopMarkerUpdating();
         super.onStop();
-
     }
 
     public void updateMarkers() {

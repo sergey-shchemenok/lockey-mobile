@@ -53,18 +53,21 @@ public class AssetActivity extends AppCompatActivity {
 
         assetData = (AssetsData) getIntent().getSerializableExtra("AssetData");
 
-        kitNumber.setText(String.valueOf(assetData.getId()));
-        regNumber.setText(assetData.getRegNumber());
-        carModel.setText(assetData.getModel());
-        name.setText(assetData.getName());
-        //lastTime.setText(String.valueOf(assetData.getLastSignalTime()));
-
+        if (assetData != null) {
+            kitNumber.setText(String.valueOf(assetData.getId()));
+            regNumber.setText(assetData.getRegNumber());
+            carModel.setText(assetData.getModel());
+            name.setText(assetData.getName());
+            //lastTime.setText(String.valueOf(assetData.getLastSignalTime()));
+        }
         toMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(AssetActivity.this, MainActivity.class);
-                intent.putExtra("latitude", assetData.getLatitude());
-                intent.putExtra("longitude", assetData.getLongitude());
+                if (assetData != null) {
+                    intent.putExtra("latitude", assetData.getLatitude());
+                    intent.putExtra("longitude", assetData.getLongitude());
+                }
                 startActivity(intent);
             }
         });
@@ -123,8 +126,6 @@ public class AssetActivity extends AppCompatActivity {
         super.onBackPressed();
         return true;
     }
-
-
 
 
 }

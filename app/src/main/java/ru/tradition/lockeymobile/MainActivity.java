@@ -145,27 +145,28 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onPageSelected(int position) {
-                if (AppData.isAssetSelectingMode && position != 0) {
-                    changeModeToNormal();
-                    AssetsFragmentTab.aft.updateListView();
-                } else if (AppData.isNotificationSelectingMode && position != 2) {
-                    changeModeToNormal();
-                    NotificationsFragmentTab.adapter.notifyDataSetChanged();
-                }
+                if (AppData.mMenu != null) {
+                    if (AppData.isAssetSelectingMode && position != 0) {
+                        changeModeToNormal();
+                        AssetsFragmentTab.aft.updateListView();
+                    } else if (AppData.isNotificationSelectingMode && position != 2) {
+                        changeModeToNormal();
+                        NotificationsFragmentTab.adapter.notifyDataSetChanged();
+                    }
 
-                if (!AppData.isAssetSelectingMode && position == 0) {
-                    AppData.mMenu.getItem(1).setVisible(true);
-                }
-                if (!AppData.isNotificationSelectingMode && position == 2) {
-                    AppData.mMenu.getItem(1).setVisible(true);
-                }
-                if (position == 1) {
-                    AppData.mMenu.getItem(1).setVisible(false);
-                    AppData.viewPager.setPagingEnabled(false);
-                } else
-                    AppData.viewPager.setPagingEnabled(true);
+                    if (!AppData.isAssetSelectingMode && position == 0) {
+                        AppData.mMenu.getItem(1).setVisible(true);
+                    }
+                    if (!AppData.isNotificationSelectingMode && position == 2) {
+                        AppData.mMenu.getItem(1).setVisible(true);
+                    }
+                    if (position == 1) {
+                        AppData.mMenu.getItem(1).setVisible(false);
+                        AppData.viewPager.setPagingEnabled(false);
+                    } else
+                        AppData.viewPager.setPagingEnabled(true);
 
-                //do not delete!!!
+                    //do not delete!!!
 //                if (MapFragmentTab.bottomSheetBehavior != null) {
 //                    if (MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED ||
 //                            MapFragmentTab.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
@@ -179,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements
 //                    }
 //                }
 
+                }
             }
 
             @Override
@@ -206,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements
                     MapFragmentTabOSM.mapController.setCenter(AppData.osmStartPoint);
                 }
                 bundle.clear();
-            } else if (bundle.containsKey("page")){
+            } else if (bundle.containsKey("page")) {
                 AppData.viewPager.setCurrentItem(bundle.getInt("page"));
             }
         }
@@ -325,6 +327,9 @@ public class MainActivity extends AppCompatActivity implements
             AppData.mAssetMap = loadedData.getAssetMap();
             Log.i(LOG_TAG, "the loading has finished without mistakes");
         }
+
+        if (AssetsFragmentTab.aft == null)
+            return;
         AssetsFragmentTab.aft.mEmptyStateTextView.setText("");
         AssetsFragmentTab.aft.progressCircle.setVisibility(View.GONE);
 

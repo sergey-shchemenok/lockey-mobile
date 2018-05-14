@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -221,7 +220,7 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
         String[] projection = {
                 //id column is always needed for the cursor
                 NotificationContract.NotificationEntry._ID,
-                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID,
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME,

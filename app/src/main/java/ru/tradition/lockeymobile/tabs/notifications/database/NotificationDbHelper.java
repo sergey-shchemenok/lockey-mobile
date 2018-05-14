@@ -16,7 +16,7 @@ public class NotificationDbHelper extends SQLiteOpenHelper {
     /**
      * Name of the database file
      */
-    private static final String DATABASE_NAME = "lockeydata_1.db";
+    private static final String DATABASE_NAME = "lockeydata_2.db";
 
     /**
      * Database version. If you change the database schema, you must increment the database version.
@@ -28,12 +28,14 @@ public class NotificationDbHelper extends SQLiteOpenHelper {
      */
     private static final String SQL_CREATE_NOTIFICATIONS_TABLE = "CREATE TABLE " + NotificationContract.NotificationEntry.TABLE_NAME + "("
             + NotificationContract.NotificationEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+            + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID + " INTEGER NOT NULL, "
             + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID + " INTEGER NOT NULL, "
             + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE + " TEXT NOT NULL, "
             + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY + " TEXT NOT NULL, "
             + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME + " TEXT NOT NULL, "
             + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE + " REAL, "
             + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE + " REAL, "
+            + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_PIC + " BLOB, "
             + NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_READ + " INTEGER NOT NULL DEFAULT 0);";
 
     /*

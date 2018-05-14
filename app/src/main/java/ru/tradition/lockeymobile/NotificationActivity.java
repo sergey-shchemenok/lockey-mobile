@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
-import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
 public class NotificationActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -114,7 +113,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         String[] projection = {
                 //id column is always needed for the cursor
                 NotificationContract.NotificationEntry._ID,
-                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID,
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME,
@@ -135,7 +134,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         // (This should be the only row in the cursor)
         if (cursor.moveToFirst()) {
             // Find the columns of notification attributes that we're interested in
-            int assetIDColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID);
+            int assetIDColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID);
             int titleColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE);
             int bodyColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY);
             int sendingTimeColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME);
@@ -289,7 +288,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     private void insertNotification(NotificationsData nd) {
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID, nd.getId());
+        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID, nd.getId());
         values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE, nd.getTitle());
         values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY, nd.getBody());
         values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME, nd.getSending_time());

@@ -415,13 +415,9 @@ public class MapFragmentTabOSM extends Fragment implements
     //Save camera position
     @Override
     public void onStop() {
-        try {
+        if (osm_map != null) {
             AppData.osmStartPoint = osm_map.getMapCenter();
             AppData.osmCameraZoom = osm_map.getZoomLevelDouble();
-
-        } catch (NullPointerException e) {
-            startActivity(new Intent(getActivity(), AuthActivity.class));
-            Log.i(LOG_TAG, "onMapStop..........NullPointerException");
         }
         //stopMarkerUpdating();
         super.onStop();

@@ -5,8 +5,6 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.v4.widget.CursorAdapter;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +14,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -113,7 +110,7 @@ public class NotificationCursorAdapter extends CursorAdapter {
 
 
         // Extract properties from cursor
-        int notificationID = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ASSET_ID));
+        int notificationID = cursor.getInt(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID));
         double notificationLatitude = cursor.getDouble(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE));
         double notificationLongitude = cursor.getDouble(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE));
         String notificationTitle = cursor.getString(cursor.getColumnIndexOrThrow(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE));

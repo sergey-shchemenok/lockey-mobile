@@ -60,7 +60,14 @@ public final class NotificationContract {
         public final static String _ID = BaseColumns._ID;
 
         /**
-         * Kit ID number .
+         * ID .
+         * <p>
+         * Type: INTEGER
+         */
+        public final static String COLUMN_NOTIFICATION_ID = "notification_id";
+
+        /**
+         * asset ID .
          * <p>
          * Type: INTEGER
          */
@@ -103,6 +110,13 @@ public final class NotificationContract {
          * Type: INTEGER
          */
         public final static String COLUMN_NOTIFICATION_READ = "read";
+
+        /**
+         * Picture of notification.
+         * Type: BLOB
+         */
+        public final static String COLUMN_NOTIFICATION_PIC = "picture";
+
     }
 
 

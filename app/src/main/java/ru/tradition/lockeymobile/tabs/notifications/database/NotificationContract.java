@@ -117,6 +117,12 @@ public final class NotificationContract {
          */
         public final static String COLUMN_NOTIFICATION_PIC = "picture";
 
+        /**
+         * Other text.
+         * Type: TEXT
+         */
+        public final static String COLUMN_NOTIFICATION_TEXT = "text";
+
     }
 
 

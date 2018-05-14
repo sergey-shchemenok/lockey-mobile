@@ -6,25 +6,45 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
+import com.google.android.gms.maps.model.LatLng;
 
+import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polygon;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
+import java.util.TreeMap;
+
+import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
+import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygonAdapter;
+import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTabOSM;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
+import static android.view.MotionEvent.ACTION_DOWN;
+
 public class NotificationActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
-    private final String LOG_TAG = NotificationActivity.class.getName();
+    private final String LOG_TAG = NotificationActivity.class.getSimpleName();
     private static final int CURSOR_LOADER_ID = 1;
     /**
      * Content URI for the existing notification
@@ -35,12 +55,16 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     private TextView notificationBody;
     private TextView notificationSendingTime;
 
+    //for map
+    private static MapView osm_map;
+    private static IMapController mapController;
+    private static TreeMap<Integer, Marker> osm_markers = new TreeMap<>();
+
     private NotificationsData ndForeground;
     private NotificationsData ndBackground;
 
     //if we open this activity not from the notificatiton tab on item clicking
     private boolean fromItem = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +77,6 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 //            fromItem = false;
 //        }
 
-
         setContentView(R.layout.activity_notification);
 
         //go to auth activity. It need to prevent seeing the internal information without authorization
@@ -62,6 +85,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             intent.putExtra("hasCredentials", false);
             startActivity(intent);
             Log.i(LOG_TAG, ".............no credentials");
+            return;
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -77,6 +101,12 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
         toolbar.setTitle(R.string.notification_activity_title);
 
+        osm_map = (MapView) findViewById(R.id.notification_osm_map);
+        osm_map.setTileSource(TileSourceFactory.MAPNIK);
+
+        //Then we add default zoom buttons, and ability to zoom with 2 fingers (multi-touch)
+        osm_map.setBuiltInZoomControls(true);
+        osm_map.setMultiTouchControls(true);
 
         //get data from the incoming intent. From clicking on item at notification tab
         Intent intent = getIntent();
@@ -134,17 +164,21 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         // (This should be the only row in the cursor)
         if (cursor.moveToFirst()) {
             // Find the columns of notification attributes that we're interested in
-            int assetIDColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID);
+            int IDColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID);
             int titleColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE);
             int bodyColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY);
             int sendingTimeColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME);
+            int latitudeIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE);
+            int longitudeIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE);
 
             // Extract out the value from the Cursor for the given column index
-            int assetID = cursor.getInt(assetIDColumnIndex);
+            int ID = cursor.getInt(IDColumnIndex);
 
             String title = cursor.getString(titleColumnIndex);
             String body = cursor.getString(bodyColumnIndex);
             String sendingTime = cursor.getString(sendingTimeColumnIndex);
+            double latitude = cursor.getDouble(latitudeIndex);
+            double longitude = cursor.getDouble(longitudeIndex);
 
             if ((title == null || title.isEmpty())
                     && (body == null || body.isEmpty())
@@ -157,6 +191,33 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             notificationBody.setText(body);
 //                    + " Номер бортового комплекта - " + String.valueOf(assetID));
             notificationSendingTime.setText(getFormattedDate(sendingTime));
+
+            //We can move the map on a default view point. For this, we need access to the map controller:
+            mapController = osm_map.getController();
+            mapController.setZoom(16.0);
+
+            GeoPoint notificationPoint = new GeoPoint(latitude, longitude);
+            mapController.setCenter(notificationPoint);
+
+            Marker notificationMarker = new Marker(osm_map);
+            notificationMarker.setPosition(notificationPoint);
+            notificationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            notificationMarker.setTitle(title);
+
+            Polygon circle = new Polygon(){
+                @Override
+                public void showInfoWindow(GeoPoint position) {
+                    //super.showInfoWindow(position);
+                }
+            };
+            circle.setPoints(Polygon.pointsAsCircle(notificationPoint, 250.0));
+            circle.setFillColor(Color.parseColor("#6421a30d"));
+            circle.setStrokeColor(Color.parseColor("#FF21A30D"));
+            circle.setStrokeWidth(0);
+
+            osm_map.getOverlays().add(circle);
+            osm_map.getOverlays().add(notificationMarker);
+            osm_map.invalidate();
 
         }
     }

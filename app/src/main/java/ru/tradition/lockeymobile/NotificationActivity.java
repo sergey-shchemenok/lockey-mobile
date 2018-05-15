@@ -8,6 +8,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -59,6 +61,8 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     private static MapView osm_map;
     private static IMapController mapController;
     private static TreeMap<Integer, Marker> osm_markers = new TreeMap<>();
+
+    private FloatingActionButton fabLayers;
 
     private NotificationsData ndForeground;
     private NotificationsData ndBackground;
@@ -129,6 +133,19 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         notificationTitle = (TextView) findViewById(R.id.notification_activity_title);
         notificationBody = (TextView) findViewById(R.id.notification_activity_body);
         notificationSendingTime = (TextView) findViewById(R.id.notification_activity_sending_time);
+        fabLayers = (FloatingActionButton)findViewById(R.id.fab_layers_notification);
+
+        fabLayers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (osm_map != null) {
+                    if (osm_map.getTileProvider().getTileSource() == TileSourceFactory.MAPNIK)
+                        osm_map.setTileSource(TileSourceFactory.OpenTopo);
+                    else
+                        osm_map.setTileSource(TileSourceFactory.MAPNIK);
+                }
+            }
+        });
 
         //trying to show data from fore or background
         showData(ndBackground);
@@ -194,7 +211,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
             //We can move the map on a default view point. For this, we need access to the map controller:
             mapController = osm_map.getController();
-            mapController.setZoom(16.0);
+            mapController.setZoom(14.0);
 
             GeoPoint notificationPoint = new GeoPoint(latitude, longitude);
             mapController.setCenter(notificationPoint);
@@ -210,7 +227,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                     //super.showInfoWindow(position);
                 }
             };
-            circle.setPoints(Polygon.pointsAsCircle(notificationPoint, 250.0));
+            circle.setPoints(Polygon.pointsAsCircle(notificationPoint, 300.0));
             circle.setFillColor(Color.parseColor("#6421a30d"));
             circle.setStrokeColor(Color.parseColor("#FF21A30D"));
             circle.setStrokeWidth(0);

@@ -384,7 +384,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         }
         Date date = new Date(milli);
         //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z"); // the format of your date
-        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy\nHH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy, HH:mm");
         //sdf.setTimeZone(TimeZone.getTimeZone("GMT-4")); // give a timezone reference for formatting (see comment at the bottom
         return sdf.format(date);
     }

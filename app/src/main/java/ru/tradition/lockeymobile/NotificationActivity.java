@@ -480,7 +480,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         // re-schedule timer here otherwise, IllegalStateException of "TimerTask is scheduled already" will be thrown
         updaterTimer = new Timer();
         mUpdater = new NotificationActivity.NotificationUpdater(zid);
-        updaterTimer.schedule(mUpdater, 0, 1500);
+        updaterTimer.schedule(mUpdater, 0, 2000);
     }
 
     private void stopUpdater() {
@@ -510,6 +510,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                         return;
                     }
                     if (AppData.mainActivity != null) {
+                        AppData.mainActivity.loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
                         Log.i(LOG_TAG, "trying to get zones...");
                         AppData.mainActivity.getZones();
                     } else {
@@ -519,4 +520,6 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             });
         }
     }
+
+
 }

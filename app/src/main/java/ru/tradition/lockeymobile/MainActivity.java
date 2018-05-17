@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private ConnectivityManager connectivityManager;
     private NetworkInfo activeNetwork;
-    private LoaderManager loaderManager;
+    public LoaderManager loaderManager;
     private TextView infoMessage;
 
 

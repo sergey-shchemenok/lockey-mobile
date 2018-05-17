@@ -83,6 +83,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
             int id = 0;
             double latitude = 0.0;
             double longitude = 0.0;
+            String text = String.valueOf(remoteMessage.getData().get("text"));
             try {
                 id = Integer.parseInt(String.valueOf(remoteMessage.getData().get("id")));
                 latitude = Double.parseDouble(String.valueOf(remoteMessage.getData().get("latitude")));
@@ -96,8 +97,9 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
             Log.i(LOG_TAG, "Message Notification date: " + date);
             Log.i(LOG_TAG, "Message Notification latitude: " + latitude);
             Log.i(LOG_TAG, "Message Notification longitude: " + longitude);
+            Log.i(LOG_TAG, "Message Notification longitude: " + text);
 
-            sendNotification(id, title, body, click_action, date, latitude, longitude);
+            sendNotification(id, title, body, click_action, date, latitude, longitude, text);
         }
     }
 
@@ -106,7 +108,8 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
      */
 //    private void sendNotification(String body) {
 //
-    private void sendNotification(int id, String title, String body, String click_action, String date, double latitude, double longitude) {
+    private void sendNotification(int id, String title, String body, String click_action, String date,
+                                  double latitude, double longitude, String text) {
         Log.i(LOG_TAG, body + ".........");
 
         Intent intent;
@@ -128,7 +131,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
                 && body != null
                 && date != null
                 ) {
-            notificationsData = new NotificationsData(id, title, body, date, latitude, longitude);
+            notificationsData = new NotificationsData(id, title, body, date, latitude, longitude, text);
         }
         if (notificationsData != null) {
             //todo nd could be empty
@@ -197,17 +200,15 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
 
+        //filter
         String[] projectionTime = {NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME};
         String selectionTime = NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME + " = \"" + nd.getSending_time() + "\"";
-
         String[] projectionBody = {NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY};
         String selectionBody = NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY + " = \"" + nd.getBody() + "\"";
-
         Cursor cursorTime = getContentResolver().query(NotificationContract.NotificationEntry.CONTENT_URI, projectionTime,
                 selectionTime, null, null);
         Cursor cursorBody = getContentResolver().query(NotificationContract.NotificationEntry.CONTENT_URI, projectionBody,
                 selectionBody, null, null);
-
         if (cursorTime.getCount() > 0 && cursorBody.getCount() > 0)
             return null;
         else {
@@ -226,6 +227,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
             values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE, nd.getLatitude());
             values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE, nd.getLongitude());
             values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_READ, isRead);
+            values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TEXT, nd.getText());
 
             return getContentResolver().insert(NotificationContract.NotificationEntry.CONTENT_URI, values);
         }

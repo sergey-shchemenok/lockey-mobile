@@ -1,6 +1,7 @@
 package ru.tradition.lockeymobile;
 
 import android.app.LoaderManager;
+import android.app.NativeActivity;
 import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -20,9 +21,13 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -34,7 +39,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
@@ -133,7 +141,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         notificationTitle = (TextView) findViewById(R.id.notification_activity_title);
         notificationBody = (TextView) findViewById(R.id.notification_activity_body);
         notificationSendingTime = (TextView) findViewById(R.id.notification_activity_sending_time);
-        fabLayers = (FloatingActionButton)findViewById(R.id.fab_layers_notification);
+        fabLayers = (FloatingActionButton) findViewById(R.id.fab_layers_notification);
 
         fabLayers.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,7 +173,8 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME,
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE,
-                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE,
+                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TEXT
         };
 
         return new CursorLoader(this, mCurrentNotificationUri, projection, null, null, null);
@@ -187,6 +196,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             int sendingTimeColumnIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME);
             int latitudeIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE);
             int longitudeIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE);
+            int textIndex = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TEXT);
 
             // Extract out the value from the Cursor for the given column index
             int ID = cursor.getInt(IDColumnIndex);
@@ -196,6 +206,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             String sendingTime = cursor.getString(sendingTimeColumnIndex);
             double latitude = cursor.getDouble(latitudeIndex);
             double longitude = cursor.getDouble(longitudeIndex);
+            String text = cursor.getString(textIndex);
 
             if ((title == null || title.isEmpty())
                     && (body == null || body.isEmpty())
@@ -221,7 +232,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             notificationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             notificationMarker.setTitle(title);
 
-            Polygon circle = new Polygon(){
+            Polygon circle = new Polygon() {
                 @Override
                 public void showInfoWindow(GeoPoint position) {
                     //super.showInfoWindow(position);
@@ -234,8 +245,49 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
             osm_map.getOverlays().add(circle);
             osm_map.getOverlays().add(notificationMarker);
-            osm_map.invalidate();
 
+//            JSONArray rootArray = new JSONArray(jsonResponse);
+//            for (int i = 0; i < rootArray.length(); i++) {
+
+            if (text != null && !text.isEmpty()) {
+                try {
+                    JSONObject textObject = new JSONObject(text);
+                    String event = textObject.getString("event");
+                    if (event.equals("zone")) {
+                        int zid = textObject.getInt("ZID");
+                        showZoneOnMap(zid);
+                    }
+
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Problem parsing the JSON results", e);
+                }
+            }
+            osm_map.invalidate();
+        }
+    }
+
+    private void showZoneOnMap(int zid) {
+
+        if (osm_map != null && AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty()) {
+            if (AppData.mPolygonsMap.containsKey(zid)) {
+                GeofencePolygon geof = AppData.mPolygonsMap.get(zid);
+                LatLng[] latLngArray = geof.getPolygon();
+                List<GeoPoint> geoPoints = new ArrayList<>();
+                for (int i = 0; i < latLngArray.length; i++) {
+                    geoPoints.add(new GeoPoint(latLngArray[i].latitude, latLngArray[i].longitude));
+                }
+
+                Polygon polygon = new Polygon();    //see note below
+                polygon.setFillColor(Color.parseColor("#6421a30d"));
+                polygon.setStrokeColor(Color.parseColor("#FF21A30D"));
+                polygon.setPoints(geoPoints);
+                osm_map.getOverlayManager().add(polygon);
+            } else {
+                //todo if zone does'not exist
+                Log.i(LOG_TAG, "zone does'not exist");
+            }
+        } else if (AppData.mPolygonsMap == null || AppData.mPolygonsMap.isEmpty()) {
+            startUpdater(zid);
         }
     }
 
@@ -318,6 +370,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         String sending_time = null;
         double latitude = 0.0;
         double longitude = 0.0;
+        String text = null;
 
         if (getIntent().getExtras() != null) {
             for (String key : getIntent().getExtras().keySet()) {
@@ -336,6 +389,9 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                     body = String.valueOf(value);
                 }
                 if (key.equals("date")) {
+                    sending_time = String.valueOf(value);
+                }
+                if (key.equals("text")) {
                     sending_time = String.valueOf(value);
                 }
                 if (key.equals("latitude")) {
@@ -358,7 +414,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                 && body != null
                 && sending_time != null
                 ) {
-            return new NotificationsData(id, title, body, sending_time, latitude, longitude);
+            return new NotificationsData(id, title, body, sending_time, latitude, longitude, text);
         } else return null;
     }
 
@@ -412,4 +468,55 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         int rowsAffected = getContentResolver().update(currentNotificationUri, values, null, null);
     }
 
+
+    //let's check up the Timer
+    private Timer updaterTimer;
+    private NotificationActivity.NotificationUpdater mUpdater;
+
+    private void startUpdater(int zid) {
+        if (updaterTimer != null) {
+            updaterTimer.cancel();
+        }
+        // re-schedule timer here otherwise, IllegalStateException of "TimerTask is scheduled already" will be thrown
+        updaterTimer = new Timer();
+        mUpdater = new NotificationActivity.NotificationUpdater(zid);
+        updaterTimer.schedule(mUpdater, 0, 1500);
+    }
+
+    private void stopUpdater() {
+        if (updaterTimer != null) {
+            updaterTimer.cancel();
+        }
+    }
+
+    class NotificationUpdater extends TimerTask {
+        int zid;
+
+        public NotificationUpdater(int zid) {
+            this.zid = zid;
+        }
+
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (osm_map != null && AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty()) {
+                        showZoneOnMap(zid);
+                        Log.i(LOG_TAG, "stop updater...");
+                        osm_map.invalidate();
+                        stopUpdater();
+                        return;
+                    }
+                    if (AppData.mainActivity != null) {
+                        Log.i(LOG_TAG, "trying to get zones...");
+                        AppData.mainActivity.getZones();
+                    } else {
+                        startActivity(new Intent(NotificationActivity.this, AuthActivity.class));
+                    }
+                }
+            });
+        }
+    }
 }

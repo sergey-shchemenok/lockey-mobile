@@ -211,7 +211,7 @@ public class AuthActivity extends AppCompatActivity
             }
         }
         if (id != 0 && title != null && body != null && sending_time != null) {
-            return new NotificationsData(id, title, body, sending_time, latitude, longitude);
+            return new NotificationsData(id, title, body, sending_time, latitude, longitude, "something");
         } else return null;
     }
 

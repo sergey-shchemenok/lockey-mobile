@@ -295,6 +295,7 @@ public class MainActivity extends AppCompatActivity implements
         //whether it can be authorized. The token has not expired
         if (GeofenceQueryUtils.zonesUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             AppData.needToken = true;
+            Log.i(LOG_TAG, "get zones again...");
             //todo something later
             getZones();
             return;

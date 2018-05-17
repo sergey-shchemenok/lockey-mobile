@@ -50,12 +50,15 @@
     <!-- Text color for the notification body -->
     <color name="notificationBodyColor">#797e83</color>
 
+    <!-- Text color for the notification body -->
+    <color name="notificationBodyColorDark">#5b5f63</color>
+
     <!-- Geofence border -->
     <color name="geofence_border">#21a30d</color>
 
     <!-- Geofence filling -->
     <color name="geofence_filling">#6421a30d</color>
-    <color name="white_transparence">#e1ffffff</color>
-    <color name="transparence">#00ffffff</color>
+    <color name="white_transparent">#d2ffffff</color>
+    <color name="transparent">#00ffffff</color>
 
 </resources>

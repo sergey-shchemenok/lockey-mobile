@@ -62,6 +62,8 @@ public class NotificationProvider extends ContentProvider {
         return true;
     }
 
+
+
     /**
      * Perform the query for the given URI. Use the given projection, selection, selection arguments, and sort order.
      */

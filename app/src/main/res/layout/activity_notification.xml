@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
                     android:textAppearance="?android:textAppearanceSmall"
-                    android:textColor="@color/notificationBodyColor"
+                    android:textColor="@color/notificationBodyColorDark"
                     tools:text="Body"
 
                     />
@@ -65,7 +65,7 @@
                     android:gravity="end"
                     android:textAlignment="viewEnd"
                     android:textAppearance="?android:textAppearanceSmall"
-                    android:textColor="@color/notificationBodyColor"
+                    android:textColor="@color/notificationBodyColorDark"
                     tools:text="28 февраля" />
 
             </LinearLayout>

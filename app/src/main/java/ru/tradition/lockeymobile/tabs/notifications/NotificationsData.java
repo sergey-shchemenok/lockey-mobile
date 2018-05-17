@@ -13,6 +13,7 @@ public class NotificationsData implements Serializable {
     private String sending_time;
     private double latitude;
     private double longitude;
+    private String text;
 
 
 //    public NotificationsData(int id, String title, String body, String sending_time) {
@@ -22,13 +23,14 @@ public class NotificationsData implements Serializable {
 //        this.sending_time = sending_time;
 //    }
 
-    public NotificationsData(int id, String title, String body, String sending_time, double latitude, double longitude) {
+    public NotificationsData(int id, String title, String body, String sending_time, double latitude, double longitude, String text) {
         this.id = id;
         this.title = title;
         this.body = body;
         this.sending_time = sending_time;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.text = text;
     }
 
     public int getId() {
@@ -53,5 +55,9 @@ public class NotificationsData implements Serializable {
 
     public double getLongitude() {
         return longitude;
+    }
+
+    public String getText() {
+        return text;
     }
 }

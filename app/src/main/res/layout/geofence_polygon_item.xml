@@ -18,7 +18,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:id="@+id/polygon_viewholder"
-    android:background="@color/transparence"
+    android:background="@color/transparent"
     android:layout_height="wrap_content"
     android:padding="8dp">
 
@@ -27,7 +27,7 @@
         android:paddingTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/transparence"
+        android:background="@color/transparent"
         android:layout_gravity="center_vertical|start"
         android:textColor="@color/notificationTitleColor"
         android:textSize="16sp"

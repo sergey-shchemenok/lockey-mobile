@@ -65,15 +65,14 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     private TextView notificationBody;
     private TextView notificationSendingTime;
 
+    private static int zid = -1;
+
     //for map
     private static MapView osm_map;
     private static IMapController mapController;
     private static TreeMap<Integer, Marker> osm_markers = new TreeMap<>();
 
     private FloatingActionButton fabLayers;
-
-    private NotificationsData ndForeground;
-    private NotificationsData ndBackground;
 
     //if we open this activity not from the notificatiton tab on item clicking
     private boolean fromItem = false;
@@ -154,10 +153,6 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                 }
             }
         });
-
-        //trying to show data from fore or background
-        showData(ndBackground);
-        showData(ndForeground);
 
     }
 
@@ -254,7 +249,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                     JSONObject textObject = new JSONObject(text);
                     String event = textObject.getString("event");
                     if (event.equals("zone")) {
-                        int zid = textObject.getInt("ZID");
+                        zid = textObject.getInt("ZID");
                         showZoneOnMap(zid);
                     }
 
@@ -284,6 +279,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                 osm_map.getOverlayManager().add(polygon);
             } else {
                 //todo if zone does'not exist
+                Toast.makeText(this, "Указанная в уведомлении зона была либо удалена, либо принадлежит другой учетной записи", Toast.LENGTH_LONG).show();
                 Log.i(LOG_TAG, "zone does'not exist");
             }
         } else if (AppData.mPolygonsMap == null || AppData.mPolygonsMap.isEmpty()) {
@@ -362,84 +358,6 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         }
     }
 
-    //to get notification data from intent
-    private NotificationsData getNotificationData() {
-        int id = 0;
-        String title = null;
-        String body = null;
-        String sending_time = null;
-        double latitude = 0.0;
-        double longitude = 0.0;
-        String text = null;
-
-        if (getIntent().getExtras() != null) {
-            for (String key : getIntent().getExtras().keySet()) {
-                Object value = getIntent().getExtras().get(key);
-                Log.i("MainActivity: ", "Key: " + key + " Value: " + value);
-                if (key.equals("id")) {
-                    try {
-                        id = Integer.parseInt(String.valueOf(value));
-                    } catch (NumberFormatException e) {
-                    }
-                }
-                if (key.equals("title")) {
-                    title = String.valueOf(value);
-                }
-                if (key.equals("body")) {
-                    body = String.valueOf(value);
-                }
-                if (key.equals("date")) {
-                    sending_time = String.valueOf(value);
-                }
-                if (key.equals("text")) {
-                    sending_time = String.valueOf(value);
-                }
-                if (key.equals("latitude")) {
-                    try {
-                        latitude = Double.parseDouble(String.valueOf(value));
-                    } catch (NumberFormatException e) {
-                    }
-
-                }
-                if (key.equals("longitude")) {
-                    try {
-                        longitude = Double.parseDouble(String.valueOf(value));
-                    } catch (NumberFormatException e) {
-                    }
-
-                }
-            }
-        }
-        if (id != 0 && title != null
-                && body != null
-                && sending_time != null
-                ) {
-            return new NotificationsData(id, title, body, sending_time, latitude, longitude, text);
-        } else return null;
-    }
-
-    //to insert data into database
-    private void insertNotification(NotificationsData nd) {
-        // Create a new map of values, where column names are the keys
-        ContentValues values = new ContentValues();
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID, nd.getId());
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE, nd.getTitle());
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY, nd.getBody());
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME, nd.getSending_time());
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE, nd.getLatitude());
-        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE, nd.getLongitude());
-        Uri newUri = getContentResolver().insert(NotificationContract.NotificationEntry.CONTENT_URI, values);
-    }
-
-    //to show data in this activity
-    private void showData(NotificationsData nd) {
-        if (nd != null) {
-            notificationTitle.setText(nd.getTitle());
-            notificationBody.setText(nd.getBody());
-//                    +  " Номер бортового комплекта - " + String.valueOf(nd.getId()));
-            notificationSendingTime.setText(getFormattedDate(nd.getSending_time()));
-        }
-    }
 
     private static String getFormattedDate(String sendingTime) {
         long milli = 0;
@@ -468,6 +386,20 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         int rowsAffected = getContentResolver().update(currentNotificationUri, values, null, null);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopUpdater();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        if (AppData.mPolygonsMap == null || AppData.mPolygonsMap.isEmpty()) {
+            if (zid != -1)
+                startUpdater(zid);
+        }
+    }
 
     //let's check up the Timer
     private Timer updaterTimer;
@@ -522,4 +454,91 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     }
 
 
+    //Old
+    //to get notification data from intent
+//    private NotificationsData ndForeground;
+//    private NotificationsData ndBackground;
+
+    //trying to show data from fore or background
+//    showData(ndBackground);
+//    showData(ndForeground);
+
+//    private NotificationsData getNotificationData() {
+//        int id = 0;
+//        String title = null;
+//        String body = null;
+//        String sending_time = null;
+//        double latitude = 0.0;
+//        double longitude = 0.0;
+//        String text = null;
+//
+//        if (getIntent().getExtras() != null) {
+//            for (String key : getIntent().getExtras().keySet()) {
+//                Object value = getIntent().getExtras().get(key);
+//                Log.i("MainActivity: ", "Key: " + key + " Value: " + value);
+//                if (key.equals("id")) {
+//                    try {
+//                        id = Integer.parseInt(String.valueOf(value));
+//                    } catch (NumberFormatException e) {
+//                    }
+//                }
+//                if (key.equals("title")) {
+//                    title = String.valueOf(value);
+//                }
+//                if (key.equals("body")) {
+//                    body = String.valueOf(value);
+//                }
+//                if (key.equals("date")) {
+//                    sending_time = String.valueOf(value);
+//                }
+//                if (key.equals("text")) {
+//                    sending_time = String.valueOf(value);
+//                }
+//                if (key.equals("latitude")) {
+//                    try {
+//                        latitude = Double.parseDouble(String.valueOf(value));
+//                    } catch (NumberFormatException e) {
+//                    }
+//
+//                }
+//                if (key.equals("longitude")) {
+//                    try {
+//                        longitude = Double.parseDouble(String.valueOf(value));
+//                    } catch (NumberFormatException e) {
+//                    }
+//
+//                }
+//            }
+//        }
+//        if (id != 0 && title != null
+//                && body != null
+//                && sending_time != null
+//                ) {
+//            return new NotificationsData(id, title, body, sending_time, latitude, longitude, text);
+//        } else return null;
+//    }
+//
+//    //to insert data into database
+//    private void insertNotification(NotificationsData nd) {
+//        // Create a new map of values, where column names are the keys
+//        ContentValues values = new ContentValues();
+//        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID, nd.getId());
+//        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_TITLE, nd.getTitle());
+//        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_BODY, nd.getBody());
+//        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME, nd.getSending_time());
+//        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LATITUDE, nd.getLatitude());
+//        values.put(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_LONGITUDE, nd.getLongitude());
+//        Uri newUri = getContentResolver().insert(NotificationContract.NotificationEntry.CONTENT_URI, values);
+//    }
+
+
+//    //to show data in this activity
+//    private void showData(NotificationsData nd) {
+//        if (nd != null) {
+//            notificationTitle.setText(nd.getTitle());
+//            notificationBody.setText(nd.getBody());
+////                    +  " Номер бортового комплекта - " + String.valueOf(nd.getId()));
+//            notificationSendingTime.setText(getFormattedDate(nd.getSending_time()));
+//        }
+//    }
 }

@@ -1,6 +1,7 @@
 package ru.tradition.lockeymobile.tabs.notifications;
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -180,6 +181,24 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
             Log.i(LOG_TAG, "toDelete initial........." + toDelete);
             for (Uri u : AppData.selectedNotificationUri) {
                 if (u != null) {
+
+                    String[] projection = {NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID};
+                    Cursor notificationIDCursor = getContext().getContentResolver().query(u, projection,
+                            null, null, null);
+
+                    notificationIDCursor.moveToFirst();
+                    int id = -1;
+                    while (notificationIDCursor.isAfterLast() == false) {
+
+                        id = notificationIDCursor.getInt(notificationIDCursor
+                                .getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID));
+                        notificationIDCursor.moveToNext();
+                    }
+                    notificationIDCursor.close();
+
+                    NotificationManager notificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.cancel(id);
+
                     int rowsAffected = getActivity().getContentResolver().delete(u, null, null);
                     toDelete -= rowsAffected;
                     Log.i(LOG_TAG, "toDelete initial........." + toDelete);

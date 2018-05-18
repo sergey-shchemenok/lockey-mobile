@@ -142,19 +142,20 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
             intent.putExtra("Uri", uri);
         }
 
-        if(notificationIDIncrement.contains(FCM_NOTIFICATION_ID)) {
-            fcmNotificationId = notificationIDIncrement.getInt(FCM_NOTIFICATION_ID, 0);
-            fcmNotificationId++;
-            SharedPreferences.Editor editor = notificationIDIncrement.edit();
-            editor.putInt(FCM_NOTIFICATION_ID, fcmNotificationId);
-            editor.commit();
-        }else {
-            SharedPreferences.Editor editor = notificationIDIncrement.edit();
-            fcmNotificationId = 0;
-            editor.putInt(FCM_NOTIFICATION_ID, fcmNotificationId);
-            editor.commit();
-        }
+//        if(notificationIDIncrement.contains(FCM_NOTIFICATION_ID)) {
+//            fcmNotificationId = notificationIDIncrement.getInt(FCM_NOTIFICATION_ID, 0);
+//            fcmNotificationId++;
+//            SharedPreferences.Editor editor = notificationIDIncrement.edit();
+//            editor.putInt(FCM_NOTIFICATION_ID, fcmNotificationId);
+//            editor.commit();
+//        }else {
+//            SharedPreferences.Editor editor = notificationIDIncrement.edit();
+//            fcmNotificationId = 0;
+//            editor.putInt(FCM_NOTIFICATION_ID, fcmNotificationId);
+//            editor.commit();
+//        }
 
+        fcmNotificationId = id;
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, fcmNotificationId/*Request code*/, intent, PendingIntent.FLAG_ONE_SHOT);
 
@@ -209,9 +210,13 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
                 selectionTime, null, null);
         Cursor cursorBody = getContentResolver().query(NotificationContract.NotificationEntry.CONTENT_URI, projectionBody,
                 selectionBody, null, null);
-        if (cursorTime.getCount() > 0 && cursorBody.getCount() > 0)
+        if (cursorTime.getCount() > 0 && cursorBody.getCount() > 0) {
+            cursorTime.close();
+            cursorBody.close();
             return null;
-        else {
+        } else {
+            cursorTime.close();
+            cursorBody.close();
 //        String savedSendingTime = cursor.getString(0);
 //       int savedSendingTime = cursor.getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME);
             Log.i(LOG_TAG, "time and body  " + cursorTime.getCount() + " " + cursorBody.getCount());

@@ -76,6 +76,7 @@ public class DataLoader extends AsyncTaskLoader<LoadedData> {
     @Override
     public LoadedData loadInBackground() {
         if (mUrl == null) {
+            Log.i(LOG_TAG, "mURL == null");
             return null;
         }
         switch (loaderID) {
@@ -86,6 +87,7 @@ public class DataLoader extends AsyncTaskLoader<LoadedData> {
                 return new LoadedData(assetsMap, null, null);
 
             case ZONES_LOADER_ID:
+                Log.v(LOG_TAG, "loadInBackground zones");
                 Map<Integer, GeofencePolygon> polygonsMap = GeofenceQueryUtils.fetchZonesData(mUrl);
                 return new LoadedData(null, polygonsMap, null);
 

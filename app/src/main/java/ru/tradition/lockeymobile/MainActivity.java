@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements
         NotificationsFragmentTab.OnFragmentInteractionListener,
         AssetsFragmentTab.OnFragmentInteractionListener {
 
+    public boolean isConnected;
+
     private static final int UPDATING_INTERVAL = 5000;
 
     private AppTabAdapter adapter;
@@ -256,11 +258,13 @@ public class MainActivity extends AppCompatActivity implements
         Log.i(LOG_TAG, "....getZones....");
         activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnected()) {
+            isConnected = true;
             loaderManager = getLoaderManager();
             loaderManager.initLoader(AppData.ZONES_LOADER_ID, null, this);
 
             Log.i(LOG_TAG, "initLoader");
         } else {
+            isConnected = false;
             infoMessage.setVisibility(View.VISIBLE);
             infoMessage.setText(R.string.no_connection);
         }
@@ -274,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.i(LOG_TAG, "onCreateLoader");
                 return new DataLoader(this, AppData.ASSETS_REQUEST_URL, ASSETS_LOADER_ID);
             case ZONES_LOADER_ID:
+                Log.i(LOG_TAG, "onCreateLoader zones");
                 return new DataLoader(this, AppData.ZONES_LIST_URL, ZONES_LOADER_ID);
             default:
                 return null;

@@ -3,6 +3,7 @@ package ru.tradition.lockeymobile;
 import android.app.LoaderManager;
 import android.app.NativeActivity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -52,6 +53,7 @@ import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
 import static android.view.MotionEvent.ACTION_DOWN;
+import static ru.tradition.lockeymobile.AppData.ZONES_LOADER_ID;
 
 public class NotificationActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private final String LOG_TAG = NotificationActivity.class.getSimpleName();
@@ -404,6 +406,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     //let's check up the Timer
     private Timer updaterTimer;
     private NotificationActivity.NotificationUpdater mUpdater;
+    private Context context = this;
 
     private void startUpdater(int zid) {
         if (updaterTimer != null) {
@@ -445,6 +448,9 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                         AppData.mainActivity.loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
                         Log.i(LOG_TAG, "trying to get zones...");
                         AppData.mainActivity.getZones();
+                        if (!AppData.mainActivity.isConnected) {
+                            Toast.makeText(context, "Отсутствует подключение к сети", Toast.LENGTH_LONG).show();
+                        }
                     } else {
                         startActivity(new Intent(NotificationActivity.this, AuthActivity.class));
                     }

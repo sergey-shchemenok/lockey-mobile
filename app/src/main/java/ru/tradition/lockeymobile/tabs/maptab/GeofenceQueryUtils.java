@@ -97,7 +97,7 @@ public final class GeofenceQueryUtils {
     public static TreeMap<Integer, GeofencePolygon> fetchZonesData(String requestUrl) {
         // Create URL object
         URL url = createUrl(requestUrl);
-        Log.v(LOG_TAG, "fetchZones");
+        Log.i(LOG_TAG, "fetchZones");
 
         // Perform HTTP request to the URL and receive a JSON response back
         String jsonResponse = null;

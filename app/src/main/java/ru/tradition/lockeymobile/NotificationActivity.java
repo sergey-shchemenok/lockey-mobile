@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +38,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polygon;
 
+import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,6 +51,7 @@ import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygonAdapter;
+import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTabOSM;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
@@ -58,6 +62,7 @@ import static ru.tradition.lockeymobile.AppData.ZONES_LOADER_ID;
 public class NotificationActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     private final String LOG_TAG = NotificationActivity.class.getSimpleName();
     private static final int CURSOR_LOADER_ID = 1;
+
     /**
      * Content URI for the existing notification
      */
@@ -66,6 +71,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     private TextView notificationTitle;
     private TextView notificationBody;
     private TextView notificationSendingTime;
+    private TextView infoMessage;
 
     private static int zid = -1;
 
@@ -143,6 +149,9 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         notificationBody = (TextView) findViewById(R.id.notification_activity_body);
         notificationSendingTime = (TextView) findViewById(R.id.notification_activity_sending_time);
         fabLayers = (FloatingActionButton) findViewById(R.id.fab_layers_notification);
+        infoMessage = (TextView)findViewById(R.id.notification_info_message);
+
+        infoMessage.setVisibility(View.GONE);
 
         fabLayers.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -285,7 +294,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                 Log.i(LOG_TAG, "zone does'not exist");
             }
         } else if (AppData.mPolygonsMap == null || AppData.mPolygonsMap.isEmpty()) {
-            startUpdater(zid);
+            startUpdater(zid, context);
         }
     }
 
@@ -399,7 +408,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         super.onPostResume();
         if (AppData.mPolygonsMap == null || AppData.mPolygonsMap.isEmpty()) {
             if (zid != -1)
-                startUpdater(zid);
+                startUpdater(zid, context);
         }
     }
 
@@ -408,13 +417,13 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     private NotificationActivity.NotificationUpdater mUpdater;
     private Context context = this;
 
-    private void startUpdater(int zid) {
+    private void startUpdater(int zid, Context context) {
         if (updaterTimer != null) {
             updaterTimer.cancel();
         }
         // re-schedule timer here otherwise, IllegalStateException of "TimerTask is scheduled already" will be thrown
         updaterTimer = new Timer();
-        mUpdater = new NotificationActivity.NotificationUpdater(zid);
+        mUpdater = new NotificationActivity.NotificationUpdater(zid, context);
         updaterTimer.schedule(mUpdater, 0, 2000);
     }
 
@@ -424,11 +433,17 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         }
     }
 
-    class NotificationUpdater extends TimerTask {
+    class NotificationUpdater extends TimerTask implements LoaderManager.LoaderCallbacks<LoadedData> {
         int zid;
+        private ConnectivityManager connectivityManager;
+        private NetworkInfo activeNetwork;
+        private LoaderManager loaderManager;
+        private Context context;
 
-        public NotificationUpdater(int zid) {
+        public NotificationUpdater(int zid, Context context) {
+            connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             this.zid = zid;
+            this.context = context;
         }
 
         @Override
@@ -444,18 +459,55 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                         stopUpdater();
                         return;
                     }
-                    if (AppData.mainActivity != null) {
-                        AppData.mainActivity.loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
-                        Log.i(LOG_TAG, "trying to get zones...");
-                        AppData.mainActivity.getZones();
-                        if (!AppData.mainActivity.isConnected) {
-                            Toast.makeText(context, "Отсутствует подключение к сети", Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        startActivity(new Intent(NotificationActivity.this, AuthActivity.class));
-                    }
+                    Log.i(LOG_TAG, "trying to get zones...");
+                    getZones();
                 }
             });
+        }
+
+
+        public void getZones() {
+            Log.i(LOG_TAG, "....getZones...notification.");
+            activeNetwork = connectivityManager.getActiveNetworkInfo();
+            if (activeNetwork != null && activeNetwork.isConnected()) {
+                loaderManager = getLoaderManager();
+                loaderManager.initLoader(AppData.ZONES_LOADER_ID, null, this);
+                Log.i(LOG_TAG, "initLoader notification");
+                infoMessage.setVisibility(View.GONE);
+            } else {
+                infoMessage.setVisibility(View.VISIBLE);
+                infoMessage.setText(R.string.no_connection);
+//                Toast.makeText(context, "Отсутствует подключение к сети", Toast.LENGTH_LONG).show();
+
+            }
+        }
+
+        @Override
+        public Loader<LoadedData> onCreateLoader(int id, Bundle args) {
+            Log.i(LOG_TAG, "onCreateLoader zones notification");
+            return new DataLoader(context, AppData.ZONES_LIST_URL, ZONES_LOADER_ID);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<LoadedData> loader, LoadedData loadedData) {
+            loaderManager.destroyLoader(AppData.ZONES_LOADER_ID);
+
+            if (loadedData.getPolygonsMap() != null && !loadedData.getPolygonsMap().isEmpty()) {
+                AppData.mPolygonsMap = loadedData.getPolygonsMap();
+                Log.i(LOG_TAG, "Polygons loaded" + "\n" + AppData.mPolygonsMap.toString());
+            }
+
+            //whether it can be authorized. The token has not expired
+            if (GeofenceQueryUtils.zonesUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                AppData.needToken = true;
+                Log.i(LOG_TAG, "get zones again..notification.");
+            }
+
+        }
+
+        @Override
+        public void onLoaderReset(Loader<LoadedData> loader) {
+
         }
     }
 

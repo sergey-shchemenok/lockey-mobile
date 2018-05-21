@@ -22,6 +22,15 @@
                 app:titleTextAppearance="@style/Toolbar.TitleText"
                 app:titleTextColor="@android:color/white" />
 
+            <TextView
+                android:id="@+id/notification_info_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@color/colorAccent"/>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -102,17 +111,6 @@
 
 
         </LinearLayout>
-
-
-        <TextView
-            android:id="@+id/notification_activity_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:padding="32dp"
-            android:textAppearance="?android:textAppearanceMedium" />
-
     </RelativeLayout>
 </LinearLayout>
 

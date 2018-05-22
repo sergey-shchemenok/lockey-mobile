@@ -55,6 +55,9 @@ public class SettingsActivity extends AppCompatActivity {
             Preference useMap = findPreference(getString(R.string.settings_use_map_key));
             bindPreferenceSummaryToValue(useMap);
 
+            Preference notificationsOrderBy = findPreference(getString(R.string.settings_notifications_order_by_key));
+            bindPreferenceSummaryToValue(notificationsOrderBy);
+
         }
 
         @Override

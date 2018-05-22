@@ -60,7 +60,7 @@ public class AssetsFragmentTab extends Fragment {
     public TextView mEmptyStateTextView;
     public ProgressBar progressCircle;
 
-    public static String orderBy;
+    private static String orderBy;
 
 
     @Override

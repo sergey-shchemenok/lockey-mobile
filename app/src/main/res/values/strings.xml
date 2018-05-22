@@ -43,6 +43,10 @@
     <string name="settings_use_map_title">Использовать карты</string>
     <string name="settings_default_map" translatable="false">@string/settings_google_map_value</string>
     <string name="settings_use_map_key">use_map</string>
+    <string name="settings_notifications_order_by_title">Сортировка уведомлений по</string>
+    <string name="settings_notifications_order_by_key">notifications_order_by</string>
+    <string name="settings_notifications_order_by_default" translatable="false">@string/settings_notifications_order_by_time_value</string>
+
 
 
     <!-- Label for order-by kit id option [CHAR LIMIT=20] -->
@@ -60,6 +64,15 @@
     <!-- Label for OpenStreetMap [CHAR LIMIT=20] -->
     <string name="settings_osm_label">OpenStreetMap</string>
     <string name="settings_osm_value" translatable="false">osm</string>
+
+    <!-- Label for notification order by time [CHAR LIMIT=20] -->
+    <string name="settings_notifications_order_by_time_label">времени отправки</string>
+    <string name="settings_notifications_order_by_time_value" translatable="false">time</string>
+
+    <!-- Label for notification order by read/unread [CHAR LIMIT=20] -->
+    <string name="settings_notifications_order_by_read_label">критерию прочитано/непрочитано</string>
+    <string name="settings_notifications_order_by_read_value" translatable="false">read</string>
+
 
     <string name="subscription_name">Название:</string>
     <string name="zone_name">Зоны:</string>

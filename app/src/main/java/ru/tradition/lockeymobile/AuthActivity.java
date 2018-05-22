@@ -25,6 +25,7 @@ import org.osmdroid.util.GeoPoint;
 
 import java.net.HttpURLConnection;
 
+import me.leolin.shortcutbadger.ShortcutBadger;
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
 import ru.tradition.lockeymobile.auth.AuthTokenLoader;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
@@ -59,13 +60,9 @@ public class AuthActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //firebase notification
-//        if(AppData.noticeReceived == true){
-////            AppData.pwd = passwordView.getText().toString();
-////            AppData.usr = loginView.getText().toString();
-//            //get token. If it is correct start main activity
-//            getToken();
-//        }
+
+//        int badgeCount = 0;
+//        ShortcutBadger.applyCount(this, badgeCount); //for 1.1.4+
 
         setContentView(R.layout.activity_auth);
 

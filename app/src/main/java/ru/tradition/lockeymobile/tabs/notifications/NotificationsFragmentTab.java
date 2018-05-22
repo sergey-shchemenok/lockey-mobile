@@ -7,9 +7,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.CursorLoader;
@@ -26,10 +29,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.NotificationActivity;
 import ru.tradition.lockeymobile.R;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragmentTab;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
+
+import static ru.tradition.lockeymobile.AppData.mAssetMap;
 
 
 /**
@@ -53,7 +63,20 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
     //to access methods from other tabs
     public static NotificationsFragmentTab notificationsFragmentTab;
 
+    private static String orderBy;
+
     public NotificationsFragmentTab() {
+    }
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        orderBy = sharedPrefs.getString(
+                getString(R.string.settings_notifications_order_by_key),
+                getString(R.string.settings_notifications_order_by_default)
+        );
     }
 
     @Override
@@ -116,13 +139,15 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long itemId) {
                 Uri currentNotificationUri = ContentUris.withAppendedId(NotificationContract.NotificationEntry.CONTENT_URI, itemId);
-                makeReadNotification(currentNotificationUri);
                 Log.i(LOG_TAG, "Current uri is..." + currentNotificationUri.toString());
                 if (!AppData.selectedNotificationLong.contains(currentNotificationUri.toString())) {
                     AppData.selectedNotificationLong.add(currentNotificationUri.toString());
                     adapter.notifyDataSetChanged();
+//                    notificationListView.smoothScrollToPosition(position);
+//                    notificationListView.findFocus()
                     //updateList();
                 } else {
+                    makeReadNotification(currentNotificationUri);
                     AppData.selectedNotificationLong.remove(currentNotificationUri.toString());
                     adapter.notifyDataSetChanged();
                     //updateList();
@@ -251,8 +276,17 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
                 NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_READ
         };
 
-        String sortOrder =
-                NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME + " DESC";
+        String sortOrder = "";
+
+        if (isAdded()) {
+            // etc ...
+            if (orderBy.equals(getString(R.string.settings_notifications_order_by_time_value))) {
+                sortOrder = NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME + " DESC";
+            } else if (orderBy.equals(getString(R.string.settings_notifications_order_by_read_value))) {
+                sortOrder = NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_READ + ", " +
+                        NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_SENDING_TIME + " DESC";
+            }
+        }
         return new CursorLoader(getContext(), NotificationContract.NotificationEntry.CONTENT_URI, projection,
                 null, null, sortOrder);
     }
@@ -315,9 +349,6 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
 //        return super.onOptionsItemSelected(item);
 //
 //    }
-
-
-
 
 
     private OnFragmentInteractionListener mListener;

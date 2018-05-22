@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     android:title="@string/settings_title">
 
     <!--<CheckBoxPreference-->
-        <!--android:title="@string/settings_allow_notifications_title"-->
-        <!--android:defaultValue="false"-->
-        <!--android:key="@string/settings_allow_notifications_key"-->
+    <!--android:title="@string/settings_allow_notifications_title"-->
+    <!--android:defaultValue="false"-->
+    <!--android:key="@string/settings_allow_notifications_key"-->
 
-        <!--/>-->
+    <!--/>-->
 
     <ListPreference
         android:defaultValue="@string/settings_order_by_default"
@@ -18,11 +17,19 @@
         android:title="@string/settings_order_by_title" />
 
     <ListPreference
+        android:defaultValue="@string/settings_notifications_order_by_default"
+        android:entries="@array/settings_notifications_order_by_labels"
+        android:entryValues="@array/settings_notifications_order_by_values"
+        android:key="@string/settings_notifications_order_by_key"
+        android:title="@string/settings_notifications_order_by_title" />
+
+    <ListPreference
         android:defaultValue="@string/settings_default_map"
         android:entries="@array/settings_use_map_labels"
         android:entryValues="@array/settings_use_map_values"
         android:key="@string/settings_use_map_key"
         android:title="@string/settings_use_map_title" />
+
 
 </PreferenceScreen>
 

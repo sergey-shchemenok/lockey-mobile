@@ -139,6 +139,8 @@ public class MapFragmentTabOSM extends Fragment implements
         osm_map.setMultiTouchControls(true);
         //todo process it later
 
+        osm_map.setMinZoomLevel(3.5);
+
         //We can move the map on a default view point. For this, we need access to the map controller:
         mapController = osm_map.getController();
         mapController.setZoom(AppData.osmCameraZoom);

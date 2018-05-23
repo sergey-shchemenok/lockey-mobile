@@ -75,6 +75,8 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
     private static int zid = -1;
 
+    private static GeoPoint notificationPoint;
+
     //for map
     private static MapView osm_map;
     private static IMapController mapController;
@@ -127,6 +129,9 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         osm_map.setBuiltInZoomControls(true);
         osm_map.setMultiTouchControls(true);
 
+//        osm_map.setMaxZoomLevel(18.0);
+        osm_map.setMinZoomLevel(3.5);
+
         //get data from the incoming intent. From clicking on item at notification tab
         Intent intent = getIntent();
         mCurrentNotificationUri = intent.getData();
@@ -149,7 +154,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         notificationBody = (TextView) findViewById(R.id.notification_activity_body);
         notificationSendingTime = (TextView) findViewById(R.id.notification_activity_sending_time);
         fabLayers = (FloatingActionButton) findViewById(R.id.fab_layers_notification);
-        infoMessage = (TextView)findViewById(R.id.notification_info_message);
+        infoMessage = (TextView) findViewById(R.id.notification_info_message);
 
         infoMessage.setVisibility(View.GONE);
 
@@ -162,6 +167,17 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                     else
                         osm_map.setTileSource(TileSourceFactory.MAPNIK);
                 }
+            }
+        });
+
+        fabLayers.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (mapController != null && notificationPoint != null) {
+                    mapController.setZoom(14.0);
+                    mapController.animateTo(notificationPoint);
+                }
+                return true;
             }
         });
 
@@ -230,7 +246,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             mapController = osm_map.getController();
             mapController.setZoom(14.0);
 
-            GeoPoint notificationPoint = new GeoPoint(latitude, longitude);
+            notificationPoint = new GeoPoint(latitude, longitude);
             mapController.setCenter(notificationPoint);
 
             Marker notificationMarker = new Marker(osm_map);

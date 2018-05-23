@@ -321,6 +321,7 @@ public class SubscriptionsActivity extends AppCompatActivity implements
                 return true;
             case R.id.subscription_menu_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                settingsIntent.putExtra("activity", "SubscriptionsActivity");
                 startActivity(settingsIntent);
                 return true;
             case R.id.subscription_menu_subscribe:

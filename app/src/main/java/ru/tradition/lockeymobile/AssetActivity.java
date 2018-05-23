@@ -102,6 +102,7 @@ public class AssetActivity extends AppCompatActivity {
                 return true;
             case R.id.asset_menu_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                settingsIntent.putExtra("activity", "AssetActivity");
                 startActivity(settingsIntent);
                 return true;
             case R.id.asset_menu_subscriptions:

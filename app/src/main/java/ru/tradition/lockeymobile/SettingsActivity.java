@@ -1,5 +1,6 @@
 package ru.tradition.lockeymobile;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
@@ -89,15 +90,43 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    public boolean onSupportNavigateUp() {
+    @Override
+    public boolean onSupportNavigateUp() {
 //        super.onBackPressed();
-//        return true;
-//    }
+        toPreviousActivityAndSave();
+        return true;
+    }
 
 
     @Override
     public void onBackPressed() {
-        super.onSupportNavigateUp();
+        onSupportNavigateUp();
     }
+
+    private void toPreviousActivityAndSave() {
+        Bundle bundle = getIntent().getExtras();
+        if (bundle.containsKey("activity")) {
+            String activity = bundle.getString("activity");
+            if (activity.equals("MainActivity") && bundle.containsKey("currentPage")) {
+                int page = bundle.getInt("currentPage");
+                Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+                intent.putExtra("page", page);
+                startActivity(intent);
+            } else {
+                super.onSupportNavigateUp();
+            }
+//            else if (activity.equals("SubscriptionsActivity")) {
+//                Intent intent = new Intent(SettingsActivity.this, SubscriptionsActivity.class);
+//                startActivity(intent);
+//            } else if (activity.equals("NotificationActivity")) {
+//                Intent intent = new Intent(SettingsActivity.this, NotificationActivity.class);
+//                startActivity(intent);
+//            } else if (activity.equals("AssetActivity")) {
+//                Intent intent = new Intent(SettingsActivity.this, AssetActivity.class);
+//                startActivity(intent);
+//            }
+
+        }
+    }
+
 }

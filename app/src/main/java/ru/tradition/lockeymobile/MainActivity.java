@@ -410,6 +410,7 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.main_menu_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 settingsIntent.putExtra("currentPage", AppData.viewPager.getCurrentItem());
+                settingsIntent.putExtra("activity", "MainActivity");
                 startActivity(settingsIntent);
                 return true;
             case R.id.main_menu_subscriptions:

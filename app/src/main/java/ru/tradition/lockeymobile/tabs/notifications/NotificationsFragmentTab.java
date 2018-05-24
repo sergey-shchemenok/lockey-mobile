@@ -112,6 +112,7 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
                     Uri currentNotificationUri = ContentUris.withAppendedId(NotificationContract.NotificationEntry.CONTENT_URI, itemId);
                     intent.setData(currentNotificationUri);
                     makeReadNotification(currentNotificationUri);
+                    removeNotificationFromTray(currentNotificationUri);
                     startActivity(intent);
                 }
                 //if it is selecting mode. Select or deselect asset
@@ -142,6 +143,9 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
                 Log.i(LOG_TAG, "Current uri is..." + currentNotificationUri.toString());
                 if (!AppData.selectedNotificationLong.contains(currentNotificationUri.toString())) {
                     AppData.selectedNotificationLong.add(currentNotificationUri.toString());
+
+                    removeNotificationFromTray(currentNotificationUri);
+
                     adapter.notifyDataSetChanged();
 //                    notificationListView.smoothScrollToPosition(position);
 //                    notificationListView.findFocus()
@@ -210,22 +214,7 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
             for (Uri u : AppData.selectedNotificationUri) {
                 if (u != null) {
 
-                    String[] projection = {NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID};
-                    Cursor notificationIDCursor = getContext().getContentResolver().query(u, projection,
-                            null, null, null);
-
-                    notificationIDCursor.moveToFirst();
-                    int id = -1;
-                    while (notificationIDCursor.isAfterLast() == false) {
-
-                        id = notificationIDCursor.getInt(notificationIDCursor
-                                .getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID));
-                        notificationIDCursor.moveToNext();
-                    }
-                    notificationIDCursor.close();
-
-                    NotificationManager notificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-                    notificationManager.cancel(id);
+                    removeNotificationFromTray(u);
 
                     int rowsAffected = getActivity().getContentResolver().delete(u, null, null);
                     toDelete -= rowsAffected;
@@ -299,6 +288,28 @@ public class NotificationsFragmentTab extends Fragment implements LoaderManager.
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         adapter.swapCursor(null);
+    }
+
+    //helper method to remove notification from tray
+    private void removeNotificationFromTray(Uri uri) {
+        if (uri != null) {
+            String[] projection = {NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID};
+            Cursor notificationIDCursor = getContext().getContentResolver().query(uri, projection,
+                    null, null, null);
+
+            notificationIDCursor.moveToFirst();
+            int id = -1;
+            while (notificationIDCursor.isAfterLast() == false) {
+
+                id = notificationIDCursor.getInt(notificationIDCursor
+                        .getColumnIndex(NotificationContract.NotificationEntry.COLUMN_NOTIFICATION_ID));
+                notificationIDCursor.moveToNext();
+            }
+            notificationIDCursor.close();
+
+            NotificationManager notificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancel(id);
+        }
     }
 
     private void makeReadNotification(Uri currentNotificationUri) {

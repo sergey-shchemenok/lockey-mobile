@@ -70,7 +70,7 @@
     <string name="settings_notifications_order_by_time_value" translatable="false">time</string>
 
     <!-- Label for notification order by read/unread [CHAR LIMIT=20] -->
-    <string name="settings_notifications_order_by_read_label">критерию прочитано/непрочитано</string>
+    <string name="settings_notifications_order_by_read_label">критерию прочитано/не прочитано</string>
     <string name="settings_notifications_order_by_read_value" translatable="false">read</string>
 
 

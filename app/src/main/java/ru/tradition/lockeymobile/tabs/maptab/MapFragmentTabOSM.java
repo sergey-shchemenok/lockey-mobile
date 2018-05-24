@@ -30,6 +30,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polygon;
+import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,7 +138,10 @@ public class MapFragmentTabOSM extends Fragment implements
         //Then we add default zoom buttons, and ability to zoom with 2 fingers (multi-touch)
         osm_map.setBuiltInZoomControls(true);
         osm_map.setMultiTouchControls(true);
-        //todo process it later
+
+//        RotationGestureOverlay mRotationGestureOverlay = new RotationGestureOverlay(osm_map);
+//        mRotationGestureOverlay.setEnabled(true);
+//        osm_map.getOverlays().add(mRotationGestureOverlay);
 
         osm_map.setMinZoomLevel(3.5);
 

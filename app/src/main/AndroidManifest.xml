@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionName="0.9.27"
+    android:versionCode="2"
+
     package="ru.tradition.lockeymobile">
+
+    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="27" />
 
     <uses-feature
         android:glEsVersion="0x00020000"

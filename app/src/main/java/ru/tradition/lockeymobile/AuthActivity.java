@@ -25,7 +25,6 @@ import org.osmdroid.util.GeoPoint;
 
 import java.net.HttpURLConnection;
 
-import me.leolin.shortcutbadger.ShortcutBadger;
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
 import ru.tradition.lockeymobile.auth.AuthTokenLoader;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;

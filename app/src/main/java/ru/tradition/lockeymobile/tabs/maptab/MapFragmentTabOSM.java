@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -30,7 +31,6 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polygon;
-import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +90,9 @@ public class MapFragmentTabOSM extends Fragment implements
     private String mParam2;
     private OnFragmentInteractionListener mListener;
 
+    private Button zoomIn;
+    private Button zoomOut;
+
     public MapFragmentTabOSM() {
     }
 
@@ -136,7 +139,7 @@ public class MapFragmentTabOSM extends Fragment implements
         osm_map.setTileSource(TileSourceFactory.MAPNIK);
 
         //Then we add default zoom buttons, and ability to zoom with 2 fingers (multi-touch)
-        osm_map.setBuiltInZoomControls(true);
+        osm_map.setBuiltInZoomControls(false);
         osm_map.setMultiTouchControls(true);
 
 //        RotationGestureOverlay mRotationGestureOverlay = new RotationGestureOverlay(osm_map);
@@ -149,6 +152,25 @@ public class MapFragmentTabOSM extends Fragment implements
         mapController = osm_map.getController();
         mapController.setZoom(AppData.osmCameraZoom);
         mapController.setCenter(AppData.osmStartPoint);
+
+        zoomIn = (Button)rootView.findViewById(R.id.map_tab_zoom_in);
+        zoomOut = (Button)rootView.findViewById(R.id.map_tab_zoom_out);
+
+        zoomIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mapController != null)
+                    mapController.zoomIn();
+            }
+        });
+        zoomOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mapController != null)
+                    mapController.zoomOut();
+            }
+        });
+
 
 //        Log.i(LOG_TAG, "osm start coordinates  " + osm_map.getMapCenter().getLatitude() + " "
 //                + osm_map.getMapCenter().getLongitude());
@@ -171,7 +193,7 @@ public class MapFragmentTabOSM extends Fragment implements
                     fabBottomDrawer.show();
                     clearPolygonSet();
                     mAdapter.notifyDataSetChanged();
-                    osm_map.setBuiltInZoomControls(true);
+//                    osm_map.setBuiltInZoomControls(true);
                 }
 
                 if (BottomSheetBehavior.STATE_EXPANDED == newState) {
@@ -182,7 +204,7 @@ public class MapFragmentTabOSM extends Fragment implements
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.hide();
                     fabBottomDrawer.hide();
-                    osm_map.setBuiltInZoomControls(false);
+//                    osm_map.setBuiltInZoomControls(false);
                 }
                 if (BottomSheetBehavior.STATE_COLLAPSED == newState) {
                     recyclerViewScrollState = layoutManager.findFirstCompletelyVisibleItemPosition();
@@ -192,7 +214,7 @@ public class MapFragmentTabOSM extends Fragment implements
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.show();
                     fabBottomDrawer.hide();
-                    osm_map.setBuiltInZoomControls(false);
+//                    osm_map.setBuiltInZoomControls(false);
                 }
             }
 

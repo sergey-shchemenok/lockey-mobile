@@ -1,12 +1,9 @@
 package ru.tradition.lockeymobile.tabs.maptab;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -20,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -29,6 +27,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -37,20 +36,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
-import org.osmdroid.api.IMapController;
-import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
-
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import ru.tradition.lockeymobile.AppData;
-import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.R;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
@@ -106,6 +96,9 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     private String mParam1;
     private String mParam2;
     private OnFragmentInteractionListener mListener;
+
+    private Button zoomIn;
+    private Button zoomOut;
 
     public MapFragmentTab() {
         // Required empty public constructor
@@ -379,6 +372,27 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         mapReady = true;
         google_map = map;
         google_map.moveCamera(CameraUpdateFactory.newCameraPosition(AppData.target));
+        final UiSettings uiSettings = google_map.getUiSettings();
+        uiSettings.setMapToolbarEnabled(false);
+        uiSettings.setZoomControlsEnabled(false);
+
+        zoomIn = (Button)rootView.findViewById(R.id.map_tab_zoom_in);
+        zoomOut = (Button)rootView.findViewById(R.id.map_tab_zoom_out);
+
+        zoomIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (google_map != null)
+                google_map.animateCamera(CameraUpdateFactory.zoomIn());
+            }
+        });
+        zoomOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (google_map != null)
+                    google_map.animateCamera(CameraUpdateFactory.zoomOut());
+            }
+        });
 
         //clicking on marker
         google_map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {

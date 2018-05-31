@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -87,6 +88,9 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     //if we open this activity not from the notificatiton tab on item clicking
     private boolean fromItem = false;
 
+    private Button zoomIn;
+    private Button zoomOut;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,7 +130,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         osm_map.setTileSource(TileSourceFactory.MAPNIK);
 
         //Then we add default zoom buttons, and ability to zoom with 2 fingers (multi-touch)
-        osm_map.setBuiltInZoomControls(true);
+        osm_map.setBuiltInZoomControls(false);
         osm_map.setMultiTouchControls(true);
 
 //        osm_map.setMaxZoomLevel(18.0);
@@ -248,6 +252,24 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
             notificationPoint = new GeoPoint(latitude, longitude);
             mapController.setCenter(notificationPoint);
+
+            zoomIn = (Button)findViewById(R.id.notification_zoom_in);
+            zoomOut = (Button)findViewById(R.id.notification_zoom_out);
+
+            zoomIn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mapController != null)
+                        mapController.zoomIn();
+                }
+            });
+            zoomOut.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mapController != null)
+                        mapController.zoomOut();
+                }
+            });
 
             Marker notificationMarker = new Marker(osm_map);
             notificationMarker.setPosition(notificationPoint);

@@ -92,11 +92,12 @@ public class DataLoader extends AsyncTaskLoader<LoadedData> {
                 return new LoadedData(null, polygonsMap, null);
 
             case SUBSCRIPTIONS_LOADER_ID:
-                if (AppData.mPolygonsMap == null || AppData.mPolygonsMap.isEmpty())
+                if (AppData.mPolygonsMap == null || AppData.mPolygonsMap.isEmpty() || SubscriptionsActivity.needToRefresh)
                     AppData.mPolygonsMap = GeofenceQueryUtils.fetchZonesData(ZONES_LIST_URL);
-                if (AppData.mAssetMap == null || AppData.mAssetMap.isEmpty())
+                if (AppData.mAssetMap == null || AppData.mAssetMap.isEmpty() || SubscriptionsActivity.needToRefresh)
                     AppData.mAssetMap = AssetsQueryUtils.fetchAssetsData(ASSETS_REQUEST_URL);
                 Map<Integer, SubscriptionData> subscriptionsMap = SubscriptionQueryUtils.fetchSubscriptionsData(mUrl);
+                SubscriptionsActivity.needToRefresh = false;
                 return new LoadedData(null, null, subscriptionsMap);
 
             case ACTIVATE_SUBSCRIPTION_LOADER_ID:

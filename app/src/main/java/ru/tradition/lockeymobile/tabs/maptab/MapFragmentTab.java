@@ -145,6 +145,10 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.tab_fragment_map_drawer, container, false);
+        /*
+        Unable to start the sqlite tile writer. Check external storage availability.
+    android.database.sqlite.SQLiteCantOpenDatabaseException: unknown error (code 14): Could not open database
+         */
 
         osmFragmentContainer = (LinearLayout) rootView.findViewById(R.id.osm_FragmentContainer);
         osmFragmentContainer.setVisibility(View.GONE);
@@ -216,7 +220,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     int padding_in_dp = 24;  // 6 dps
                     final float scale = getResources().getDisplayMetrics().density;
                     int padding_in_px = (int) (padding_in_dp * scale * (2 + slideOffset) + 0.5f);
-                    zooms.setPadding(0,0,0,padding_in_px);
+                    zooms.setPadding(0, 0, 0, padding_in_px);
                 } else {
 //                    int padding_in_dp = 24;  // 6 dps
 //                    final float scale = getResources().getDisplayMetrics().density;
@@ -237,7 +241,8 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 else {
                     Toast.makeText(getContext(), "Получение списка зон", Toast.LENGTH_LONG).show();
-                    AppData.mainActivity.getZones();
+                    if (AppData.mainActivity != null)
+                        AppData.mainActivity.getZones();
                 }
             }
         });
@@ -394,14 +399,14 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         uiSettings.setMapToolbarEnabled(false);
         uiSettings.setZoomControlsEnabled(false);
 
-        zoomIn = (Button)rootView.findViewById(R.id.map_tab_zoom_in);
-        zoomOut = (Button)rootView.findViewById(R.id.map_tab_zoom_out);
+        zoomIn = (Button) rootView.findViewById(R.id.map_tab_zoom_in);
+        zoomOut = (Button) rootView.findViewById(R.id.map_tab_zoom_out);
 
         zoomIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (google_map != null)
-                google_map.animateCamera(CameraUpdateFactory.zoomIn());
+                    google_map.animateCamera(CameraUpdateFactory.zoomIn());
             }
         });
         zoomOut.setOnClickListener(new View.OnClickListener() {

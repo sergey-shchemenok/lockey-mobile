@@ -47,4 +47,10 @@
         android:title="@string/menu_about_program"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/main_menu_refresh"
+        app:actionLayout="@xml/custom_refresh"
+        android:title="refresh"
+        app:showAsAction="always" />
+
 </menu><!--android:visible="false"-->

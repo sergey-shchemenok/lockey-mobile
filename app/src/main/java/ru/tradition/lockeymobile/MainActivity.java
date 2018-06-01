@@ -366,8 +366,10 @@ public class MainActivity extends AppCompatActivity implements
             AppData.mMenu.getItem(3).setVisible(false);
         if (!AppData.isNotificationSelectingMode)
             AppData.mMenu.getItem(4).setVisible(false);
-        if (AppData.isAssetSelectingMode || AppData.isNotificationSelectingMode)
+        if (AppData.isAssetSelectingMode || AppData.isNotificationSelectingMode) {
             AppData.mMenu.getItem(1).setVisible(false);
+            AppData.mMenu.getItem(8).setVisible(false);
+        }
         try {
             if (AppData.viewPager.getCurrentItem() == 1)
                 AppData.mMenu.getItem(1).setVisible(false);
@@ -392,6 +394,7 @@ public class MainActivity extends AppCompatActivity implements
                         AppData.mainActivity.setUpButton();
                         AppData.mMenu.getItem(3).setVisible(true);
                         AppData.mMenu.getItem(1).setVisible(false);
+                        AppData.mMenu.getItem(8).setVisible(false);
                         AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(AppData.selectedAssetCounter));
                         AssetsFragmentTab.aft.updateListView();
                     } else if (AppData.viewPager.getCurrentItem() == 2 && NotificationsFragmentTab.notificationListView.getCount() != 0) {
@@ -400,6 +403,7 @@ public class MainActivity extends AppCompatActivity implements
                         AppData.mainActivity.setUpButton();
                         AppData.mMenu.getItem(4).setVisible(true);
                         AppData.mMenu.getItem(1).setVisible(false);
+                        AppData.mMenu.getItem(8).setVisible(false);
                         AppData.mainActivity.setTitle("Выбрано: " + String.valueOf(AppData.selectedNotificationCounter));
                         NotificationsFragmentTab.adapter.notifyDataSetChanged();
                     }
@@ -493,6 +497,10 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.main_menu_about_program:
                 showAboutTheProgram(this);
                 return true;
+
+            case R.id.main_menu_refresh:
+                recreate();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -519,6 +527,7 @@ public class MainActivity extends AppCompatActivity implements
         AppData.mMenu.getItem(3).setVisible(false);
         AppData.mMenu.getItem(4).setVisible(false);
         AppData.mMenu.getItem(1).setVisible(true);
+        AppData.mMenu.getItem(8).setVisible(true);
         removeUpButton();
 
     }

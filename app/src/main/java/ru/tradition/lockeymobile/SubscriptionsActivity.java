@@ -39,6 +39,9 @@ import static ru.tradition.lockeymobile.AppData.SUBSCRIPTIONS_LOADER_ID;
 public class SubscriptionsActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<LoadedData> {
 
+    public static boolean needToRefresh = false;
+
+
     private static final String LOG_TAG = SubscriptionsActivity.class.getSimpleName();
 
     private Toolbar toolbar;
@@ -54,7 +57,7 @@ public class SubscriptionsActivity extends AppCompatActivity implements
     private ListView subscriptionsListView;
 
     private static Menu mMenu;
-    private static boolean itemSelected = false;
+    private static boolean unsubscribedItemSelected = false;
     private static boolean subscribedItemSelected = false;
 
     //Contains subscription SID
@@ -109,6 +112,7 @@ public class SubscriptionsActivity extends AppCompatActivity implements
                 if (!AppData.selectedSubscription.contains(sid)) {
                     AppData.selectedSubscription.clear();
                     AppData.selectedSubscription.add(sid);
+                    mMenu.getItem(6).setVisible(false);
                     mSID = sid;
                     subscriptionDataAdapter.notifyDataSetChanged();
                     if (AppData.activatingSubscription.contains(mSID) ||
@@ -120,11 +124,11 @@ public class SubscriptionsActivity extends AppCompatActivity implements
 
                     if (sd.isSubscribed()) {
                         subscribedItemSelected = true;
-                        itemSelected = false;
+                        unsubscribedItemSelected = false;
                         mMenu.getItem(2).setVisible(false);
                         mMenu.getItem(3).setVisible(true);
                     } else {
-                        itemSelected = true;
+                        unsubscribedItemSelected = true;
                         subscribedItemSelected = false;
                         mMenu.getItem(2).setVisible(true);
                         mMenu.getItem(3).setVisible(false);
@@ -133,10 +137,11 @@ public class SubscriptionsActivity extends AppCompatActivity implements
                     AppData.selectedSubscription.clear();
                     mSID = -1;
                     subscriptionDataAdapter.notifyDataSetChanged();
-                    itemSelected = false;
+                    unsubscribedItemSelected = false;
                     subscribedItemSelected = false;
                     mMenu.getItem(2).setVisible(false);
                     mMenu.getItem(3).setVisible(false);
+                    mMenu.getItem(6).setVisible(true);
                 }
             }
         });
@@ -301,13 +306,17 @@ public class SubscriptionsActivity extends AppCompatActivity implements
         mMenu = menu;
         if (!subscribedItemSelected)
             mMenu.getItem(3).setVisible(false);
-        if (!itemSelected)
+        if (!unsubscribedItemSelected)
             mMenu.getItem(2).setVisible(false);
         if (AppData.activatingSubscription.contains(mSID) ||
                 AppData.deactivatingSubscription.contains(mSID)) {
             mMenu.getItem(2).setVisible(false);
             mMenu.getItem(3).setVisible(false);
         }
+        if (AppData.selectedSubscription == null ||
+                AppData.selectedSubscription.isEmpty())
+            mMenu.getItem(6).setVisible(true);
+        else mMenu.getItem(6).setVisible(false);
 
         return true;
     }
@@ -331,7 +340,8 @@ public class SubscriptionsActivity extends AppCompatActivity implements
                         AppData.selectedSubscription.clear();
                         mSID = -1;
                         mMenu.getItem(2).setVisible(false);
-                        itemSelected = false;
+                        mMenu.getItem(6).setVisible(true);
+                        unsubscribedItemSelected = false;
                         subscribedItemSelected = false;
                         subscriptionDataAdapter.notifyDataSetChanged();
                     }
@@ -345,7 +355,8 @@ public class SubscriptionsActivity extends AppCompatActivity implements
 
                         mSID = -1;
                         mMenu.getItem(3).setVisible(false);
-                        itemSelected = false;
+                        mMenu.getItem(6).setVisible(true);
+                        unsubscribedItemSelected = false;
                         subscribedItemSelected = false;
                         subscriptionDataAdapter.notifyDataSetChanged();
                     }
@@ -354,6 +365,34 @@ public class SubscriptionsActivity extends AppCompatActivity implements
 
             case R.id.subscription_menu_about_program:
                 MainActivity.showAboutTheProgram(this);
+                return true;
+
+            case R.id.subscription_menu_refresh:
+                needToRefresh = true;
+                if (AppData.selectedSubscription != null)
+                    AppData.selectedSubscription.clear();
+                recreate();
+                for (int x : AppData.activatingSubscription) {
+                    Log.i(LOG_TAG, "activation value of " + x);
+                    if (AppData.mSubscriptionsMap.get(x) == null) {
+                        Log.i(LOG_TAG, "activation broken..... " + x);
+                        break;
+                    }
+                    mSID = x;
+                    activateSubscription();
+                    mSID = -1;
+                }
+                for (int x : AppData.deactivatingSubscription) {
+                    Log.i(LOG_TAG, "activation value of " + x);
+                    if (AppData.mSubscriptionsMap.get(x) == null) {
+                        Log.i(LOG_TAG, "activation broken..... " + x);
+                        break;
+                    }
+                    mSID = x;
+                    deactivateSubscription();
+                    mSID = -1;
+                }
+
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -370,7 +409,7 @@ public class SubscriptionsActivity extends AppCompatActivity implements
         AppData.selectedSubscription.clear();
         subscriptionDataAdapter.notifyDataSetChanged();
         subscribedItemSelected = false;
-        itemSelected = false;
+        unsubscribedItemSelected = false;
         return true;
     }
 
@@ -380,7 +419,7 @@ public class SubscriptionsActivity extends AppCompatActivity implements
         AppData.selectedSubscription.clear();
         subscriptionDataAdapter.notifyDataSetChanged();
         subscribedItemSelected = false;
-        itemSelected = false;
+        unsubscribedItemSelected = false;
     }
 
 
@@ -425,7 +464,7 @@ public class SubscriptionsActivity extends AppCompatActivity implements
                     AppData.deactivatingSubscription.remove(x);
                     if (mSID == x && mMenu != null) {
                         mMenu.getItem(2).setVisible(true);
-                        itemSelected = true;
+                        unsubscribedItemSelected = true;
                     }
                 }
             }

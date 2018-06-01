@@ -63,7 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
-            android:maxLines="1"
+            android:maxLines="3"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:textColor="@color/assetTableContentColor"
@@ -127,6 +127,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:ellipsize="end"
+            android:maxLines="3"
             android:textColor="@color/assetTableContentColor"
             android:textSize="16sp"
             tools:text="2171, 2165, 2412, 5653, 2563" />

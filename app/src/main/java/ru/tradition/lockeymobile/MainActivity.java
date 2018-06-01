@@ -123,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements
             MapFragmentTabOSM.osm_map.getOverlays().clear();
 
 
-        //todo when server part be ready
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         useMap = sharedPrefs.getString(
                 getString(R.string.settings_use_map_key),

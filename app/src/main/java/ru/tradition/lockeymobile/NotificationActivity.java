@@ -1,35 +1,43 @@
 package ru.tradition.lockeymobile;
 
 import android.app.LoaderManager;
-import android.app.NativeActivity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
@@ -44,30 +52,25 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
-import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygonAdapter;
 import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
-import ru.tradition.lockeymobile.tabs.maptab.MapFragmentTabOSM;
-import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
-import static android.view.MotionEvent.ACTION_DOWN;
 import static ru.tradition.lockeymobile.AppData.ZONES_LOADER_ID;
 
-public class NotificationActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class NotificationActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+        OnMapReadyCallback {
     private final String LOG_TAG = NotificationActivity.class.getSimpleName();
     private static final int CURSOR_LOADER_ID = 1;
 
     /**
      * Content URI for the existing notification
      */
-    private Uri mCurrentNotificationUri;
+    private static Uri mCurrentNotificationUri;
 
     private TextView notificationTitle;
     private TextView notificationBody;
@@ -77,15 +80,18 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     private static int zid = -1;
 
     private static GeoPoint notificationPoint;
+    private static CameraPosition target;
 
     //for map
-    private static MapView osm_map;
-    private static IMapController mapController;
-    private static TreeMap<Integer, Marker> osm_markers = new TreeMap<>();
+    private String useMap;
+    private MapView osm_map;
+    private IMapController mapController;
+    private GoogleMap google_map;
+    private boolean google_mapReady = false;
 
     private FloatingActionButton fabLayers;
 
-    //if we open this activity not from the notificatiton tab on item clicking
+    //if we open this activity not from the notification tab on item clicking
     private boolean fromItem = false;
 
     private Button zoomIn;
@@ -102,7 +108,17 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 //            fromItem = false;
 //        }
 
-        setContentView(R.layout.activity_notification);
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        useMap = sharedPrefs.getString(
+                getString(R.string.settings_use_map_key),
+                getString(R.string.settings_default_map)
+        );
+
+        if (useMap.equals(getString(R.string.settings_osm_value)))
+            setContentView(R.layout.activity_notification_osm);
+        else if (useMap.equals(getString(R.string.settings_google_map_value)))
+            setContentView(R.layout.activity_notification_gm);
 
         //go to auth activity. It need to prevent seeing the internal information without authorization
         if (AppData.usr.equals("") || AppData.pwd.equals("") || AppData.isAuthorized == false) {
@@ -126,16 +142,20 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
         toolbar.setTitle(R.string.notification_activity_title);
 
-        osm_map = (MapView) findViewById(R.id.notification_osm_map);
-        osm_map.setTileSource(TileSourceFactory.MAPNIK);
+        if (useMap.equals(getString(R.string.settings_osm_value))) {
+            osm_map = (MapView) findViewById(R.id.notification_osm_map);
+            osm_map.setTileSource(TileSourceFactory.MAPNIK);
 
-        //Then we add default zoom buttons, and ability to zoom with 2 fingers (multi-touch)
-        osm_map.setBuiltInZoomControls(false);
-        osm_map.setMultiTouchControls(true);
+            //Then we add default zoom buttons, and ability to zoom with 2 fingers (multi-touch)
+            osm_map.setBuiltInZoomControls(false);
+            osm_map.setMultiTouchControls(true);
 
 //        osm_map.setMaxZoomLevel(18.0);
-        osm_map.setMinZoomLevel(3.5);
-
+            osm_map.setMinZoomLevel(3.5);
+        } else if (useMap.equals(getString(R.string.settings_google_map_value))) {
+            MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.notification_google_map);
+            mapFragment.getMapAsync(this);
+        }
         //get data from the incoming intent. From clicking on item at notification tab
         Intent intent = getIntent();
         mCurrentNotificationUri = intent.getData();
@@ -165,11 +185,28 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         fabLayers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (osm_map != null) {
-                    if (osm_map.getTileProvider().getTileSource() == TileSourceFactory.MAPNIK)
-                        osm_map.setTileSource(TileSourceFactory.OpenTopo);
-                    else
-                        osm_map.setTileSource(TileSourceFactory.MAPNIK);
+                if (useMap.equals(getString(R.string.settings_osm_value))) {
+
+                    if (osm_map != null) {
+                        if (osm_map.getTileProvider().getTileSource() == TileSourceFactory.MAPNIK)
+                            osm_map.setTileSource(TileSourceFactory.OpenTopo);
+                        else
+                            osm_map.setTileSource(TileSourceFactory.MAPNIK);
+                    }
+                } else if (useMap.equals(getString(R.string.settings_google_map_value))) {
+                    if (google_mapReady && google_map != null) {
+                        int mapType = google_map.getMapType();
+                        if (mapType == GoogleMap.MAP_TYPE_NORMAL) {
+                            google_map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                            mapType = GoogleMap.MAP_TYPE_SATELLITE;
+                        } else if (mapType == GoogleMap.MAP_TYPE_SATELLITE) {
+                            google_map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                            mapType = GoogleMap.MAP_TYPE_HYBRID;
+                        } else {
+                            google_map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                            mapType = GoogleMap.MAP_TYPE_NORMAL;
+                        }
+                    }
                 }
             }
         });
@@ -177,9 +214,15 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         fabLayers.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if (mapController != null && notificationPoint != null) {
-                    mapController.setZoom(14.0);
-                    mapController.animateTo(notificationPoint);
+                if (useMap.equals(getString(R.string.settings_osm_value))) {
+                    if (mapController != null && notificationPoint != null) {
+                        mapController.setZoom(14.0);
+                        mapController.animateTo(notificationPoint);
+                    }
+                } else if (useMap.equals(getString(R.string.settings_google_map_value))) {
+                    if (google_mapReady && google_map != null && target != null) {
+                        google_map.animateCamera(CameraUpdateFactory.newCameraPosition(target));
+                    }
                 }
                 return true;
             }
@@ -246,52 +289,54 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 //                    + " Номер бортового комплекта - " + String.valueOf(assetID));
             notificationSendingTime.setText(getFormattedDate(sendingTime));
 
-            //We can move the map on a default view point. For this, we need access to the map controller:
-            mapController = osm_map.getController();
-            mapController.setZoom(14.0);
+            if (useMap.equals(getString(R.string.settings_osm_value))) {
+                if (osm_map != null) {
+                    //We can move the map on a default view point. For this, we need access to the map controller:
+                    mapController = osm_map.getController();
+                    mapController.setZoom(14.0);
 
-            notificationPoint = new GeoPoint(latitude, longitude);
-            mapController.setCenter(notificationPoint);
+                    notificationPoint = new GeoPoint(latitude, longitude);
+                    mapController.setCenter(notificationPoint);
+                }
+            } else if (useMap.equals(getString(R.string.settings_google_map_value))) {
+                if (google_mapReady && google_map != null) {
+                    target = CameraPosition.builder()
+                            .target(new LatLng(latitude, longitude))
+                            .zoom(12)
+                            .build();
+                    google_map.moveCamera(CameraUpdateFactory.newCameraPosition(target));
+                }
+            }
 
-            zoomIn = (Button)findViewById(R.id.notification_zoom_in);
-            zoomOut = (Button)findViewById(R.id.notification_zoom_out);
+            zoomIn = (Button) findViewById(R.id.notification_zoom_in);
+            zoomOut = (Button) findViewById(R.id.notification_zoom_out);
 
             zoomIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mapController != null)
-                        mapController.zoomIn();
+                    if (useMap.equals(getString(R.string.settings_osm_value))) {
+                        if (mapController != null)
+                            mapController.zoomIn();
+                    } else if (useMap.equals(getString(R.string.settings_google_map_value))) {
+                        if (google_mapReady && google_map != null) {
+                            google_map.animateCamera(CameraUpdateFactory.zoomIn());
+                        }
+                    }
                 }
             });
             zoomOut.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mapController != null)
-                        mapController.zoomOut();
+                    if (useMap.equals(getString(R.string.settings_osm_value))) {
+                        if (mapController != null)
+                            mapController.zoomOut();
+                    } else if (useMap.equals(getString(R.string.settings_google_map_value))) {
+                        if (google_mapReady && google_map != null) {
+                            google_map.animateCamera(CameraUpdateFactory.zoomOut());
+                        }
+                    }
                 }
             });
-
-            Marker notificationMarker = new Marker(osm_map);
-            notificationMarker.setPosition(notificationPoint);
-            notificationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            notificationMarker.setTitle(title);
-
-            Polygon circle = new Polygon() {
-                @Override
-                public void showInfoWindow(GeoPoint position) {
-                    //super.showInfoWindow(position);
-                }
-            };
-            circle.setPoints(Polygon.pointsAsCircle(notificationPoint, 300.0));
-            circle.setFillColor(Color.parseColor("#6421a30d"));
-            circle.setStrokeColor(Color.parseColor("#FF21A30D"));
-            circle.setStrokeWidth(0);
-
-            osm_map.getOverlays().add(circle);
-            osm_map.getOverlays().add(notificationMarker);
-
-//            JSONArray rootArray = new JSONArray(jsonResponse);
-//            for (int i = 0; i < rootArray.length(); i++) {
 
             if (text != null && !text.isEmpty()) {
                 try {
@@ -299,42 +344,108 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                     String event = textObject.getString("event");
                     if (event.equals("zone")) {
                         zid = textObject.getInt("ZID");
-                        showZoneOnMap(zid);
                     }
-
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "Problem parsing the JSON results", e);
                 }
             }
-            osm_map.invalidate();
+
+            if (useMap.equals(getString(R.string.settings_osm_value))) {
+                Marker notificationMarker = new Marker(osm_map);
+                notificationMarker.setPosition(notificationPoint);
+                notificationMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                notificationMarker.setTitle(title);
+
+                Polygon circle = new Polygon() {
+                    @Override
+                    public void showInfoWindow(GeoPoint position) {
+                        //super.showInfoWindow(position);
+                    }
+                };
+                circle.setPoints(Polygon.pointsAsCircle(notificationPoint, 300.0));
+                circle.setFillColor(Color.parseColor("#6421a30d"));
+                circle.setStrokeColor(Color.parseColor("#FF21A30D"));
+                circle.setStrokeWidth(0);
+
+                osm_map.getOverlays().add(circle);
+                osm_map.getOverlays().add(notificationMarker);
+
+//            JSONArray rootArray = new JSONArray(jsonResponse);
+//            for (int i = 0; i < rootArray.length(); i++) {
+                if (text != null && !text.isEmpty())
+                    showZoneOnMap(zid);
+                osm_map.invalidate();
+            } else if (useMap.equals(getString(R.string.settings_google_map_value))) {
+                if (google_mapReady && google_map != null) {
+                    LatLng position = new LatLng(latitude, longitude);
+                    MarkerOptions markerOpt = new MarkerOptions()
+                            .position(position)
+                            .title(title);
+                    google_map.addMarker(markerOpt);
+                    google_map.addCircle(new CircleOptions()
+                            .center(position)
+                            .radius(300)
+                            .strokeColor(Color.parseColor("#6421a30d"))
+                            .strokeWidth(0)
+                            .fillColor(Color.parseColor("#6421a30d")));
+                    if (text != null && !text.isEmpty())
+                        showZoneOnMap(zid);
+                }
+            }
+        }
+        getLoaderManager().destroyLoader(CURSOR_LOADER_ID);
+
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        if (useMap.equals(getString(R.string.settings_google_map_value))) {
+            google_mapReady = true;
+            google_map = googleMap;
+            UiSettings uiSettings = google_map.getUiSettings();
+            uiSettings.setMapToolbarEnabled(false);
+            uiSettings.setZoomControlsEnabled(false);
         }
     }
 
     private void showZoneOnMap(int zid) {
-
-        if (osm_map != null && AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty()) {
+        if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty()) {
             if (AppData.mPolygonsMap.containsKey(zid)) {
                 GeofencePolygon geof = AppData.mPolygonsMap.get(zid);
                 LatLng[] latLngArray = geof.getPolygon();
-                List<GeoPoint> geoPoints = new ArrayList<>();
-                for (int i = 0; i < latLngArray.length; i++) {
-                    geoPoints.add(new GeoPoint(latLngArray[i].latitude, latLngArray[i].longitude));
-                }
+                if (useMap.equals(getString(R.string.settings_osm_value))) {
+                    if (osm_map != null && AppData.mPolygonsMap != null) {
+                        List<GeoPoint> geoPoints = new ArrayList<>();
+                        for (int i = 0; i < latLngArray.length; i++) {
+                            geoPoints.add(new GeoPoint(latLngArray[i].latitude, latLngArray[i].longitude));
+                        }
 
-                Polygon polygon = new Polygon();    //see note below
-                polygon.setFillColor(Color.parseColor("#6421a30d"));
-                polygon.setStrokeColor(Color.parseColor("#FF21A30D"));
-                polygon.setPoints(geoPoints);
-                osm_map.getOverlayManager().add(polygon);
+                        Polygon polygon = new Polygon();    //see note below
+                        polygon.setFillColor(Color.parseColor("#6421a30d"));
+                        polygon.setStrokeColor(Color.parseColor("#FF21A30D"));
+                        polygon.setPoints(geoPoints);
+                        osm_map.getOverlayManager().add(polygon);
+                    }
+                } else if (useMap.equals(getString(R.string.settings_google_map_value))) {
+                    if (google_mapReady && google_map != null && AppData.mPolygonsMap != null) {
+                        PolygonOptions popt = new PolygonOptions().geodesic(true);
+                        for (LatLng point : latLngArray) {
+                            popt.add(point);
+                        }
+                        com.google.android.gms.maps.model.Polygon geozone = google_map.addPolygon(popt);
+                        geozone.setFillColor(Color.parseColor("#6421a30d"));
+                        geozone.setStrokeColor(Color.parseColor("#FF21A30D"));
+                    }
+                }
             } else {
                 //todo if zone does'not exist
                 Toast.makeText(this, "Указанная в уведомлении зона была либо удалена, либо принадлежит другой учетной записи", Toast.LENGTH_LONG).show();
                 Log.i(LOG_TAG, "zone does'not exist");
             }
-        } else if (AppData.mPolygonsMap == null || AppData.mPolygonsMap.isEmpty()) {
+        } else
             startUpdater(zid, context);
-        }
     }
+
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -408,7 +519,6 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         }
     }
 
-
     private static String getFormattedDate(String sendingTime) {
         long milli = 0;
         java.text.SimpleDateFormat simpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -443,12 +553,17 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     }
 
     @Override
-    protected void onPostResume() {
-        super.onPostResume();
+    protected void onResume() {
+        super.onResume();
         if (AppData.mPolygonsMap == null || AppData.mPolygonsMap.isEmpty()) {
             if (zid != -1)
                 startUpdater(zid, context);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     //let's check up the Timer
@@ -491,10 +606,18 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
                 @Override
                 public void run() {
-                    if (osm_map != null && AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty()) {
-                        showZoneOnMap(zid);
+                    if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty()) {
+                        if (useMap.equals(getString(R.string.settings_google_map_value))) {
+                            if (google_mapReady && google_map != null) {
+                                showZoneOnMap(zid);
+                            }
+                        }else if (useMap.equals(getString(R.string.settings_osm_value))) {
+                            if (osm_map != null) {
+                                showZoneOnMap(zid);
+                                osm_map.invalidate();
+                            }
+                        }
                         Log.i(LOG_TAG, "stop updater...");
-                        osm_map.invalidate();
                         stopUpdater();
                         return;
                     }
@@ -503,7 +626,6 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
                 }
             });
         }
-
 
         public void getZones() {
             Log.i(LOG_TAG, "....getZones...notification.");
@@ -548,15 +670,16 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         public void onLoaderReset(Loader<LoadedData> loader) {
 
         }
+
     }
 
 
-    //Old
-    //to get notification data from intent
+//Old
+//to get notification data from intent
 //    private NotificationsData ndForeground;
 //    private NotificationsData ndBackground;
 
-    //trying to show data from fore or background
+//trying to show data from fore or background
 //    showData(ndBackground);
 //    showData(ndForeground);
 

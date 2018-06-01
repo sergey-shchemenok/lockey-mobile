@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/colorPrimary"
+                app:titleTextAppearance="@style/Toolbar.TitleText"
+                app:titleTextColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/notification_info_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@color/colorAccent" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="16dp">
+
+
+                <TextView
+                    android:id="@+id/notification_activity_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textColor="@color/notificationTitleColor"
+                    tools:text="Title"
+
+                    />
+
+
+                <TextView
+                    android:id="@+id/notification_activity_body"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="@color/notificationBodyColorDark"
+                    tools:text="Body"
+
+                    />
+
+
+                <TextView
+                    android:id="@+id/notification_activity_sending_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:gravity="end"
+                    android:textAlignment="viewEnd"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="@color/notificationBodyColorDark"
+                    tools:text="28 февраля" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab_layers_notification"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_gravity="top|end"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="19dp"
+                    android:src="@drawable/ic_layers"
+                    app:backgroundTint="@color/fab_back"
+                    app:borderWidth="0dp"
+                    app:elevation="1dp"
+                    app:fabSize="normal"
+                    app:pressedTranslationZ="12dp"
+                    app:rippleColor="@color/fab_ripple" />
+
+                <LinearLayout
+                    android:id="@+id/osm_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <org.osmdroid.views.MapView
+                        android:id="@+id/notification_osm_map"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/notification_zooms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="horizontal"
+                    android:paddingBottom="24dp">
+
+                    <Button
+                        android:id="@+id/notification_zoom_in"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginRight="8dp"
+                        android:background="@drawable/button_color"
+                        android:fontFamily="sans-serif"
+                        android:text="+"
+                        android:textSize="24sp"
+                        android:textStyle="normal" />
+
+                    <Button
+                        android:id="@+id/notification_zoom_out"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/button_color"
+                        android:fontFamily="sans-serif"
+                        android:text="—"
+                        android:textSize="24sp"
+                        android:textStyle="normal" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>
+
+
+    <!--<LinearLayout--><!--android:layout_width="match_parent"--><!--android:layout_height="wrap_content"-->
+
+    <!--android:orientation="horizontal">-->
+
+    <!--<Button--><!--android:id="@+id/activity_notification_command1"--><!--android:layout_width="0dp"--><!--android:layout_height="32dp"--><!--android:layout_marginRight="16dp"--><!--android:layout_weight="1"--><!--android:background="@color/colorAccent"--><!--android:ellipsize="end"--><!--android:maxLines="1"--><!--android:text="Команда 1"--><!--android:textColor="@android:color/white" />-->
+
+    <!--<Button--><!--android:id="@+id/activity_asset_command2"--><!--android:layout_width="0dp"--><!--android:layout_height="32dp"--><!--android:layout_weight="1"--><!--android:background="@color/colorAccent"--><!--android:ellipsize="end"--><!--android:maxLines="1"--><!--android:text="Команда 2"--><!--android:textColor="@android:color/white" />-->
+
+    <!--</LinearLayout>-->
+
+

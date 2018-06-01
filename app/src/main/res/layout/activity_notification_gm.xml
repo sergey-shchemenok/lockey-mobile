@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -29,7 +30,7 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:textAppearance="?android:textAppearanceSmall"
-                android:textColor="@color/colorAccent"/>
+                android:textColor="@color/colorAccent" />
 
 
             <LinearLayout
@@ -102,42 +103,49 @@
                     app:pressedTranslationZ="12dp"
                     app:rippleColor="@color/fab_ripple" />
 
-
-                <org.osmdroid.views.MapView
-                    android:id="@+id/notification_osm_map"
+                <LinearLayout
+                    android:id="@+id/google_map_container"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:id="@+id/notification_google_map"
+                        android:name="com.google.android.gms.maps.MapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="100" />
+                </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/notification_zooms"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="16dp"
-                    android:orientation="vertical"
-                    android:layout_alignParentRight="true">
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="horizontal"
+                    android:paddingBottom="24dp">
 
                     <Button
                         android:id="@+id/notification_zoom_in"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:layout_marginBottom="8dp"
-                        android:width="16dp"
+                        android:layout_marginRight="8dp"
                         android:background="@drawable/button_color"
                         android:fontFamily="sans-serif"
                         android:text="+"
-                        android:textSize="28sp"
+                        android:textSize="24sp"
                         android:textStyle="normal" />
 
                     <Button
                         android:id="@+id/notification_zoom_out"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:textStyle="normal"
                         android:background="@drawable/button_color"
                         android:fontFamily="sans-serif"
+                        android:text="—"
                         android:textSize="24sp"
-                        android:text="—" />
+                        android:textStyle="normal" />
 
                 </LinearLayout>
 

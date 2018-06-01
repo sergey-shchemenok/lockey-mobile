@@ -79,6 +79,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
     private FloatingActionButton fabBottomDrawer;
     private LinearLayout geoFenceBottomSheet;
     private LinearLayout osmFragmentContainer;
+    private LinearLayout zooms;
     public static BottomSheetBehavior bottomSheetBehavior;
 
     private LinearLayoutManager layoutManager;
@@ -151,6 +152,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         // Inflate the layout for this fragment
         fabLayers = (FloatingActionButton) rootView.findViewById(R.id.fab_layers);
         fabBottomDrawer = (FloatingActionButton) rootView.findViewById(R.id.fab_bottom_drawer);
+        zooms = rootView.findViewById(R.id.map_tab_zooms);
         geoFenceBottomSheet = (LinearLayout) rootView.findViewById(R.id.bottom_sheet);
         // init the bottom sheet behavior
         bottomSheetBehavior = BottomSheetBehavior.from(geoFenceBottomSheet);
@@ -173,10 +175,10 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 //                    fabBottomDrawer.animate().scaleX(1).scaleY(1).setDuration(100).start();
                     fabLayers.show();
                     fabBottomDrawer.show();
+                    zooms.setVisibility(View.VISIBLE);
                     clearPolygonSet();
                     mAdapter.notifyDataSetChanged();
                 }
-
                 if (BottomSheetBehavior.STATE_EXPANDED == newState) {
                     //recyclerViewScrollState = mPolygonsList.getScrollState();
                     recyclerViewScrollState = layoutManager.findFirstCompletelyVisibleItemPosition();
@@ -186,6 +188,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.hide();
                     fabBottomDrawer.hide();
+                    zooms.setVisibility(View.GONE);
                 }
                 if (BottomSheetBehavior.STATE_COLLAPSED == newState) {
                     //recyclerViewScrollState = mPolygonsList.getScrollState();
@@ -196,6 +199,7 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.show();
                     fabBottomDrawer.hide();
+                    zooms.setVisibility(View.VISIBLE);
                 }
 
 
@@ -208,6 +212,20 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
 //                    fabBottomDrawer.animate().scaleX(1 - slideOffset).scaleY(1 - slideOffset).setDuration(0).start();
 //                }
                 //fabBottomDrawer.animate().scaleX(1 - Math.abs(slideOffset)).scaleY(1 - Math.abs(slideOffset)).setDuration(0).start();
+                if (slideOffset <= 0) {
+                    int padding_in_dp = 24;  // 6 dps
+                    final float scale = getResources().getDisplayMetrics().density;
+                    int padding_in_px = (int) (padding_in_dp * scale * (2 + slideOffset) + 0.5f);
+                    zooms.setPadding(0,0,0,padding_in_px);
+                } else {
+//                    int padding_in_dp = 24;  // 6 dps
+//                    final float scale = getResources().getDisplayMetrics().density;
+//                    int padding_in_px = (int) (padding_in_dp * scale * (2 - slideOffset*2) + 0.5f);
+//                    zooms.setPadding(0,0,0,padding_in_px);
+                    fabLayers.hide();
+                    fabBottomDrawer.hide();
+                    zooms.setVisibility(View.GONE);
+                }
 
             }
         });

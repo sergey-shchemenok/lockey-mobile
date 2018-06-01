@@ -78,6 +78,7 @@ public class MapFragmentTabOSM extends Fragment implements
 
     private LinearLayoutManager layoutManager;
     private LinearLayout googleMapFragmentContainer;
+    private LinearLayout zooms;
     private int recyclerViewScrollState = 0;
 
 
@@ -182,6 +183,8 @@ public class MapFragmentTabOSM extends Fragment implements
         fabLayers = (FloatingActionButton) rootView.findViewById(R.id.fab_layers);
         fabBottomDrawer = (FloatingActionButton) rootView.findViewById(R.id.fab_bottom_drawer);
         geoFenceBottomSheet = (LinearLayout) rootView.findViewById(R.id.bottom_sheet);
+        zooms = rootView.findViewById(R.id.map_tab_zooms);
+
         bottomSheetBehavior = BottomSheetBehavior.from(geoFenceBottomSheet);
         bottomSheetBehavior.setHideable(true);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -191,6 +194,7 @@ public class MapFragmentTabOSM extends Fragment implements
                 if (BottomSheetBehavior.STATE_HIDDEN == newState) {
                     fabLayers.show();
                     fabBottomDrawer.show();
+                    zooms.setVisibility(View.VISIBLE);
                     clearPolygonSet();
                     mAdapter.notifyDataSetChanged();
 //                    osm_map.setBuiltInZoomControls(true);
@@ -204,6 +208,7 @@ public class MapFragmentTabOSM extends Fragment implements
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.hide();
                     fabBottomDrawer.hide();
+                    zooms.setVisibility(View.GONE);
 //                    osm_map.setBuiltInZoomControls(false);
                 }
                 if (BottomSheetBehavior.STATE_COLLAPSED == newState) {
@@ -214,6 +219,7 @@ public class MapFragmentTabOSM extends Fragment implements
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.show();
                     fabBottomDrawer.hide();
+                    zooms.setVisibility(View.VISIBLE);
 //                    osm_map.setBuiltInZoomControls(false);
                 }
             }
@@ -221,6 +227,16 @@ public class MapFragmentTabOSM extends Fragment implements
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                 bottomSheetBehavior.getPeekHeight();
+                if (slideOffset <= 0) {
+                    int padding_in_dp = 24;  // 6 dps
+                    final float scale = getResources().getDisplayMetrics().density;
+                    int padding_in_px = (int) (padding_in_dp * scale * (2 + slideOffset) + 0.5f);
+                    zooms.setPadding(0,0,0,padding_in_px);
+                } else {
+                    fabLayers.hide();
+                    fabBottomDrawer.hide();
+                    zooms.setVisibility(View.GONE);
+                }
             }
         });
 

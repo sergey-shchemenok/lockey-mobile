@@ -29,7 +29,6 @@
         <item name="colorControlActivated">@color/checkboxColor</item>
     </style>
 
-
     <!-- Style for a tab that displays a category name -->
     <style name="CategoryTab" parent="Widget.Design.TabLayout">
         <item name="tabIndicatorColor">@android:color/white</item>

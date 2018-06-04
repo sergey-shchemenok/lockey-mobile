@@ -430,7 +430,6 @@ public class MainActivity extends AppCompatActivity implements
                 //Let it be here for a while
                 NotificationsFragmentTab.notificationsFragmentTab.showDeleteConfirmationDialog();
                 NotificationsFragmentTab.adapter.notifyDataSetChanged();
-
                 return true;
             case R.id.main_menu_zoom_out:
                 if (!AppData.selectedAsset.isEmpty() && AppData.selectedAsset != null) {

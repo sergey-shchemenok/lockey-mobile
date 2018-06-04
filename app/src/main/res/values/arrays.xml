@@ -33,6 +33,11 @@
         <item>@string/settings_notifications_order_by_read_value</item>
     </string-array>
 
-
+    <!-- These are the options displayed in the command drop-down Spinner -->
+    <string-array name="array_command_options">
+        <item>@string/choose_command</item>
+        <item>@string/lock_engine</item>
+        <item>@string/unlock_engine</item>
+    </string-array>
 
 </resources>

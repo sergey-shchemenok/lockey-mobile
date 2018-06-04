@@ -335,10 +335,13 @@ public class MainActivity extends AppCompatActivity implements
 
         if (AssetsFragmentTab.aft == null)
             return;
-        AssetsFragmentTab.aft.mEmptyStateTextView.setText("");
-        AssetsFragmentTab.aft.progressCircle.setVisibility(View.GONE);
+        try {
+            AssetsFragmentTab.aft.mEmptyStateTextView.setText("");
+            AssetsFragmentTab.aft.progressCircle.setVisibility(View.GONE);
+            AssetsFragmentTab.aft.updateListView();
+        } catch (NullPointerException e){}
 
-        AssetsFragmentTab.aft.updateListView();
+
     }
 
     //we need to interrupt the loading thread
@@ -414,6 +417,8 @@ public class MainActivity extends AppCompatActivity implements
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 settingsIntent.putExtra("currentPage", AppData.viewPager.getCurrentItem());
                 settingsIntent.putExtra("activity", "MainActivity");
+                MapFragmentTab.polygonNamesNumber = -1;
+                MapFragmentTabOSM.polygonNamesNumber = -1;
                 startActivity(settingsIntent);
                 return true;
             case R.id.main_menu_subscriptions:

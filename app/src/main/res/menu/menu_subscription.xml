@@ -36,7 +36,7 @@
 
     <item
         android:id="@+id/subscription_menu_refresh"
-        app:actionLayout="@xml/custom_refresh"
+        android:icon="@drawable/ic_refresh"
         android:title="refresh"
         app:showAsAction="always" />
 

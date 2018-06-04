@@ -33,6 +33,7 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polygon;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -41,6 +42,8 @@ import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.AuthActivity;
 import ru.tradition.lockeymobile.R;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
+
+import static ru.tradition.lockeymobile.AppData.mPolygonsMap;
 
 
 /**
@@ -203,8 +206,9 @@ public class MapFragmentTabOSM extends Fragment implements
                 if (BottomSheetBehavior.STATE_EXPANDED == newState) {
                     recyclerViewScrollState = layoutManager.findFirstCompletelyVisibleItemPosition();
                     layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                    mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), MapFragmentTabOSM.this, MapFragmentTabOSM.this);
-                    mPolygonsList.setAdapter(mAdapter);
+                    ArrayList<GeofencePolygon> geoPoly = new ArrayList<>(mPolygonsMap.values());
+                    Collections.sort(geoPoly);
+                    mAdapter = new GeofencePolygonAdapter(geoPoly, MapFragmentTabOSM.this, MapFragmentTabOSM.this);                    mPolygonsList.setAdapter(mAdapter);
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.hide();
                     fabBottomDrawer.hide();
@@ -214,8 +218,9 @@ public class MapFragmentTabOSM extends Fragment implements
                 if (BottomSheetBehavior.STATE_COLLAPSED == newState) {
                     recyclerViewScrollState = layoutManager.findFirstCompletelyVisibleItemPosition();
                     layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-                    mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), MapFragmentTabOSM.this, MapFragmentTabOSM.this);
-                    mPolygonsList.setAdapter(mAdapter);
+                    ArrayList<GeofencePolygon> geoPoly = new ArrayList<>(mPolygonsMap.values());
+                    Collections.sort(geoPoly);
+                    mAdapter = new GeofencePolygonAdapter(geoPoly, MapFragmentTabOSM.this, MapFragmentTabOSM.this);                    mPolygonsList.setAdapter(mAdapter);
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.show();
                     fabBottomDrawer.hide();
@@ -309,7 +314,9 @@ public class MapFragmentTabOSM extends Fragment implements
         mPolygonsList.setLayoutManager(layoutManager);
         mPolygonsList.setHasFixedSize(true);
         if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty()) {
-            mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), this, this);
+            ArrayList<GeofencePolygon> geoPoly = new ArrayList<>(mPolygonsMap.values());
+            Collections.sort(geoPoly);
+            mAdapter = new GeofencePolygonAdapter(geoPoly, MapFragmentTabOSM.this, MapFragmentTabOSM.this);
             mPolygonsList.setAdapter(mAdapter);
         }
         //to remove zones after rotation
@@ -341,6 +348,8 @@ public class MapFragmentTabOSM extends Fragment implements
             }
             if (polygonNamesNumber != clickedItemIndex) {
                 ArrayList<GeofencePolygon> polygonList = new ArrayList<>(AppData.mPolygonsMap.values());
+                Collections.sort(polygonList);
+
                 GeofencePolygon geof = polygonList.get(clickedItemIndex);
                 LatLng[] latLngArray = geof.getPolygon();
                 List<GeoPoint> geoPoints = new ArrayList<>();
@@ -380,6 +389,8 @@ public class MapFragmentTabOSM extends Fragment implements
         }
 
         ArrayList<GeofencePolygon> polygonList = new ArrayList<>(AppData.mPolygonsMap.values());
+        Collections.sort(polygonList);
+
         GeofencePolygon geof = polygonList.get(clickedItemIndex);
         LatLng[] latLngArray = geof.getPolygon();
         List<GeoPoint> geoPoints = new ArrayList<>();

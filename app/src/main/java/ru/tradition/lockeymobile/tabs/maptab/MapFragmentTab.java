@@ -37,12 +37,18 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.AppData;
 import ru.tradition.lockeymobile.R;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragmentTab;
+
+import static ru.tradition.lockeymobile.AppData.mAssetMap;
+import static ru.tradition.lockeymobile.AppData.mPolygonsMap;
 
 
 /**
@@ -187,7 +193,11 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     //recyclerViewScrollState = mPolygonsList.getScrollState();
                     recyclerViewScrollState = layoutManager.findFirstCompletelyVisibleItemPosition();
                     layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                    mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), MapFragmentTab.this, MapFragmentTab.this);
+
+                    ArrayList<GeofencePolygon> geoPoly = new ArrayList<>(mPolygonsMap.values());
+                    Collections.sort(geoPoly);
+                    mAdapter = new GeofencePolygonAdapter(geoPoly, MapFragmentTab.this, MapFragmentTab.this);
+
                     mPolygonsList.setAdapter(mAdapter);
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.hide();
@@ -198,7 +208,11 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
                     //recyclerViewScrollState = mPolygonsList.getScrollState();
                     recyclerViewScrollState = layoutManager.findFirstCompletelyVisibleItemPosition();
                     layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-                    mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), MapFragmentTab.this, MapFragmentTab.this);
+
+                    ArrayList<GeofencePolygon> geoPoly = new ArrayList<>(mPolygonsMap.values());
+                    Collections.sort(geoPoly);
+                    mAdapter = new GeofencePolygonAdapter(geoPoly, MapFragmentTab.this, MapFragmentTab.this);
+
                     mPolygonsList.setAdapter(mAdapter);
                     mPolygonsList.scrollToPosition(recyclerViewScrollState);
                     fabLayers.show();
@@ -294,7 +308,10 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         mPolygonsList.setLayoutManager(layoutManager);
         mPolygonsList.setHasFixedSize(true);
         if (AppData.mPolygonsMap != null && !AppData.mPolygonsMap.isEmpty()) {
-            mAdapter = new GeofencePolygonAdapter(new ArrayList<>(AppData.mPolygonsMap.values()), this, this);
+            ArrayList<GeofencePolygon> geoPoly = new ArrayList<>(mPolygonsMap.values());
+            Collections.sort(geoPoly);
+            mAdapter = new GeofencePolygonAdapter(geoPoly, MapFragmentTab.this, MapFragmentTab.this);
+
             mPolygonsList.setAdapter(mAdapter);
         }
         //to remove zones after rotation
@@ -324,6 +341,8 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
             }
             if (polygonNamesNumber != clickedItemIndex) {
                 ArrayList<GeofencePolygon> polygonList = new ArrayList<>(AppData.mPolygonsMap.values());
+                Collections.sort(polygonList);
+
                 GeofencePolygon geof = polygonList.get(clickedItemIndex);
                 LatLng[] latLngArray = geof.getPolygon();
 
@@ -358,6 +377,8 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         }
 
         ArrayList<GeofencePolygon> polygonList = new ArrayList<>(AppData.mPolygonsMap.values());
+        Collections.sort(polygonList);
+
         GeofencePolygon geof = polygonList.get(clickedItemIndex);
         LatLng[] latLng = geof.getPolygon();
         Log.i(LOG_TAG, "long click.....");

@@ -1,12 +1,18 @@
 package ru.tradition.lockeymobile.tabs.maptab;
 
+import android.support.annotation.NonNull;
+
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.Comparator;
+
+import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 
 /**
  * Created by Caelestis on 16.03.2018.
  */
 
-public class GeofencePolygon {
+public class GeofencePolygon implements Comparable<GeofencePolygon> {
     private int geofence_id;
     private String polygonName;
     private boolean isPrivate;
@@ -33,5 +39,12 @@ public class GeofencePolygon {
 
     public LatLng[] getPolygon() {
         return polygon;
+    }
+
+
+
+    @Override
+    public int compareTo(@NonNull GeofencePolygon o) {
+        return polygonName.compareTo(o.getPolygonName());
     }
 }

@@ -15,14 +15,18 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/user_agreement_text" />
+            android:textColor="@color/notificationTitleColor"
+            android:text="@string/user_agreement_text"
+            android:layout_marginBottom="8dp"/>
 
 
         <CheckBox
             android:id="@+id/checkBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
             android:buttonTint="@color/checkboxColor"
+            android:textStyle="bold"
             android:text="Принять соглашение" />
     </LinearLayout>
 

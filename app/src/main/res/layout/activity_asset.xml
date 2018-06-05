@@ -150,60 +150,94 @@
 
             </LinearLayout>
 
-            <Button
-                android:id="@+id/activity_asset_send_command"
-                android:layout_width="100dp"
-                android:layout_marginTop="8dp"
-                android:layout_height="32dp"
-                android:background="@color/assetTableHeaderColor"
-                android:maxLines="1"
-                android:text="отправить"
-                android:textColor="@android:color/white" />
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+
                 android:orientation="horizontal">
 
-               <!-- Command drop-down spinner -->
-                <Spinner
-                    android:id="@+id/spinner_command"
+                <Button
+                    android:id="@+id/activity_asset_to_map"
                     android:layout_width="wrap_content"
                     android:layout_height="32dp"
                     android:layout_marginRight="16dp"
-                    android:spinnerMode="dropdown"
-                    android:textAllCaps="true"
-                     />
-
-                <Button
-                    android:id="@+id/activity_asset_block_engine"
-                    android:layout_width="100dp"
-                    android:layout_height="32dp"
-                    android:background="@color/assetTableHeaderColor"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAccent"
+                    android:ellipsize="end"
                     android:maxLines="1"
-                    android:text="отправить"
+                    android:text="На карте"
                     android:textColor="@android:color/white" />
 
-            </LinearLayout>
+                <Button
+                    android:id="@+id/activity_asset_send_command"
+                    android:layout_width="172dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/colorAccent"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:text="Отправить команду"
+                    android:textColor="@android:color/white" />
 
-            <Button
-                android:id="@+id/activity_asset_to_map"
-                android:layout_width="100dp"
-                android:layout_height="32dp"
-                android:layout_marginRight="16dp"
-                android:layout_marginTop="16dp"
-                android:background="@color/colorAccent"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="На карте"
-                android:textColor="@android:color/white" />
 
+            </RelativeLayout>
 
         </LinearLayout>
 
     </LinearLayout>
 
 </ScrollView>
+
+<!--<Button-->
+<!--android:id="@+id/activity_asset_send_command"-->
+<!--android:layout_width="100dp"-->
+<!--android:layout_marginTop="8dp"-->
+<!--android:layout_height="32dp"-->
+<!--android:background="@color/assetTableHeaderColor"-->
+<!--android:maxLines="1"-->
+<!--android:text="отправить"-->
+<!--android:textColor="@android:color/white" />-->
+
+<!--<LinearLayout-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:layout_marginTop="16dp"-->
+<!--android:orientation="horizontal">-->
+
+<!--&lt;!&ndash; Command drop-down spinner &ndash;&gt;-->
+<!--<Spinner-->
+    <!--android:id="@+id/spinner_command"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="32dp"-->
+    <!--android:layout_marginRight="16dp"-->
+    <!--android:spinnerMode="dropdown"-->
+    <!--android:textAllCaps="true"-->
+    <!--/>-->
+
+<!--<Button-->
+    <!--android:id="@+id/activity_asset_block_engine"-->
+    <!--android:layout_width="100dp"-->
+    <!--android:layout_height="32dp"-->
+    <!--android:background="@color/assetTableHeaderColor"-->
+    <!--android:maxLines="1"-->
+    <!--android:text="отправить"-->
+    <!--android:textColor="@android:color/white" />-->
+
+<!--</LinearLayout>-->
+
+<!--<Button-->
+<!--android:id="@+id/activity_asset_to_map"-->
+<!--android:layout_width="100dp"-->
+<!--android:layout_height="32dp"-->
+<!--android:layout_marginRight="16dp"-->
+<!--android:layout_marginTop="16dp"-->
+<!--android:background="@color/colorAccent"-->
+<!--android:ellipsize="end"-->
+<!--android:maxLines="1"-->
+<!--android:text="На карте"-->
+<!--android:textColor="@android:color/white" />-->
 
 

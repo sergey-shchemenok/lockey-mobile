@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding ="8dp"
+    >
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/warning_text"
+            android:textSize="16sp"
+            android:textColor="@color/colorAccent" />
+
+        <!-- Command drop-down spinner -->
+        <Spinner
+            android:id="@+id/spinner_command"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:spinnerMode="dropdown"
+            android:textAllCaps="true" />
+
+        <!--<Button-->
+            <!--android:id="@+id/send_dialog_block_engine"-->
+            <!--android:layout_width="100dp"-->
+            <!--android:layout_height="32dp"-->
+            <!--android:background="@color/assetTableHeaderColor"-->
+            <!--android:maxLines="1"-->
+            <!--android:text="отправить"-->
+            <!--android:textColor="@android:color/white" />-->
+
+    </LinearLayout>
+
+</LinearLayout>

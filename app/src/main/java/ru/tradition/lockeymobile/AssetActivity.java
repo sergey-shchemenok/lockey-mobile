@@ -30,14 +30,11 @@ public class AssetActivity extends AppCompatActivity {
     private TextView name;
 
     private Button toMapButton;
-    private Button blockEngineButton;
     private Button sendCommand;
 
     private AssetsData assetData;
 
     //for spinner
-    private Spinner mCommandSpinner;
-    //Переменные для спинера
     private final static int CHOOSE_COMMAND = 0;
     private final static int COMMAND_LOCK_ENGINE = 1;
     private final static int COMMAND_UNLOCK_ENGINE = 2;
@@ -67,12 +64,7 @@ public class AssetActivity extends AppCompatActivity {
         name = (TextView) findViewById(R.id.asset_name);
         //lastTime = (TextView)findViewById(R.id.asset_last_time);
         toMapButton = (Button) findViewById(R.id.activity_asset_to_map);
-        blockEngineButton = (Button) findViewById(R.id.activity_asset_block_engine);
         sendCommand = (Button) findViewById(R.id.activity_asset_send_command);
-
-        mCommandSpinner = (Spinner) findViewById(R.id.spinner_command);
-        setupSpinner();
-        mCommandSpinner.getBackground().setColorFilter(getResources().getColor(R.color.checkboxColor), PorterDuff.Mode.SRC_ATOP);
 
         assetData = (AssetsData) getIntent().getSerializableExtra("AssetData");
 
@@ -98,16 +90,15 @@ public class AssetActivity extends AppCompatActivity {
         sendCommand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showUserAgreement();
+                if (alertDialogIsChecked)
+                    showSendCommandDialog();
+                else
+                    showUserAgreement();
             }
         });
 
-        blockEngineButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(AssetActivity.this, "Функция блокировки недоступна в текущей версии приложения", Toast.LENGTH_LONG).show();
-            }
-        });
+
+         
     }
 
     @Override
@@ -120,19 +111,52 @@ public class AssetActivity extends AppCompatActivity {
     /**
      * Setup the dropdown spinner that allows the user to select the command.
      */
-    private void setupSpinner() {
-        // Create adapter for spinner. The list options are from the String array it will use
-        // the spinner will use the default layout
+//    private void setupSpinner() {
+//        // Create adapter for spinner. The list options are from the String array it will use
+//        // the spinner will use the default layout
+//        ArrayAdapter commandSpinnerAdapter = ArrayAdapter.createFromResource(this,
+//                R.array.array_command_options, android.R.layout.simple_spinner_item);
+//
+//        // Specify dropdown layout style - simple list view with 1 item per line
+//        commandSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+//
+//        // Apply the adapter to the spinner
+//        mCommandSpinner.setAdapter(commandSpinnerAdapter);
+//
+//        // Set the integer mSelected to the constant values
+//        mCommandSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                String selection = (String) parent.getItemAtPosition(position);
+//                if (!TextUtils.isEmpty(selection)) {
+//                    if (selection.equals(getString(R.string.lock_engine))) {
+//                        mCommand = COMMAND_LOCK_ENGINE; // Lock
+//                    } else if (selection.equals(getString(R.string.unlock_engine))) {
+//                        mCommand = COMMAND_UNLOCK_ENGINE; // Unlock
+//                    } else {
+//                        mCommand = CHOOSE_COMMAND;
+//                    }
+//                }
+//            }
+//
+//            // Because AdapterView is an abstract class, onNothingSelected must be defined
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//                mCommand = CHOOSE_COMMAND; // Unknown
+//            }
+//        });
+//    }
+    private void showSendCommandDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View mView = getLayoutInflater().inflate(R.layout.send_command_view, null);
+
+        Spinner mCommandSpinner = (Spinner) mView.findViewById(R.id.spinner_command);
         ArrayAdapter commandSpinnerAdapter = ArrayAdapter.createFromResource(this,
                 R.array.array_command_options, android.R.layout.simple_spinner_item);
 
-        // Specify dropdown layout style - simple list view with 1 item per line
         commandSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
-        // Apply the adapter to the spinner
         mCommandSpinner.setAdapter(commandSpinnerAdapter);
-
-        // Set the integer mSelected to the constant values
         mCommandSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -148,30 +172,18 @@ public class AssetActivity extends AppCompatActivity {
                 }
             }
 
-            // Because AdapterView is an abstract class, onNothingSelected must be defined
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 mCommand = CHOOSE_COMMAND; // Unknown
             }
         });
-    }
+        mCommandSpinner.getBackground().setColorFilter(getResources().getColor(R.color.checkboxColor), PorterDuff.Mode.SRC_ATOP);
 
-    int a = 5;
-
-    public void showUserAgreement() {
-        // Create an AlertDialog.Builder and set the message, and click listeners
-        // for the positive and negative buttons on the dialog.
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        View mView = getLayoutInflater().inflate(R.layout.check_box, null);
-        CheckBox mCheckBox = mView.findViewById(R.id.checkBox);
-
-        builder.setTitle("Пользовательское соглашение")
+        builder.setTitle("Отправка команд")
 //                .setMessage(R.string.user_agreement_text)
                 .setView(mView)
-                .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
                         // User clicked the "Delete" button, so delete the notifications.
                     }
                 })
@@ -195,27 +207,75 @@ public class AssetActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         // TODO Do something
-                        a--;
+                        Toast.makeText(AssetActivity.this, "Функция блокировки недоступна в текущей версии приложения", Toast.LENGTH_LONG).show();
 
-                        if (a == 0)
-                            //Dismiss once everything is OK.
-                            alertDialog.dismiss();
+                        alertDialog.dismiss();
                     }
                 });
             }
         });
-
-
         alertDialog.show();
 
+    }
+
+
+    private static boolean alertDialogIsChecked = false;
+
+    private void showUserAgreement() {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the positive and negative buttons on the dialog.
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        View mView = getLayoutInflater().inflate(R.layout.user_agreement_view, null);
+        CheckBox mCheckBox = mView.findViewById(R.id.checkBox);
+
+        builder.setTitle("Пользовательское соглашение")
+//                .setMessage(R.string.user_agreement_text)
+                .setView(mView)
+                .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User clicked the "Delete" button, so delete the notifications.
+                    }
+                })
+                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User clicked the "Cancel" button, so dismiss the dialog
+                        // and continue editing the pet.
+                        if (dialog != null) {
+                            dialog.dismiss();
+                        }
+                    }
+                });
+
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialogInterface) {
+                Button button = ((AlertDialog) alertDialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+                        // TODO Do something
+                        if (alertDialogIsChecked) {
+                            //Dismiss once everything is OK.
+                            alertDialog.dismiss();
+                            showSendCommandDialog();
+                        }
+                    }
+                });
+            }
+        });
+        alertDialog.show();
 
         mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (compoundButton.isChecked()) {
-//                    storeDialogStatus(true);
+                    alertDialogIsChecked = true;
                 } else {
-//                    storeDialogStatus(false);
+                    alertDialogIsChecked = false;
                 }
             }
         });

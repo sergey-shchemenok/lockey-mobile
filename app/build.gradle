@@ -6,8 +6,8 @@ android {
         applicationId "ru.tradition.lockeymobile"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 14
-        versionName "0.9.40"
+        versionCode 15
+        versionName "0.9.41"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -51,6 +51,9 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-messaging:11.4.0'
     apply plugin: 'com.google.gms.google-services'
+
+    implementation project(':locker')
+
 }
 apply plugin: 'com.google.gms.google-services'
 

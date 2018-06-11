@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/LockeyMobile.iml" filepath="$PROJECT_DIR$/LockeyMobile.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/locker/locker.iml" filepath="$PROJECT_DIR$/locker/locker.iml" />
     </modules>
   </component>
 </project>

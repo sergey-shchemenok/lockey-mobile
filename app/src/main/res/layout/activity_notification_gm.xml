@@ -126,24 +126,25 @@
                     android:orientation="horizontal"
                     android:paddingBottom="24dp">
 
-                    <Button
-                        android:id="@+id/notification_zoom_in"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginRight="8dp"
-                        android:background="@drawable/button_color"
-                        android:fontFamily="sans-serif"
-                        android:text="+"
-                        android:textSize="24sp"
-                        android:textStyle="normal" />
 
                     <Button
                         android:id="@+id/notification_zoom_out"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:background="@drawable/button_color"
+                        android:layout_marginRight="8dp"
                         android:fontFamily="sans-serif"
                         android:text="—"
+                        android:textSize="24sp"
+                        android:textStyle="normal" />
+
+                    <Button
+                        android:id="@+id/notification_zoom_in"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/button_color"
+                        android:fontFamily="sans-serif"
+                        android:text="+"
                         android:textSize="24sp"
                         android:textStyle="normal" />
 

@@ -439,13 +439,13 @@ public class MapFragmentTab extends Fragment implements OnMapReadyCallback,
         });
 
         //clicking on marker
-        google_map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                Toast.makeText(getContext(), marker.getTitle() + " " + marker.getPosition(), Toast.LENGTH_LONG).show();
-                return true;
-            }
-        });
+//        google_map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//            @Override
+//            public boolean onMarkerClick(Marker marker) {
+//                Toast.makeText(getContext(), marker.getTitle() + " " + marker.getPosition(), Toast.LENGTH_LONG).show();
+//                return true;
+//            }
+//        });
 
         placeMarkersOnMap();
 

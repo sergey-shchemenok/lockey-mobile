@@ -174,7 +174,7 @@
                     android:layout_width="172dp"
                     android:layout_height="32dp"
                     android:layout_marginTop="8dp"
-                    android:background="@color/colorAccent"
+                    android:background="@color/assetTableHeaderColor"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:layout_alignParentRight="true"
@@ -184,6 +184,15 @@
 
 
             </RelativeLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_height="wrap_content"
+                android:text="* Функция отправки команд работает в тестовом режиме"
+                android:textColor="@color/notificationBodyColor"
+
+                />
 
         </LinearLayout>
 

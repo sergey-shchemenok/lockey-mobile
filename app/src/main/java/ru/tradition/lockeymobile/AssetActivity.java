@@ -90,15 +90,18 @@ public class AssetActivity extends AppCompatActivity {
         sendCommand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //to delete after testing
+                alertDialogIsChecked = false;
+
                 if (alertDialogIsChecked)
                     showSendCommandDialog();
-                else
+                else {
                     showUserAgreement();
+                }
             }
         });
 
 
-         
     }
 
     @Override
@@ -207,7 +210,7 @@ public class AssetActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         // TODO Do something
-                        Toast.makeText(AssetActivity.this, "Функция блокировки недоступна в текущей версии приложения", Toast.LENGTH_LONG).show();
+                        Toast.makeText(AssetActivity.this, "Функция отправки команд недоступна в текущей версии приложения", Toast.LENGTH_LONG).show();
 
                         alertDialog.dismiss();
                     }

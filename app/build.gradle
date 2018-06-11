@@ -6,8 +6,8 @@ android {
         applicationId "ru.tradition.lockeymobile"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 13
-        versionName "0.9.38"
+        versionCode 14
+        versionName "0.9.40"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -57,9 +57,15 @@ apply plugin: 'com.google.gms.google-services'
 //for osm
 repositories {
     mavenCentral()
+
+    //app locker
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
+    //app locker
+    implementation 'com.github.balrampandey19:AppLocker:1.0.1'
+
     implementation 'org.osmdroid:osmdroid-android:6.0.1'
     implementation 'org.osmdroid:osmdroid-wms:6.0.1'
     implementation 'org.osmdroid:osmdroid-mapsforge:6.0.1'

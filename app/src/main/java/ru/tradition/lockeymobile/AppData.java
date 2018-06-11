@@ -27,7 +27,7 @@ import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
 
 public final class AppData {
 
-    public static final String VERSION = "0.9.39";
+    public static final String VERSION = "0.9.40";
     //fab is added to notification activity
 
     public static MainActivity mainActivity;

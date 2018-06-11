@@ -59,13 +59,10 @@ repositories {
     mavenCentral()
 
     //app locker
-    maven { url "https://jitpack.io" }
+
 }
 
 dependencies {
-    //app locker
-    implementation 'com.github.balrampandey19:AppLocker:1.0.1'
-
     implementation 'org.osmdroid:osmdroid-android:6.0.1'
     implementation 'org.osmdroid:osmdroid-wms:6.0.1'
     implementation 'org.osmdroid:osmdroid-mapsforge:6.0.1'

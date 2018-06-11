@@ -13,7 +13,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
-        <!--&lt;!&ndash; App bar style &ndash;&gt;-->
+        <!--&lt;!&ndash; Appbar style &ndash;&gt;-->
         <!--<item name="actionBarStyle">@style/LockeyMobileBarStyle</item>-->
         <!--<item name="android:windowContentOverlay">@null</item>-->
 

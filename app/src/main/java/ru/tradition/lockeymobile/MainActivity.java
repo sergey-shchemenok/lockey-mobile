@@ -89,13 +89,25 @@ public class MainActivity extends AppCompatActivity implements
 
     public static final String LOG_TAG = MainActivity.class.getName();
 
+    private SharedPreferences preferences;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        useMap = preferences.getString(
+                getString(R.string.settings_use_map_key),
+                getString(R.string.settings_default_map)
+        );
+        Log.i(LOG_TAG, "useMap.........." + useMap);
+
+        String pwd = preferences.getString(AppData.PWD_PREFERENCES, "");
+        String usr = preferences.getString(AppData.USR_PREFERENCES, "");
+
         //go to auth activity
-        if (AppData.usr.equals("") || AppData.pwd.equals("")) {
+        if (usr.equals("") || pwd.equals("")) {
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
             Log.i(LOG_TAG, ".............no credentials");
@@ -121,14 +133,6 @@ public class MainActivity extends AppCompatActivity implements
             MapFragmentTabOSM.osm_markers.clear();
         if (MapFragmentTabOSM.osm_map != null)
             MapFragmentTabOSM.osm_map.getOverlays().clear();
-
-
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        useMap = sharedPrefs.getString(
-                getString(R.string.settings_use_map_key),
-                getString(R.string.settings_default_map)
-        );
-        Log.i(LOG_TAG, "useMap.........." + useMap);
 
         connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -271,6 +275,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public Loader<LoadedData> onCreateLoader(int loaderId, Bundle bundle) {
+        AppData.pwd = preferences.getString(AppData.PWD_PREFERENCES, "");
+        AppData.usr = preferences.getString(AppData.USR_PREFERENCES, "");
         switch (loaderId) {
             case ASSETS_LOADER_ID:
                 // Create a new loader for the given URL
@@ -302,6 +308,10 @@ public class MainActivity extends AppCompatActivity implements
             Log.i(LOG_TAG, "get zones again...");
             //todo something later
             getZones();
+            if (!GeofenceQueryUtils.message.equals("OK")) {
+                GeofenceQueryUtils.message = "OK";
+                logout();
+            }
             return;
         }
 
@@ -309,6 +319,10 @@ public class MainActivity extends AppCompatActivity implements
         if (AssetsQueryUtils.assetsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             AppData.needToken = true;
             getAssetsData();
+            if (!AssetsQueryUtils.message.equals("OK")) {
+                AssetsQueryUtils.message = "OK";
+                logout();
+            }
             return;
         }
 
@@ -339,7 +353,8 @@ public class MainActivity extends AppCompatActivity implements
             AssetsFragmentTab.aft.mEmptyStateTextView.setText("");
             AssetsFragmentTab.aft.progressCircle.setVisibility(View.GONE);
             AssetsFragmentTab.aft.updateListView();
-        } catch (NullPointerException e){}
+        } catch (NullPointerException e) {
+        }
 
 
     }
@@ -387,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
             case R.id.main_menu_logout:
-                logout();
+                showLogoutConfirmationDialog();
                 return true;
             case R.id.main_menu_item_selection:
                 //todo settings here
@@ -492,7 +507,7 @@ public class MainActivity extends AppCompatActivity implements
                 Intent intent = new Intent(Intent.ACTION_SENDTO);
                 intent.setData(Uri.parse("mailto:")); // only email apps should handle this
                 intent.putExtra(Intent.EXTRA_EMAIL, addresses);
-                intent.putExtra(Intent.EXTRA_SUBJECT, "Сообщение от пользователя " + AppData.usr);
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Сообщение от пользователя " + preferences.getString(AppData.USR_PREFERENCES, ""));
                 if (intent.resolveActivity(getPackageManager()) != null) {
                     startActivity(intent);
                 }
@@ -511,11 +526,38 @@ public class MainActivity extends AppCompatActivity implements
 
     public void logout() {
         Intent intent = new Intent(this, AuthActivity.class);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(AppData.PWD_PREFERENCES, "");
+        editor.putString(AppData.USR_PREFERENCES, "");
+        editor.commit();
         NotificationsFragmentTab.loaderSwitch = 0;
         if (AppData.isAssetSelectingMode || AppData.isNotificationSelectingMode)
             changeModeToNormal();
         startActivity(intent);
 //        AppData.viewPager.setCurrentItem(0);
+    }
+
+    public void showLogoutConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.logout);
+        builder.setPositiveButton(R.string.confirm_logout, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                logout();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Cancel" button, so dismiss the dialog
+                // and continue editing the pet.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     //to change mode from selecting to normal
@@ -574,7 +616,7 @@ public class MainActivity extends AppCompatActivity implements
                 MapFragmentTabOSM.bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
             MapFragmentTabOSM.bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         } else
-            logout();
+            showLogoutConfirmationDialog();
     }
 
     @Override

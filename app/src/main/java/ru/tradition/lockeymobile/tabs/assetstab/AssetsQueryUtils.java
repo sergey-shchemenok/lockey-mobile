@@ -1,5 +1,8 @@
 package ru.tradition.lockeymobile.tabs.assetstab;
 
+import android.app.Application;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -21,6 +24,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 
 import ru.tradition.lockeymobile.AppData;
+import ru.tradition.lockeymobile.MainActivity;
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
 
 import static ru.tradition.lockeymobile.auth.AuthQueryUtils.authCookieManager;
@@ -38,6 +42,7 @@ public final class AssetsQueryUtils {
 
     public static int assetsUrlResponseCode;
 
+    public static String message = "OK";
 
     /**
      * Create a private constructor because no one should ever create a {@link AssetsQueryUtils} object.
@@ -154,7 +159,10 @@ public final class AssetsQueryUtils {
 
         //todo process here
         if (AppData.needToken) {
-            AuthQueryUtils.makeHttpRequest(new URL(AppData.AUTH_REQUEST_URL), AppData.pwd, AppData.usr);
+            message = AuthQueryUtils.extractData(
+                    AuthQueryUtils.makeHttpRequest(
+                            new URL(AppData.AUTH_REQUEST_URL), AppData.pwd, AppData.usr));
+            Log.i(LOG_TAG, "message assets is " + message + " ...");
             AppData.needToken = false;
         }
 

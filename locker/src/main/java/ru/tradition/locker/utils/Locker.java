@@ -16,7 +16,7 @@ public abstract class Locker {
 	public static final String MESSAGE = "message";
 	public static final String TYPE = "type";
 
-	public static final int DEFAULT_TIMEOUT = 0; // 2000ms
+	public static final int DEFAULT_TIMEOUT = 5000; // 2000ms
 
 	protected int lockTimeOut;
 	protected HashSet<String> ignoredActivities;

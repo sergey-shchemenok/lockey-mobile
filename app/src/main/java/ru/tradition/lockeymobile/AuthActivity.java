@@ -5,10 +5,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -40,6 +42,8 @@ public class AuthActivity extends AppCompatActivity
     private EditText passwordView;
     private Button loginButton;
 
+    private SharedPreferences preferences;
+
     private ProgressBar progressCircle;
 
     public static final String LOG_TAG = AuthActivity.class.getName();
@@ -59,6 +63,7 @@ public class AuthActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 //        int badgeCount = 0;
 //        ShortcutBadger.applyCount(this, badgeCount); //for 1.1.4+
@@ -110,13 +115,15 @@ public class AuthActivity extends AppCompatActivity
             }
         }
 
-        if (!AppData.usr.isEmpty())
-            loginView.setText(AppData.usr);
-        if (!AppData.pwd.isEmpty())
-            passwordView.setText(AppData.pwd);
+        String pwd = preferences.getString(AppData.PWD_PREFERENCES, "");
+        String usr = preferences.getString(AppData.USR_PREFERENCES, "");
+        if (!usr.isEmpty())
+            loginView.setText(usr);
+        if (!pwd.isEmpty())
+            passwordView.setText(pwd);
 
-        if ((AppData.usr.isEmpty() && AppData.pwd.isEmpty()) ||
-                (AppData.usr.equals("") && AppData.pwd.equals(""))) {
+        if ((usr.isEmpty() && pwd.isEmpty()) ||
+                (usr.equals("") && pwd.equals(""))) {
             AppData.osmStartPoint = new GeoPoint(55.7522200, 37.6155600);
             AppData.osmCameraZoom = 12.0;
         }
@@ -126,11 +133,22 @@ public class AuthActivity extends AppCompatActivity
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //todo all clear
                 if (AppData.mAssetMap != null)
                     AppData.mAssetMap.clear();
-                AppData.pwd = passwordView.getText().toString();
+                if (AppData.mPolygonsMap != null)
+                    AppData.mPolygonsMap.clear();
+                if (AppData.mSubscriptionsMap != null)
+                    AppData.mSubscriptionsMap.clear();
+
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString(AppData.PWD_PREFERENCES, passwordView.getText().toString());
+                editor.putString(AppData.USR_PREFERENCES, loginView.getText().toString());
+                editor.commit();
+
+//                AppData.pwd = passwordView.getText().toString();
                 //.trim();
-                AppData.usr = loginView.getText().toString();
+//                AppData.usr = loginView.getText().toString();
                 //.trim();
                 //get token. If it is correct start main activity
                 progressCircle.setVisibility(View.VISIBLE);
@@ -242,7 +260,9 @@ public class AuthActivity extends AppCompatActivity
     public Loader<String> onCreateLoader(int i, Bundle bundle) {
         // Create a new loader for the given URL
         Log.v(LOG_TAG, "onCreateLoader");
-        return new AuthTokenLoader(this, AppData.AUTH_REQUEST_URL, AppData.pwd, AppData.usr);
+        String pwd = preferences.getString(AppData.PWD_PREFERENCES, "");
+        String usr = preferences.getString(AppData.USR_PREFERENCES, "");
+        return new AuthTokenLoader(this, AppData.AUTH_REQUEST_URL, pwd, usr);
     }
 
     @Override
@@ -264,7 +284,7 @@ public class AuthActivity extends AppCompatActivity
         infoMessage.setVisibility(View.GONE);
         Log.v(LOG_TAG, "onLoadFinished");
         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
-        AppData.isAuthorized = true;
+//        AppData.isAuthorized = true;
         intent.putExtra("page", page);
         startActivity(intent);
     }
@@ -279,7 +299,7 @@ public class AuthActivity extends AppCompatActivity
     protected void onStart() {
         Log.i(LOG_TAG, "Activity has started..............................");
         super.onStart();
-        AppData.isAuthorized = false;
+//        AppData.isAuthorized = false;
         startRepeatingTask();
     }
 

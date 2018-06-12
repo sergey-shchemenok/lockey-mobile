@@ -35,7 +35,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
 
     private static final String NOTIFICATION_ID_PREFERENCES = "notification_id_preferences";
     public static final String FCM_NOTIFICATION_ID = "fcm_notification_id";
-    SharedPreferences notificationIDIncrement;
+    SharedPreferences preferences;
 
     private static final String LOG_TAG = FcmInstanceIDService.class.getSimpleName();
 
@@ -49,7 +49,7 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
     @Override
     public void onCreate() {
         super.onCreate();
-        notificationIDIncrement = getSharedPreferences(NOTIFICATION_ID_PREFERENCES, Context.MODE_PRIVATE);
+        preferences = getSharedPreferences(NOTIFICATION_ID_PREFERENCES, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -142,14 +142,14 @@ public class FcmMessagingService extends com.google.firebase.messaging.FirebaseM
             intent.putExtra("Uri", uri);
         }
 
-//        if(notificationIDIncrement.contains(FCM_NOTIFICATION_ID)) {
-//            fcmNotificationId = notificationIDIncrement.getInt(FCM_NOTIFICATION_ID, 0);
+//        if(preferences.contains(FCM_NOTIFICATION_ID)) {
+//            fcmNotificationId = preferences.getInt(FCM_NOTIFICATION_ID, 0);
 //            fcmNotificationId++;
-//            SharedPreferences.Editor editor = notificationIDIncrement.edit();
+//            SharedPreferences.Editor editor = preferences.edit();
 //            editor.putInt(FCM_NOTIFICATION_ID, fcmNotificationId);
 //            editor.commit();
 //        }else {
-//            SharedPreferences.Editor editor = notificationIDIncrement.edit();
+//            SharedPreferences.Editor editor = preferences.edit();
 //            fcmNotificationId = 0;
 //            editor.putInt(FCM_NOTIFICATION_ID, fcmNotificationId);
 //            editor.commit();

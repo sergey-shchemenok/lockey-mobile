@@ -1,12 +1,16 @@
 package ru.tradition.lockeymobile;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -30,6 +34,8 @@ import ru.tradition.lockeymobile.subscriptions.DeactivatingSubscriptionQueryUtil
 import ru.tradition.lockeymobile.subscriptions.SubscriptionData;
 import ru.tradition.lockeymobile.subscriptions.SubscriptionDataAdapter;
 import ru.tradition.lockeymobile.subscriptions.SubscriptionQueryUtils;
+import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
+import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 
 import static ru.tradition.lockeymobile.AppData.ACTIVATE_SUBSCRIPTION_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.DEACTIVATE_SUBSCRIPTION_LOADER_ID;
@@ -63,13 +69,19 @@ public class SubscriptionsActivity extends AppCompatActivity implements
     //Contains subscription SID
     private static int mSID = -1;
 
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
         super.onCreate(savedInstanceState);
 
+        String pwd = preferences.getString(AppData.PWD_PREFERENCES, "");
+        String usr = preferences.getString(AppData.USR_PREFERENCES, "");
         //go to auth activity. It need to prevent seeing the internal information without authorization
-        if (AppData.usr.equals("") || AppData.pwd.equals("") || AppData.isAuthorized == false) {
+        if (usr.equals("") || pwd.equals("")
+//                ||AppData.isAuthorized == false
+                ) {
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
         }
@@ -200,6 +212,8 @@ public class SubscriptionsActivity extends AppCompatActivity implements
 
     @Override
     public Loader<LoadedData> onCreateLoader(int loaderId, Bundle bundle) {
+        AppData.pwd = preferences.getString(AppData.PWD_PREFERENCES, "");
+        AppData.usr = preferences.getString(AppData.USR_PREFERENCES, "");
         Log.i(LOG_TAG, "onCreateLoader");
         switch (loaderId) {
             case SUBSCRIPTIONS_LOADER_ID:
@@ -234,6 +248,10 @@ public class SubscriptionsActivity extends AppCompatActivity implements
             mSID = loadedData.getSid();
             activateSubscription();
             mSID = -1;
+            if (!ActivatingSubscriptionQueryUtils.message.equals("OK")) {
+                ActivatingSubscriptionQueryUtils.message = "OK";
+                logout();
+            }
             return;
         }
         //whether it can be authorized. The token has not expired
@@ -243,10 +261,18 @@ public class SubscriptionsActivity extends AppCompatActivity implements
             mSID = loadedData.getSid();
             deactivateSubscription();
             mSID = -1;
+            if (!DeactivatingSubscriptionQueryUtils.message.equals("OK")) {
+                DeactivatingSubscriptionQueryUtils.message = "OK";
+                logout();
+            }
             return;
         }
         if (SubscriptionQueryUtils.subscriptionsUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             AppData.needToken = true;
+            if (!SubscriptionQueryUtils.message.equals("OK")) {
+                SubscriptionQueryUtils.message = "OK";
+                logout();
+            }
 //            getSubscriptions();
 //            return;
         }
@@ -326,7 +352,7 @@ public class SubscriptionsActivity extends AppCompatActivity implements
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
             case R.id.subscription_menu_logout:
-                logout();
+                showLogoutConfirmationDialog();
                 return true;
             case R.id.subscription_menu_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
@@ -400,7 +426,34 @@ public class SubscriptionsActivity extends AppCompatActivity implements
 
     public void logout() {
         Intent intent = new Intent(this, AuthActivity.class);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(AppData.PWD_PREFERENCES, "");
+        editor.putString(AppData.USR_PREFERENCES, "");
+        editor.commit();
         startActivity(intent);
+    }
+
+    public void showLogoutConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.logout);
+        builder.setPositiveButton(R.string.confirm_logout, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                logout();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Cancel" button, so dismiss the dialog
+                // and continue editing the pet.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @Override

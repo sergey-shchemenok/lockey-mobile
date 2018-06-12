@@ -42,6 +42,8 @@ public final class GeofenceQueryUtils {
 
     public static int zonesUrlResponseCode;
 
+    public static String message = "OK";
+
 
     /**
      * Create a private constructor because no one should ever create a {@link GeofenceQueryUtils} object.
@@ -129,7 +131,9 @@ public final class GeofenceQueryUtils {
         }
 
         if (AppData.needToken) {
-            AuthQueryUtils.makeHttpRequest(new URL(AppData.AUTH_REQUEST_URL), AppData.pwd, AppData.usr);
+            message = AuthQueryUtils.extractData(
+                    AuthQueryUtils.makeHttpRequest(
+                            new URL(AppData.AUTH_REQUEST_URL), AppData.pwd, AppData.usr));
             AppData.needToken = false;
         }
 

@@ -29,6 +29,8 @@
     <string name="editor_delete_notification_successful">Операция выполнена успешно, количество удаленных элементов - </string>
     <string name="delete_all_notifications">Удалить все уведомления?</string>
     <string name="delete">Удалить</string>
+    <string name="confirm_logout">Выйти</string>
+    <string name="logout">Выйти из учетной записи?</string>
     <string name="cancel">Отмена</string>
     <string name="delete_notifications">Удалить выбранные уведомления?</string>
     <string name="settings_title">Настройки</string>

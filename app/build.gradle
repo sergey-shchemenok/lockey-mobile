@@ -6,8 +6,8 @@ android {
         applicationId "ru.tradition.lockeymobile"
         minSdkVersion 16
         targetSdkVersion 27
-        versionCode 15
-        versionName "0.9.41"
+        versionCode 18
+        versionName "0.9.44"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {

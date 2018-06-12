@@ -34,6 +34,8 @@ public final class DeactivatingSubscriptionQueryUtils {
     //Stores the response message for the request
     public static String deactivatingSubscriptionUrlResponseMessage;
 
+    public static String message = "OK";
+
     private DeactivatingSubscriptionQueryUtils() {}
 
     public static String extractData(String jsonResponse) {
@@ -102,7 +104,9 @@ public final class DeactivatingSubscriptionQueryUtils {
         }
 
         if (AppData.needToken) {
-            AuthQueryUtils.makeHttpRequest(new URL(AppData.AUTH_REQUEST_URL), AppData.pwd, AppData.usr);
+            message = AuthQueryUtils.extractData(
+                    AuthQueryUtils.makeHttpRequest(
+                            new URL(AppData.AUTH_REQUEST_URL), AppData.pwd, AppData.usr));
             AppData.needToken = false;
         }
 

@@ -121,7 +121,7 @@ public class MapFragmentTabOSM extends Fragment implements
             Context ctx = AppData.mainActivity.getApplicationContext();
             Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         } catch (NullPointerException e) {
-            startActivity(new Intent(getActivity(), AuthActivity.class));
+            //startActivity(new Intent(getActivity(), AuthActivity.class));
 
         }
 

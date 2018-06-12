@@ -3,7 +3,9 @@ package ru.tradition.lockeymobile;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
+import android.preference.PreferenceManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
+import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 
 public class AssetActivity extends AppCompatActivity {
     private TextView kitNumber;
@@ -41,9 +44,24 @@ public class AssetActivity extends AppCompatActivity {
     private final static int COMMAND_UNLOCK_ENGINE = 2;
     private static int mCommand;
 
+    private SharedPreferences preferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String pwd = preferences.getString(AppData.PWD_PREFERENCES, "");
+        String usr = preferences.getString(AppData.USR_PREFERENCES, "");
+        if (usr.equals("") || pwd.equals("")
+//                || AppData.isAuthorized == false
+                ) {
+            Intent intent = new Intent(this, AuthActivity.class);
+            intent.putExtra("hasCredentials", false);
+            startActivity(intent);
+            return;
+        }
+
         setContentView(R.layout.activity_asset);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -299,7 +317,7 @@ public class AssetActivity extends AppCompatActivity {
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
             case R.id.asset_menu_logout:
-                logout();
+                showLogoutConfirmationDialog();
                 return true;
             case R.id.asset_menu_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
@@ -320,8 +338,36 @@ public class AssetActivity extends AppCompatActivity {
 
     public void logout() {
         Intent intent = new Intent(this, AuthActivity.class);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(AppData.PWD_PREFERENCES, "");
+        editor.putString(AppData.USR_PREFERENCES, "");
+        editor.commit();
         startActivity(intent);
     }
+
+    public void showLogoutConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.logout);
+        builder.setPositiveButton(R.string.confirm_logout, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                logout();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Cancel" button, so dismiss the dialog
+                // and continue editing the pet.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
 
     @Override
     public boolean onSupportNavigateUp() {

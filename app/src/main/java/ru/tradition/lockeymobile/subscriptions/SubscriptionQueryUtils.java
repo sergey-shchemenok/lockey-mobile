@@ -38,6 +38,7 @@ public final class SubscriptionQueryUtils {
     //Stores the response message for the request
     public static int subscriptionsUrlResponseCode;
     public static String subscriptionsUrlResponseMessage;
+    public static String message = "OK";
 
     /**
      * Create a private constructor because no one should ever create a {@link SubscriptionQueryUtils} object.
@@ -177,7 +178,10 @@ public final class SubscriptionQueryUtils {
         }
 
         if (AppData.needToken) {
-            AuthQueryUtils.makeHttpRequest(new URL(AppData.AUTH_REQUEST_URL), AppData.pwd, AppData.usr);
+            message = AuthQueryUtils.extractData(
+                    AuthQueryUtils.makeHttpRequest(
+                            new URL(AppData.AUTH_REQUEST_URL), AppData.pwd, AppData.usr));
+            Log.i(LOG_TAG, "message subscriptions is " + message + " ...");
             AppData.needToken = false;
         }
 

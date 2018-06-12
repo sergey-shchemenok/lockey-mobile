@@ -1,9 +1,11 @@
 package ru.tradition.lockeymobile;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -56,8 +58,10 @@ import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru.tradition.lockeymobile.subscriptions.SubscriptionQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
 import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
+import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContract;
 
 import static ru.tradition.lockeymobile.AppData.ZONES_LOADER_ID;
@@ -97,6 +101,8 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
     private Button zoomIn;
     private Button zoomOut;
 
+    private SharedPreferences preferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,11 +115,14 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 //        }
 
 
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        useMap = sharedPrefs.getString(
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        useMap = preferences.getString(
                 getString(R.string.settings_use_map_key),
                 getString(R.string.settings_default_map)
         );
+
+        String pwd = preferences.getString(AppData.PWD_PREFERENCES, "");
+        String usr = preferences.getString(AppData.USR_PREFERENCES, "");
 
         if (useMap.equals(getString(R.string.settings_osm_value)))
             setContentView(R.layout.activity_notification_osm);
@@ -121,7 +130,9 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             setContentView(R.layout.activity_notification_gm);
 
         //go to auth activity. It need to prevent seeing the internal information without authorization
-        if (AppData.usr.equals("") || AppData.pwd.equals("") || AppData.isAuthorized == false) {
+        if (usr.equals("") || pwd.equals("")
+//                || AppData.isAuthorized == false
+                ) {
             Intent intent = new Intent(this, AuthActivity.class);
             intent.putExtra("hasCredentials", false);
             startActivity(intent);
@@ -467,7 +478,7 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
             case R.id.notification_menu_logout:
-                logout();
+                showLogoutConfirmationDialog();
                 return true;
             case R.id.notification_menu_settings:
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
@@ -488,8 +499,36 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
     public void logout() {
         Intent intent = new Intent(this, AuthActivity.class);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(AppData.PWD_PREFERENCES, "");
+        editor.putString(AppData.USR_PREFERENCES, "");
+        editor.commit();
         startActivity(intent);
     }
+
+    public void showLogoutConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.logout);
+        builder.setPositiveButton(R.string.confirm_logout, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                logout();
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Cancel" button, so dismiss the dialog
+                // and continue editing the pet.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -645,6 +684,9 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
 
         @Override
         public Loader<LoadedData> onCreateLoader(int id, Bundle args) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(NotificationActivity.this);
+            AppData.pwd = preferences.getString(AppData.PWD_PREFERENCES, "");
+            AppData.usr = preferences.getString(AppData.USR_PREFERENCES, "");
             Log.i(LOG_TAG, "onCreateLoader zones notification");
             return new DataLoader(context, AppData.ZONES_LIST_URL, ZONES_LOADER_ID);
         }
@@ -662,6 +704,10 @@ public class NotificationActivity extends AppCompatActivity implements LoaderMan
             if (GeofenceQueryUtils.zonesUrlResponseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
                 AppData.needToken = true;
                 Log.i(LOG_TAG, "get zones again..notification.");
+                if (!GeofenceQueryUtils.message.equals("OK")) {
+                    GeofenceQueryUtils.message = "OK";
+                    logout();
+                }
             }
 
         }

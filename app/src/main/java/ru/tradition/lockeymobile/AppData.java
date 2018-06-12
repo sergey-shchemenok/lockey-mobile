@@ -27,7 +27,7 @@ import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
 
 public final class AppData {
 
-    public static final String VERSION = "0.9.41";
+    public static final String VERSION = "0.9.44";
     //fab is added to notification activity
 
     public static MainActivity mainActivity;
@@ -76,10 +76,12 @@ public final class AppData {
     public static CustomViewPager viewPager;
 
     //user's login and password
-    public static boolean isAuthorized = false;
+//    public static boolean isAuthorized = false;
     public static String pwd = "";
     public static String usr = "";
 
+    public static final String PWD_PREFERENCES = "pwd_preferences";
+    public static final String USR_PREFERENCES = "usr_preferences";
 
     /**
      * Constant value for the loader ID.

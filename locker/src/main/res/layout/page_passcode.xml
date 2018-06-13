@@ -27,7 +27,7 @@
             android:paddingTop="16dp"
             android:singleLine="true"
             android:textColor="#FF464646"
-            android:text="Enter Pin"
+            android:text="Введите ПИН-код"
             android:textSize="18sp" />
 
         <LinearLayout

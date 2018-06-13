@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.balram.locker.main.PatternLockActivity">
+    tools:context=".main.PatternLockActivity">
 <com.balram.locker.view.PatternLockView
     android:layout_width="match_parent"
     android:layout_height="match_parent"

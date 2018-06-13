@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru.tradition.locker.view.LockActivity;
 import ru.tradition.lockeymobile.subscriptions.ActivatingSubscriptionQueryUtils;
 import ru.tradition.lockeymobile.subscriptions.DeactivatingSubscriptionQueryUtils;
 import ru.tradition.lockeymobile.subscriptions.SubscriptionData;
@@ -42,7 +43,7 @@ import static ru.tradition.lockeymobile.AppData.DEACTIVATE_SUBSCRIPTION_LOADER_I
 import static ru.tradition.lockeymobile.AppData.SUBSCRIPTIONS_LOADER_ID;
 
 
-public class SubscriptionsActivity extends AppCompatActivity implements
+public class SubscriptionsActivity extends LockActivity implements
         LoaderManager.LoaderCallbacks<LoadedData> {
 
     public static boolean needToRefresh = false;

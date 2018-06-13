@@ -24,10 +24,11 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import ru.tradition.locker.view.LockActivity;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
 
-public class AssetActivity extends AppCompatActivity {
+public class AssetActivity extends LockActivity {
     private TextView kitNumber;
     private TextView regNumber;
     private TextView carModel;

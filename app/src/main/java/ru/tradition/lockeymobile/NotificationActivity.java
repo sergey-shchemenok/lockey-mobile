@@ -58,6 +58,7 @@ import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru.tradition.locker.view.LockActivity;
 import ru.tradition.lockeymobile.subscriptions.SubscriptionQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
 import ru.tradition.lockeymobile.tabs.maptab.GeofenceQueryUtils;
@@ -66,7 +67,7 @@ import ru.tradition.lockeymobile.tabs.notifications.database.NotificationContrac
 
 import static ru.tradition.lockeymobile.AppData.ZONES_LOADER_ID;
 
-public class NotificationActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
+public class NotificationActivity extends LockActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         OnMapReadyCallback {
     private final String LOG_TAG = NotificationActivity.class.getSimpleName();
     private static final int CURSOR_LOADER_ID = 1;

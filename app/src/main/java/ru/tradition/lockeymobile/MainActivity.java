@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru.tradition.locker.view.LockActivity;
 import ru.tradition.lockeymobile.tabs.AppTabAdapter;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsFragmentTab;
@@ -62,7 +63,7 @@ import static ru.tradition.lockeymobile.AppData.ZONES_LOADER_ID;
 import static ru.tradition.lockeymobile.AppData.mAssetMap;
 import static ru.tradition.lockeymobile.tabs.assetstab.AssetsQueryUtils.assetsUrlResponseMessage;
 
-public class MainActivity extends AppCompatActivity implements
+public class MainActivity extends LockActivity implements
         LoaderManager.LoaderCallbacks<LoadedData>,
         MapFragmentTab.OnFragmentInteractionListener,
         MapFragmentTabOSM.OnFragmentInteractionListener,

@@ -24,334 +24,375 @@ import ru.tradition.locker.utils.Encryptor;
 import ru.tradition.locker.utils.Locker;
 
 public class LockActivity extends AppLockerActivity {
-	public static final String TAG = "LockActivity";
+    public static final String TAG = "LockActivity";
 
-	private int type = -1;
-	private String oldPasscode = null;
+    public static boolean isReset = false;
 
-	protected EditText codeField1 = null;
-	protected EditText codeField2 = null;
-	protected EditText codeField3 = null;
-	protected EditText codeField4 = null;
-	protected InputFilter[] filters = null;
-	protected TextView tvMessage = null;
-	protected Activity mActivity;
+    public static int count = 5;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    private int type = -1;
+    private String oldPasscode = null;
 
-		setContentView(R.layout.page_passcode);
-		mActivity=this;
+    protected EditText codeField1 = null;
+    protected EditText codeField2 = null;
+    protected EditText codeField3 = null;
+    protected EditText codeField4 = null;
+    protected InputFilter[] filters = null;
+    protected TextView tvMessage = null;
+    protected TextView trials = null;
+    protected Activity mActivity;
 
-		tvMessage = (TextView) findViewById(R.id.tv_message);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		Bundle extras = getIntent().getExtras();
-		if (extras != null) {
-			String message = extras.getString(Locker.MESSAGE);
-			if (message != null) {
-				tvMessage.setText(message);
-			}
+        setContentView(R.layout.page_passcode);
+        mActivity = this;
 
-			type = extras.getInt(Locker.TYPE, -1);
-		}
+        tvMessage = (TextView) findViewById(R.id.tv_message);
+        trials = (TextView) findViewById(R.id.trials);
 
-		filters = new InputFilter[2];
-		filters[0] = new InputFilter.LengthFilter(1);
-		filters[1] = numberFilter;
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            String message = extras.getString(Locker.MESSAGE);
+            if (message != null) {
+                tvMessage.setText(message);
+            }
 
-		codeField1 = (EditText) findViewById(R.id.passcode_1);
-		setupEditText(codeField1);
+            type = extras.getInt(Locker.TYPE, -1);
+        }
 
-		codeField2 = (EditText) findViewById(R.id.passcode_2);
-		setupEditText(codeField2);
+        filters = new InputFilter[2];
+        filters[0] = new InputFilter.LengthFilter(1);
+        filters[1] = numberFilter;
 
-		codeField3 = (EditText) findViewById(R.id.passcode_3);
-		setupEditText(codeField3);
+        codeField1 = (EditText) findViewById(R.id.passcode_1);
+        setupEditText(codeField1);
 
-		codeField4 = (EditText) findViewById(R.id.passcode_4);
-		setupEditText(codeField4);
+        codeField2 = (EditText) findViewById(R.id.passcode_2);
+        setupEditText(codeField2);
 
-		// setup the keyboard
-		((Button) findViewById(R.id.button0)).setOnClickListener(btnListener);
-		((Button) findViewById(R.id.button1)).setOnClickListener(btnListener);
-		((Button) findViewById(R.id.button2)).setOnClickListener(btnListener);
-		((Button) findViewById(R.id.button3)).setOnClickListener(btnListener);
-		((Button) findViewById(R.id.button4)).setOnClickListener(btnListener);
-		((Button) findViewById(R.id.button5)).setOnClickListener(btnListener);
-		((Button) findViewById(R.id.button6)).setOnClickListener(btnListener);
-		((Button) findViewById(R.id.button7)).setOnClickListener(btnListener);
-		((Button) findViewById(R.id.button8)).setOnClickListener(btnListener);
-		((Button) findViewById(R.id.button9)).setOnClickListener(btnListener);
+        codeField3 = (EditText) findViewById(R.id.passcode_3);
+        setupEditText(codeField3);
 
-		((Button) findViewById(R.id.button_clear))
-				.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						clearFields();
-					}
-				});
+        codeField4 = (EditText) findViewById(R.id.passcode_4);
+        setupEditText(codeField4);
 
-		((Button) findViewById(R.id.button_erase))
-				.setOnClickListener(new OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						onDeleteKey();
-					}
-				});
+        // setup the keyboard
+        ((Button) findViewById(R.id.button0)).setOnClickListener(btnListener);
+        ((Button) findViewById(R.id.button1)).setOnClickListener(btnListener);
+        ((Button) findViewById(R.id.button2)).setOnClickListener(btnListener);
+        ((Button) findViewById(R.id.button3)).setOnClickListener(btnListener);
+        ((Button) findViewById(R.id.button4)).setOnClickListener(btnListener);
+        ((Button) findViewById(R.id.button5)).setOnClickListener(btnListener);
+        ((Button) findViewById(R.id.button6)).setOnClickListener(btnListener);
+        ((Button) findViewById(R.id.button7)).setOnClickListener(btnListener);
+        ((Button) findViewById(R.id.button8)).setOnClickListener(btnListener);
+        ((Button) findViewById(R.id.button9)).setOnClickListener(btnListener);
 
-		overridePendingTransition(R.anim.slide_up, R.anim.zero);
+        ((Button) findViewById(R.id.button_clear))
+                .setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        clearFields();
+                    }
+                });
 
-		switch (type) {
+        ((Button) findViewById(R.id.button_erase))
+                .setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        onDeleteKey();
+                    }
+                });
 
-		case Locker.DISABLE_PASSLOCK:
-			this.setTitle("Disable Pin");
-			break;
-		case Locker.ENABLE_PASSLOCK:
-			this.setTitle("Enable Pin");
-			break;
-		case Locker.CHANGE_PASSWORD:
-			this.setTitle("Change Pin");
-			break;
-		case Locker.UNLOCK_PASSWORD:
-			this.setTitle("Unlock Pin");
-			break;
-		}
-	}
+        overridePendingTransition(R.anim.slide_up, R.anim.zero);
 
-	public int getType() {
-		return type;
-	}
+        switch (type) {
 
-	protected void onPasscodeInputed() {
-		String passLock = codeField1.getText().toString()
-				+ codeField2.getText().toString()
-				+ codeField3.getText().toString() + codeField4.getText();
+            case Locker.DISABLE_PASSLOCK:
+                this.setTitle("Disable Pin");
+                break;
+            case Locker.ENABLE_PASSLOCK:
+                this.setTitle("Enable Pin");
+                break;
+            case Locker.CHANGE_PASSWORD:
+                this.setTitle("Change Pin");
+                break;
+            case Locker.UNLOCK_PASSWORD:
+                this.setTitle("Unlock Pin");
+                break;
+        }
+    }
 
-		codeField1.setText("");
-		codeField2.setText("");
-		codeField3.setText("");
-		codeField4.setText("");
-		codeField1.requestFocus();
+    public int getType() {
+        return type;
+    }
 
-		switch (type) {
+    protected void onPasscodeInputed() {
+        String passLock = codeField1.getText().toString()
+                + codeField2.getText().toString()
+                + codeField3.getText().toString() + codeField4.getText();
 
-		case Locker.DISABLE_PASSLOCK:
-			if (AppLocker.getInstance().getAppLock().checkPasscode(passLock)) {
-				setResult(RESULT_OK);
-				AppLocker.getInstance().getAppLock().setPasscode(null);
-				finish();
-			} else {
-				onPasscodeError();
-			}
-			break;
+        codeField1.setText("");
+        codeField2.setText("");
+        codeField3.setText("");
+        codeField4.setText("");
+        codeField1.requestFocus();
 
-		case Locker.ENABLE_PASSLOCK:
-			if (oldPasscode == null) {
-				tvMessage.setText(R.string.reenter_passcode);
-				oldPasscode = passLock;
-			} else {
-				if (passLock.equals(oldPasscode)) {
-					setResult(RESULT_OK);
-					AppLocker.getInstance().getAppLock()
-							.setPasscode(passLock);
-					finish();
-				} else {
-					oldPasscode = null;
-					tvMessage.setText(R.string.enter_passcode);
-					onPasscodeError();
-				}
-			}
-			break;
+        switch (type) {
 
-		case Locker.CHANGE_PASSWORD:
-			if (AppLocker.getInstance().getAppLock().checkPasscode(passLock)) {
-				tvMessage.setText(R.string.enter_passcode);
-				type = Locker.ENABLE_PASSLOCK;
-			} else {
-				onPasscodeError();
-			}
-			break;
+            case Locker.DISABLE_PASSLOCK:
+                if (AppLocker.getInstance().getAppLock().checkPasscode(passLock)) {
+                    count = 5;
+                    setResult(RESULT_OK);
+                    AppLocker.getInstance().getAppLock().setPasscode(null);
+                    finish();
+                } else {
+                    onPasscodeError();
+                    onPasscodeErrorNext();
+                }
+                break;
 
-		case Locker.UNLOCK_PASSWORD:
-			if (AppLocker.getInstance().getAppLock().checkPasscode(passLock)) {
-				setResult(RESULT_OK);
-				finish();
-			} else {
-				onPasscodeError();
-			}
-			break;
+            case Locker.ENABLE_PASSLOCK:
+                if (oldPasscode == null) {
+                    tvMessage.setText(R.string.reenter_passcode);
+                    oldPasscode = passLock;
+                    trials.setText("");
+                } else {
+                    if (passLock.equals(oldPasscode)) {
+                        count = 5;
+                        setResult(RESULT_OK);
+                        AppLocker.getInstance().getAppLock()
+                                .setPasscode(passLock);
+                        finish();
+                    } else {
+                        oldPasscode = null;
+                        tvMessage.setText(R.string.enter_passcode);
+                        onPasscodeError();
+                        trials.setText("Пароли не совпадают. Введите повторно.");
+                    }
+                }
+                break;
 
-		default:
-			break;
-		}
-	}
+            case Locker.CHANGE_PASSWORD:
+                if (AppLocker.getInstance().getAppLock().checkPasscode(passLock)) {
+                    count = 5;
+                    tvMessage.setText(R.string.enter_passcode);
+                    type = Locker.ENABLE_PASSLOCK;
+                } else {
+                    onPasscodeError();
+                    onPasscodeErrorNext();
+                }
+                break;
 
-	@Override
-	public void onBackPressed() {
-		if (type == Locker.UNLOCK_PASSWORD) {
-			// back to home screen
-			Intent intent = new Intent();
-			intent.setAction(Intent.ACTION_MAIN);
-			intent.addCategory(Intent.CATEGORY_HOME);
-			this.startActivity(intent);
-			finish();
-		} else {
-			finish();
-		}
-	}
+            case Locker.UNLOCK_PASSWORD:
+                if (AppLocker.getInstance().getAppLock().checkPasscode(passLock)) {
+                    count = 5;
+                    setResult(RESULT_OK);
+                    finish();
+                } else {
+                    onPasscodeError();
+                    onPasscodeErrorNext();
+                }
+                break;
 
-	protected void setupEditText(EditText editText) {
-		editText.setInputType(InputType.TYPE_NULL);
-		editText.setFilters(filters);
-		editText.setOnTouchListener(touchListener);
-		editText.setTransformationMethod(PasswordTransformationMethod
-				.getInstance());
-	}
+            default:
+                break;
+        }
+    }
 
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_DEL) {
-			onDeleteKey();
-			return true;
-		}
-		return super.onKeyDown(keyCode, event);
-	}
+    private void onPasscodeErrorNext() {
+        count--;
+        if (count == 0) {
+            count = 5;
+            isReset = true;
+            //todo later
+            AppLocker.getInstance().getAppLock().setPasscode(null);
+            finish();
+        }
+        if (count != 5 && count != 1)
+            trials.setText("Осталось " + count + " попытки.");
+        else if (count != 5)
+            trials.setText("Осталось " + count + " попытка.");
+    }
 
-	private void onDeleteKey() {
-		if (codeField1.isFocused()) {
+    @Override
+    public void onBackPressed() {
+        if (type == Locker.UNLOCK_PASSWORD) {
+            // back to home screen
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            this.startActivity(intent);
+            finish();
+        } else {
+            finish();
+        }
+    }
 
-		} else if (codeField2.isFocused()) {
-			codeField1.requestFocus();
-			codeField1.setText("");
-		} else if (codeField3.isFocused()) {
-			codeField2.requestFocus();
-			codeField2.setText("");
-		} else if (codeField4.isFocused()) {
-			codeField3.requestFocus();
-			codeField3.setText("");
-		}
-	}
+    @Override
+    protected void onUserLeaveHint() {
+        if (type == Locker.ENABLE_PASSLOCK ||
+                type == Locker.DISABLE_PASSLOCK ||
+                type == Locker.CHANGE_PASSWORD) {
+            finish();
+        }
+        super.onUserLeaveHint();
+    }
 
-	private OnClickListener btnListener = new OnClickListener() {
-		@Override
-		public void onClick(View view) {
-			int currentValue = -1;
-			int id = view.getId();
-			if (id == R.id.button0) {
-				currentValue = 0;
-			} else if (id == R.id.button1) {
-				currentValue = 1;
-			} else if (id == R.id.button2) {
-				currentValue = 2;
-			} else if (id == R.id.button3) {
-				currentValue = 3;
-			} else if (id == R.id.button4) {
-				currentValue = 4;
-			} else if (id == R.id.button5) {
-				currentValue = 5;
-			} else if (id == R.id.button6) {
-				currentValue = 6;
-			} else if (id == R.id.button7) {
-				currentValue = 7;
-			} else if (id == R.id.button8) {
-				currentValue = 8;
-			} else if (id == R.id.button9) {
-				currentValue = 9;
-			} else {
-			}
 
-			// set the value and move the focus
-			String currentValueString = String.valueOf(currentValue);
-			if (codeField1.isFocused()) {
-				codeField1.setText(currentValueString);
-				codeField2.requestFocus();
-				codeField2.setText("");
-			} else if (codeField2.isFocused()) {
-				codeField2.setText(currentValueString);
-				codeField3.requestFocus();
-				codeField3.setText("");
-			} else if (codeField3.isFocused()) {
-				codeField3.setText(currentValueString);
-				codeField4.requestFocus();
-				codeField4.setText("");
-			} else if (codeField4.isFocused()) {
-				codeField4.setText(currentValueString);
-			}
+    protected void setupEditText(EditText editText) {
+        editText.setInputType(InputType.TYPE_NULL);
+        editText.setFilters(filters);
+        editText.setOnTouchListener(touchListener);
+        editText.setTransformationMethod(PasswordTransformationMethod
+                .getInstance());
+    }
 
-			if (codeField4.getText().toString().length() > 0
-					&& codeField3.getText().toString().length() > 0
-					&& codeField2.getText().toString().length() > 0
-					&& codeField1.getText().toString().length() > 0) {
-				onPasscodeInputed();
-			}
-		}
-	};
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_DEL) {
+            onDeleteKey();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
-	protected void onPasscodeError() {
-		Encryptor.snackPeak(mActivity,getString(R.string.passcode_wrong));
+    private void onDeleteKey() {
+        if (codeField1.isFocused()) {
 
-		Thread thread = new Thread() {
-			public void run() {
-				Animation animation = AnimationUtils.loadAnimation(
-						LockActivity.this, R.anim.shake);
-				findViewById(R.id.ll_applock).startAnimation(animation);
-				codeField1.setText("");
-				codeField2.setText("");
-				codeField3.setText("");
-				codeField4.setText("");
-				codeField1.requestFocus();
-			}
-		};
-		runOnUiThread(thread);
-	}
+        } else if (codeField2.isFocused()) {
+            codeField1.requestFocus();
+            codeField1.setText("");
+        } else if (codeField3.isFocused()) {
+            codeField2.requestFocus();
+            codeField2.setText("");
+        } else if (codeField4.isFocused()) {
+            codeField3.requestFocus();
+            codeField3.setText("");
+        }
+    }
 
-	private InputFilter numberFilter = new InputFilter() {
-		@Override
-		public CharSequence filter(CharSequence source, int start, int end,
+    private OnClickListener btnListener = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            int currentValue = -1;
+            int id = view.getId();
+            if (id == R.id.button0) {
+                currentValue = 0;
+            } else if (id == R.id.button1) {
+                currentValue = 1;
+            } else if (id == R.id.button2) {
+                currentValue = 2;
+            } else if (id == R.id.button3) {
+                currentValue = 3;
+            } else if (id == R.id.button4) {
+                currentValue = 4;
+            } else if (id == R.id.button5) {
+                currentValue = 5;
+            } else if (id == R.id.button6) {
+                currentValue = 6;
+            } else if (id == R.id.button7) {
+                currentValue = 7;
+            } else if (id == R.id.button8) {
+                currentValue = 8;
+            } else if (id == R.id.button9) {
+                currentValue = 9;
+            } else {
+            }
+
+            // set the value and move the focus
+            String currentValueString = String.valueOf(currentValue);
+            if (codeField1.isFocused()) {
+                codeField1.setText(currentValueString);
+                codeField2.requestFocus();
+                codeField2.setText("");
+            } else if (codeField2.isFocused()) {
+                codeField2.setText(currentValueString);
+                codeField3.requestFocus();
+                codeField3.setText("");
+            } else if (codeField3.isFocused()) {
+                codeField3.setText(currentValueString);
+                codeField4.requestFocus();
+                codeField4.setText("");
+            } else if (codeField4.isFocused()) {
+                codeField4.setText(currentValueString);
+            }
+
+            if (codeField4.getText().toString().length() > 0
+                    && codeField3.getText().toString().length() > 0
+                    && codeField2.getText().toString().length() > 0
+                    && codeField1.getText().toString().length() > 0) {
+                onPasscodeInputed();
+            }
+        }
+    };
+
+    protected void onPasscodeError() {
+        Encryptor.snackPeak(mActivity, getString(R.string.passcode_wrong));
+
+        Thread thread = new Thread() {
+            public void run() {
+                Animation animation = AnimationUtils.loadAnimation(
+                        LockActivity.this, R.anim.shake);
+                findViewById(R.id.ll_applock).startAnimation(animation);
+                codeField1.setText("");
+                codeField2.setText("");
+                codeField3.setText("");
+                codeField4.setText("");
+                codeField1.requestFocus();
+            }
+        };
+        runOnUiThread(thread);
+    }
+
+    private InputFilter numberFilter = new InputFilter() {
+        @Override
+        public CharSequence filter(CharSequence source, int start, int end,
                                    Spanned dest, int dstart, int dend) {
 
-			if (source.length() > 1) {
-				return "";
-			}
+            if (source.length() > 1) {
+                return "";
+            }
 
-			if (source.length() == 0) // erase
-			{
-				return null;
-			}
+            if (source.length() == 0) // erase
+            {
+                return null;
+            }
 
-			try {
-				int number = Integer.parseInt(source.toString());
-				if ((number >= 0) && (number <= 9))
-					return String.valueOf(number);
-				else
-					return "";
-			} catch (NumberFormatException e) {
-				return "";
-			}
-		}
-	};
+            try {
+                int number = Integer.parseInt(source.toString());
+                if ((number >= 0) && (number <= 9))
+                    return String.valueOf(number);
+                else
+                    return "";
+            } catch (NumberFormatException e) {
+                return "";
+            }
+        }
+    };
 
-	private OnTouchListener touchListener = new OnTouchListener() {
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			v.performClick();
-			clearFields();
-			return false;
-		}
-	};
+    private OnTouchListener touchListener = new OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            v.performClick();
+            clearFields();
+            return false;
+        }
+    };
 
-	private void clearFields() {
-		codeField1.setText("");
-		codeField2.setText("");
-		codeField3.setText("");
-		codeField4.setText("");
+    private void clearFields() {
+        codeField1.setText("");
+        codeField2.setText("");
+        codeField3.setText("");
+        codeField4.setText("");
 
-		codeField1.postDelayed(new Runnable() {
+        codeField1.postDelayed(new Runnable() {
 
-			@Override
-			public void run() {
-				codeField1.requestFocus();
-			}
-		}, 200);
-	}
+            @Override
+            public void run() {
+                codeField1.requestFocus();
+            }
+        }, 200);
+    }
 }

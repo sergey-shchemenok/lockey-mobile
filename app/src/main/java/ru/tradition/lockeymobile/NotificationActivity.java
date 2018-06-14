@@ -58,6 +58,7 @@ import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru.tradition.locker.utils.Locker;
 import ru.tradition.locker.view.LockActivity;
 import ru.tradition.lockeymobile.subscriptions.SubscriptionQueryUtils;
 import ru.tradition.lockeymobile.tabs.maptab.GeofencePolygon;
@@ -134,6 +135,7 @@ public class NotificationActivity extends LockActivity implements LoaderManager.
         if (usr.equals("") || pwd.equals("")
 //                || AppData.isAuthorized == false
                 ) {
+            Locker.setShouldBeLocked(false);
             Intent intent = new Intent(this, AuthActivity.class);
             intent.putExtra("hasCredentials", false);
             startActivity(intent);
@@ -595,6 +597,9 @@ public class NotificationActivity extends LockActivity implements LoaderManager.
     @Override
     protected void onResume() {
         super.onResume();
+        if (isReset){
+            logout();
+        }
         if (AppData.mPolygonsMap == null || AppData.mPolygonsMap.isEmpty()) {
             if (zid != -1)
                 startUpdater(zid, context);

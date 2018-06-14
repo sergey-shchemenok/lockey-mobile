@@ -106,6 +106,23 @@ public class SettingsActivity extends LockActivity implements View.OnClickListen
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isReset){
+            logout();
+        }
+    }
+
+    public void logout() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        Intent intent = new Intent(this, AuthActivity.class);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(AppData.PWD_PREFERENCES, "");
+        editor.putString(AppData.USR_PREFERENCES, "");
+        editor.commit();
+        startActivity(intent);
+    }
 
     public static class LockeyMobilePreferenceFragment extends PreferenceFragment
             implements Preference.OnPreferenceChangeListener {

@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru.tradition.locker.utils.Locker;
 import ru.tradition.locker.view.LockActivity;
 import ru.tradition.lockeymobile.subscriptions.ActivatingSubscriptionQueryUtils;
 import ru.tradition.lockeymobile.subscriptions.DeactivatingSubscriptionQueryUtils;
@@ -83,6 +84,7 @@ public class SubscriptionsActivity extends LockActivity implements
         if (usr.equals("") || pwd.equals("")
 //                ||AppData.isAuthorized == false
                 ) {
+            Locker.setShouldBeLocked(false);
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
         }
@@ -167,6 +169,9 @@ public class SubscriptionsActivity extends LockActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        if (isReset){
+            logout();
+        }
         startUpdater();
     }
 

@@ -28,6 +28,7 @@ import org.osmdroid.util.GeoPoint;
 import java.net.HttpURLConnection;
 
 import ru.tradition.locker.utils.Locker;
+import ru.tradition.locker.view.LockActivity;
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
 import ru.tradition.lockeymobile.auth.AuthTokenLoader;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
@@ -42,6 +43,8 @@ public class AuthActivity extends AppCompatActivity
     private EditText loginView;
     private EditText passwordView;
     private Button loginButton;
+
+    private static boolean isReset = false;
 
     private SharedPreferences preferences;
 
@@ -65,6 +68,9 @@ public class AuthActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        isReset = LockActivity.isReset;
+        Locker.setShouldBeLocked(false);
+        LockActivity.isReset = false;
 
 //        int badgeCount = 0;
 //        ShortcutBadger.applyCount(this, badgeCount); //for 1.1.4+
@@ -180,6 +186,11 @@ public class AuthActivity extends AppCompatActivity
             }
         });
 
+        if (isReset){
+            infoMessage.setVisibility(View.VISIBLE);
+            infoMessage.setText("ПИН-код отключен");
+            isReset = false;
+        }
     }
 
     private NotificationsData getNotificationData() {
@@ -287,7 +298,6 @@ public class AuthActivity extends AppCompatActivity
         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
 //        AppData.isAuthorized = true;
         intent.putExtra("page", page);
-        Locker.setShouldBeLocked(false);
         startActivity(intent);
     }
 

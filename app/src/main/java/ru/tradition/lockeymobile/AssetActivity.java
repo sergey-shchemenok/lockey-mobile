@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import ru.tradition.locker.utils.Locker;
 import ru.tradition.locker.view.LockActivity;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsFragmentTab;
@@ -57,6 +58,7 @@ public class AssetActivity extends LockActivity {
         if (usr.equals("") || pwd.equals("")
 //                || AppData.isAuthorized == false
                 ) {
+            Locker.setShouldBeLocked(false);
             Intent intent = new Intent(this, AuthActivity.class);
             intent.putExtra("hasCredentials", false);
             startActivity(intent);
@@ -130,6 +132,13 @@ public class AssetActivity extends LockActivity {
         Log.i("AssetActivity", "starting asset activity...");
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isReset){
+            logout();
+        }
+    }
 
     /**
      * Setup the dropdown spinner that allows the user to select the command.

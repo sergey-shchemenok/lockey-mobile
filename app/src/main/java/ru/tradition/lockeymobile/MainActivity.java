@@ -110,6 +110,7 @@ public class MainActivity extends LockActivity implements
 
         //go to auth activity
         if (usr.equals("") || pwd.equals("")) {
+            Locker.setShouldBeLocked(false);
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
             Log.i(LOG_TAG, ".............no credentials");
@@ -117,7 +118,6 @@ public class MainActivity extends LockActivity implements
         }
 
         AppData.mainActivity = this;
-        Locker.setShouldBeLocked(true);
 
         setContentView(R.layout.activity_main);
 
@@ -672,6 +672,10 @@ public class MainActivity extends LockActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        if (isReset){
+            logout();
+        }
+        Locker.setShouldBeLocked(true);
         startMainDataUpdater();
     }
 
@@ -689,5 +693,4 @@ public class MainActivity extends LockActivity implements
         AlertDialog alert = builder.create();
         alert.show();
     }
-
 }

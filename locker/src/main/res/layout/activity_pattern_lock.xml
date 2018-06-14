@@ -17,3 +17,6 @@
     app:lineWidth="8dp"
     ></com.balram.locker.view.PatternLockView>
 </LinearLayout>
+
+    <!--app:lineColor="#ff006699"-->
+

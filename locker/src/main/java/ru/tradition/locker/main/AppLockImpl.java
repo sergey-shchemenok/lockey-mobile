@@ -126,7 +126,7 @@ public class AppLockImpl extends Locker implements PageListener {
 			return false;
 		}
 
-		return true;
+		return shouldBeLocked;
 	}
 
 	@Override

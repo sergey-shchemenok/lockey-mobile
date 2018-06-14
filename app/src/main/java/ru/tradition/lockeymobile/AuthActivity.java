@@ -27,6 +27,7 @@ import org.osmdroid.util.GeoPoint;
 
 import java.net.HttpURLConnection;
 
+import ru.tradition.locker.utils.Locker;
 import ru.tradition.lockeymobile.auth.AuthQueryUtils;
 import ru.tradition.lockeymobile.auth.AuthTokenLoader;
 import ru.tradition.lockeymobile.tabs.notifications.NotificationsData;
@@ -286,6 +287,7 @@ public class AuthActivity extends AppCompatActivity
         Intent intent = new Intent(AuthActivity.this, MainActivity.class);
 //        AppData.isAuthorized = true;
         intent.putExtra("page", page);
+        Locker.setShouldBeLocked(false);
         startActivity(intent);
     }
 

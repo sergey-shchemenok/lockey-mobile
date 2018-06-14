@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru.tradition.locker.utils.Locker;
 import ru.tradition.locker.view.LockActivity;
 import ru.tradition.lockeymobile.tabs.AppTabAdapter;
 import ru.tradition.lockeymobile.tabs.assetstab.AssetsData;
@@ -116,6 +117,7 @@ public class MainActivity extends LockActivity implements
         }
 
         AppData.mainActivity = this;
+        Locker.setShouldBeLocked(true);
 
         setContentView(R.layout.activity_main);
 

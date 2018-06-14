@@ -18,6 +18,8 @@ public abstract class Locker {
 
 	public static final int DEFAULT_TIMEOUT = 5000; // 2000ms
 
+	public static boolean shouldBeLocked = true;
+
 	protected int lockTimeOut;
 	protected HashSet<String> ignoredActivities;
 
@@ -38,6 +40,10 @@ public abstract class Locker {
 	public void removeIgnoredActivity(Class<?> clazz) {
 		String clazzName = clazz.getName();
 		this.ignoredActivities.remove(clazzName);
+	}
+
+	public static void setShouldBeLocked(boolean shouldBeLocked) {
+		Locker.shouldBeLocked = shouldBeLocked;
 	}
 
 	public abstract void enable();
